@@ -137,8 +137,8 @@ class FormController extends Controller
 
 
         $productionLine = DB::table('ole_pos')
-            ->join('ole_assignement_team_po', 'ole_assignement_team_po.po', '=', 'ole_pos.number')
-            ->join('ole_productionline', 'ole_productionline.id', '=', 'ole_assignement_team_po.productionline')
+            ->join('ole_assignement_team_pos', 'ole_assignement_team_pos.po', '=', 'ole_pos.number')
+            ->join('ole_productionline', 'ole_productionline.id', '=', 'ole_assignement_team_pos.productionline')
             ->select('ole_productionline.productionline_name', 'ole_productionline.worksiteID' )
             ->get();
 
