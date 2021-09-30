@@ -1,0 +1,162 @@
+<template>
+    <div >
+        <div align="center" class="productionName rcorners2">
+            <template v-if="downtimeType === 'unplannedDowntime'">
+                Arrêt de production non planifié
+            </template>
+            <template v-else>
+                Arrêt de production planifié
+            </template>
+        </div>
+
+        <br/>
+
+
+        <div class="row" align="center">
+
+                <div class="col-sm-4" v-for="reason in downtimeReasons">
+                    <button
+                        class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info"
+                        type="button" @click.prevent="setReasonDowntime(reason.reason)">
+                        {{reason.reason}}
+                    </button>
+
+                </div>
+
+
+
+        </div>
+
+
+        <br/>
+
+        <div align="left">
+            <button type="button" class="btn btn-danger" @click.prevent="backPage()">
+                Retour
+            </button>
+        </div>
+    </div>
+
+</template>
+
+<script>
+    import {mapGetters} from 'vuex';
+
+    export default {
+
+        name: "unplanned_pannel1",
+
+
+        data(){
+            return {
+                url : sessionStorage.getItem("url"),
+                productionName : sessionStorage.getItem("productionName"),
+                downtimeType : sessionStorage.getItem("downtimeType"),
+                parameters : [],
+            }
+        },
+
+        methods:{
+
+            setReasonDowntime : function (reasonDowntime) {
+
+                console.log('YOUHOU : ' + reasonDowntime);
+                if(sessionStorage.getItem("reasonDowntime") === null){
+                    sessionStorage.reasonDowntime = reasonDowntime;
+                }else{
+                    sessionStorage.setItem("reasonDowntime",reasonDowntime);
+                }
+
+                switch (reasonDowntime) {
+
+                    case "CIP":
+                        window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/CIP';
+                        break;
+
+                    case "Changement de format":
+                        window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/changingFormat';
+                        break;
+
+                    case "Changement de numero de lot":
+                        window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/clientChanging';
+                        break;
+
+                    case "Arret non planifie":
+                        window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/unplannedDowntime';
+                        break;
+
+                    default :
+                        window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/' + reasonDowntime;
+                        break;
+
+                }
+
+
+
+
+
+
+            },
+
+            backPage : function () {
+                window.location.href = this.url + 'summary/' + this.productionName;
+            }
+
+
+        },
+
+        mounted() {
+
+            console.log('ICI : ' + this.downtimeType);
+            this.parameters.push(this.productionName);
+            this.parameters.push(this.downtimeType);
+            this.$store.dispatch('fetchDowntimeReason', this.parameters);
+
+        },
+
+        computed: {
+            ...mapGetters([
+                'downtimeReasons',
+            ])
+        }
+    }
+
+
+</script>
+
+<style scoped>
+
+
+    .productionName{
+        left:0;
+        top:0;
+        min-width: 150px;
+        max-width: 250px;
+
+        margin-bottom: 50px;
+    }
+    .rcorners1{
+        border-radius: 25px;
+        background: lightblue;
+        padding: 20px;
+        margin-bottom: 30px;
+        width: 180px;
+
+    }
+
+
+    .rcorners2 {
+        border-radius: 25px;
+        border: 2px solid lightblue;
+        padding: 20px;
+    }
+
+    #summary{
+        padding: 40px;
+    }
+
+    button{
+        color: white;
+        margin-top: 20px;
+    }
+</style>

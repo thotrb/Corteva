@@ -1,0 +1,110 @@
+let mutations = {
+
+
+    FETCH_USER(state, user) {
+
+        return state.user = user
+    },
+
+    FETCH_EVENTS1(state, events) {
+
+        return state.events1 = events;
+    },
+
+    FETCH_EVENTS2(state, events) {
+
+        return state.events2 = events;
+    },
+
+    FETCH_PO(state, pos) {
+
+        return state.pos = pos;
+    },
+
+    FETCH_WORKSITEID(state, id) {
+
+        return state.worksiteID = id;
+    },
+
+    FETCH_PRODUCTIONLINEID(state, id) {
+
+        return state.productionlineID = id;
+    },
+
+    FETCH_DOWNTIME_REASONS(state, downtimeReasons){
+
+        return state.downtimeReasons = downtimeReasons;
+    },
+
+    FETCH_DOWNTIME_REASONS_2(state, downtimeReasons_2){
+
+        return state.downtimeReasons_2 = downtimeReasons_2;
+    },
+
+    FETCH_SPEEDLOSSES(state, speedLoss){
+
+        return state.speedLoss = speedLoss;
+    },
+
+
+    FETCH_DOWNTIME_REASONS_MACHINE_ISSUE(state, machineIssue){
+        return state.machineIssue = machineIssue;
+    },
+
+    CREATE_PO(state, POs){
+        state.PO.unshift(POs);
+    },
+
+    FETCH_SITES(state, sites){
+        return state.sites = sites;
+    },
+
+    FETCH_MACHINES(state, machines){
+        return state.machines = machines;
+    },
+
+
+    CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent){
+        state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
+    },
+
+
+    CREATE_UNPLANNEDEVENT_CHANGINGFORMAT(state, unplannedEvent) {
+        state.unplannedEvent_ChangingFormat.unshift(unplannedEvent)
+    },
+
+    CREATE_UNPLANNEDEVENT_CLIENTCHANGING(state, unplannedEvent) {
+        state.unplannedEvent_ClientChanging.unshift(unplannedEvent)
+    },
+
+    CREATE_ASSIGNATION(state, assignation) {
+        state.assignation.unshift(assignation)
+    },
+
+    CREATE_UNPLANNEDEVENT_CIP(state, unplannedEvent) {
+        state.unplannedEvent_CIP.unshift(unplannedEvent)
+    },
+
+    CREATE_PLANNEDEVENT(state, plannedEvent) {
+        state.plannedEvent.unshift(plannedEvent)
+    },
+
+    CREATE_SPEEDLOSS(state, speedLoss) {
+        state.speedLoss.unshift(speedLoss)
+    },
+
+    STOP_PO(state, PO) {
+        state.PO.unshift(PO)
+    },
+
+    RETREIVETOKEN(state, token) {
+        state.token = token;
+    },
+
+
+
+
+
+
+};
+export default mutations
