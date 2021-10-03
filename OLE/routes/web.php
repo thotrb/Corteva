@@ -31,6 +31,7 @@ Route::get('/teamInfo', \App\Http\Controllers\FormController::class.'@index');
 
 Route::get('/packagingLineID', \App\Http\Controllers\FormController::class.'@indexAdmin');
 
+Route::get('/downtimesReport', \App\Http\Controllers\FormController::class.'@downtimesReport');
 
 
 Route::get('/summary', \App\Http\Controllers\FormController::class.'@summary');

@@ -23,6 +23,10 @@ let getters = {
       return state.sites;
     },
 
+    allEvents : state =>{
+        return state.allEvents;
+    },
+
 
     machines : state => {
         return state.machines;

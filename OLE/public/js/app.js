@@ -2686,6 +2686,461 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "downtimesReport",
+  data: function data() {
+    return {
+      site: '',
+      productionline: '',
+      product: '',
+      formulationType: '',
+      reporting: '',
+      tool: '',
+      beginningDate: '',
+      endingDate: '',
+      username: sessionStorage.getItem("username"),
+      index: -1,
+      show: 0
+    };
+  },
+  methods: {
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
+                  _context.next = 13;
+                  break;
+                }
+
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(this.beginningDate);
+                tab.push(this.endingDate);
+                this.$store.dispatch('fecthAllEvents', tab);
+                _context.next = 11;
+                return this.resolveAfter15Second();
+
+              case 11:
+                this.index = index;
+                this.show = 1;
+
+              case 13:
+                console.log(this.productionline);
+                console.log(this.beginningDate);
+                console.log(this.endingDate);
+
+              case 16:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.$store.dispatch('fetchSites');
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("startingPO").setAttribute("max", today);
+    document.getElementById("endingPO").setAttribute("max", today);
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=script&lang=js&":
 /*!************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=script&lang=js& ***!
@@ -3293,7 +3748,7 @@ var today = new Date();
       return new Promise(function (resolve) {
         setTimeout(function () {
           resolve('resolved');
-        }, 500);
+        }, 1000);
       });
     },
     validateInformations: function () {
@@ -3415,26 +3870,50 @@ var today = new Date();
 
       return validateInformations;
     }(),
-    confirmSpeedloss: function confirmSpeedloss() {
-      var responses = document.getElementsByClassName('response');
-      var reason = '';
+    confirmSpeedloss: function () {
+      var _confirmSpeedloss = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var responses, reason, i, comment;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                responses = document.getElementsByClassName('response');
+                reason = '';
 
-      for (var i = 0; i < responses.length; i++) {
-        if (responses[i].checked) {
-          reason = responses[i].value;
-        }
+                for (i = 0; i < responses.length; i++) {
+                  if (responses[i].checked) {
+                    reason = responses[i].value;
+                  }
 
-        responses[i].setAttribute('disabled', 'disabled');
+                  responses[i].setAttribute('disabled', 'disabled');
+                }
+
+                comment = document.getElementById('comments').value;
+                this.speedLossEvent.comment = comment;
+                this.speedLossEvent.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
+                this.speedLossEvent.reason = reason;
+                console.log(this.speedLossEvent);
+                this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
+                _context3.next = 11;
+                return this.resolveAfter1Second();
+
+              case 11:
+                window.location.reload();
+
+              case 12:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function confirmSpeedloss() {
+        return _confirmSpeedloss.apply(this, arguments);
       }
 
-      var comment = document.getElementById('comments').value;
-      this.speedLossEvent.comment = comment;
-      this.speedLossEvent.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
-      this.speedLossEvent.reason = reason;
-      console.log(this.speedLossEvent);
-      this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
-      window.location.reload();
-    }
+      return confirmSpeedloss;
+    }()
   },
   mounted: function mounted() {
     var tab = [];
@@ -3569,20 +4048,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbar",
   data: function data() {
@@ -3593,7 +4058,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     nextPage: function nextPage() {
-      console.log(this.url + this.selection); //window.location.href = this.url + this.s;
+      console.log(this.url + this.selection);
+      window.location.href = this.url + this.selection;
     }
   }
 });
@@ -3868,10 +4334,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       if (this.productionline !== '') {
         this.$store.dispatch('fetchMachines', index);
+        this.index = index;
+        this.show = 1;
       }
-
-      this.index = index;
-      this.show = 1;
     }
   },
   mounted: function mounted() {
@@ -5268,6 +5733,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js"
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('navbar', __webpack_require__(/*! ./components/navbar.vue */ "./resources/js/components/navbar.vue").default);
+Vue.component('downtimesReport', __webpack_require__(/*! ./components/downtimesReport.vue */ "./resources/js/components/downtimesReport.vue").default);
 Vue.component('packagingID', __webpack_require__(/*! ./components/packagingLineID.vue */ "./resources/js/components/packagingLineID.vue").default);
 Vue.component('choiceLogin', __webpack_require__(/*! ./components/choiceLogin.vue */ "./resources/js/components/choiceLogin.vue").default);
 Vue.component('login', __webpack_require__(/*! ./components/login.vue */ "./resources/js/components/login.vue").default);
@@ -5391,8 +5857,20 @@ var actions = {
       console.log(err);
     });
   },
-  fetchEvents: function fetchEvents(_ref4, parameters) {
+  fecthAllEvents: function fecthAllEvents(_ref4, parameters) {
     var commit = _ref4.commit;
+    var site = parameters[0];
+    var productionLine = parameters[1];
+    var beginningDate = parameters[2];
+    var endingDate = parameters[3];
+    axios.get("/api/allevents/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate)).then(function (res) {
+      commit('FETCH_ALL_EVENTS', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  fetchEvents: function fetchEvents(_ref5, parameters) {
+    var commit = _ref5.commit;
     axios.get("/api/events/".concat(parameters[1], "/").concat(parameters[2])).then(function (res) {
       //console.log(res.data);
       if (parameters[0] === 1) {
@@ -5404,8 +5882,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchPO: function fetchPO(_ref5, parameters) {
-    var commit = _ref5.commit;
+  fetchPO: function fetchPO(_ref6, parameters) {
+    var commit = _ref6.commit;
     axios.get("/api/pos/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       //console.log(res.data);
       commit('FETCH_PO', res.data);
@@ -5413,16 +5891,16 @@ var actions = {
       console.log(err);
     });
   },
-  fetchSpeedLosses: function fetchSpeedLosses(_ref6, parameters) {
-    var commit = _ref6.commit;
+  fetchSpeedLosses: function fetchSpeedLosses(_ref7, parameters) {
+    var commit = _ref7.commit;
     axios.get("/api/speedLosses/".concat(parameters[1], "/").concat(parameters[0])).then(function (res) {
       commit('FETCH_SPEEDLOSSES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchDowntimeReason: function fetchDowntimeReason(_ref7, parameters) {
-    var commit = _ref7.commit;
+  fetchDowntimeReason: function fetchDowntimeReason(_ref8, parameters) {
+    var commit = _ref8.commit;
     axios.get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS', res.data);
@@ -5430,8 +5908,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref8, parameters) {
-    var commit = _ref8.commit;
+  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref9, parameters) {
+    var commit = _ref9.commit;
     axios.get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
       console.log('Je passe ici');
       console.log(res.data);
@@ -5440,8 +5918,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref9, machineName) {
-    var commit = _ref9.commit;
+  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref10, machineName) {
+    var commit = _ref10.commit;
     axios.get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_MACHINE_ISSUE', res.data);
@@ -5449,32 +5927,32 @@ var actions = {
       console.log(err);
     });
   },
-  getWorksiteID: function getWorksiteID(_ref10, worksite) {
-    var commit = _ref10.commit;
+  getWorksiteID: function getWorksiteID(_ref11, worksite) {
+    var commit = _ref11.commit;
     axios.get("/api/worksiteID/".concat(worksite)).then(function (res) {
       commit('FETCH_WORKSITEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getProductionlineID: function getProductionlineID(_ref11, productionline) {
-    var commit = _ref11.commit;
+  getProductionlineID: function getProductionlineID(_ref12, productionline) {
+    var commit = _ref12.commit;
     axios.get("/api/productionlineID/".concat(productionline)).then(function (res) {
       commit('FETCH_PRODUCTIONLINEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkAssignation: function checkAssignation(_ref12, assignation) {
-    var commit = _ref12.commit;
+  checkAssignation: function checkAssignation(_ref13, assignation) {
+    var commit = _ref13.commit;
     axios.get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref13, potab) {
-    var commit = _ref13.commit;
+  create_PO: function create_PO(_ref14, potab) {
+    var commit = _ref14.commit;
 
     for (var i = 0; i < potab.length; i++) {
       axios.post("/api/PO", potab[i]).then(function (res) {
@@ -5484,64 +5962,64 @@ var actions = {
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref14, assignation) {
-    var commit = _ref14.commit;
+  storeAssignation: function storeAssignation(_ref15, assignation) {
+    var commit = _ref15.commit;
     axios.post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref15, event) {
-    var commit = _ref15.commit;
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref16, event) {
+    var commit = _ref16.commit;
     axios.post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref16, event) {
-    var commit = _ref16.commit;
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref17, event) {
+    var commit = _ref17.commit;
     axios.post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref17, event) {
-    var commit = _ref17.commit;
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref18, event) {
+    var commit = _ref18.commit;
     axios.post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref18, event) {
-    var commit = _ref18.commit;
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref19, event) {
+    var commit = _ref19.commit;
     axios.post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref19, event) {
-    var commit = _ref19.commit;
+  create_plannedEvent: function create_plannedEvent(_ref20, event) {
+    var commit = _ref20.commit;
     axios.post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref20, PONumber) {
-    var commit = _ref20.commit;
+  stop_PO: function stop_PO(_ref21, PONumber) {
+    var commit = _ref21.commit;
     axios.post("/api/stopPO/".concat(PONumber), PONumber).then(function (res) {
       commit('STOP_PO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref21, event) {
-    var commit = _ref21.commit;
+  create_SpeedLoss: function create_SpeedLoss(_ref22, event) {
+    var commit = _ref22.commit;
     axios.post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
@@ -5579,6 +6057,9 @@ var getters = {
   },
   sites: function sites(state) {
     return state.sites;
+  },
+  allEvents: function allEvents(state) {
+    return state.allEvents;
   },
   machines: function machines(state) {
     return state.machines;
@@ -5702,6 +6183,9 @@ var mutations = {
   FETCH_MACHINES: function FETCH_MACHINES(state, machines) {
     return state.machines = machines;
   },
+  FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
+    return state.allEvents = events;
+  },
   CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME: function CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent) {
     state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
   },
@@ -5763,6 +6247,7 @@ var state = {
   assignation: [],
   PO: [],
   machines: [],
+  allEvents: [],
   worksiteID: -1,
   productionlineID: -1,
   token: localStorage.getItem('access_token')
@@ -10326,6 +10811,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-3ec6ef7d] {\n    left: 0;\n    top: 0;\n    max-width: 150px;\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-3ec6ef7d] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-3ec6ef7d] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n#summary[data-v-3ec6ef7d] {\n    padding: 40px;\n}\nbutton[data-v-3ec6ef7d] {\n    color: white;\n    margin-top: 20px;\n}\n.table-info-data[data-v-3ec6ef7d] {\n    overflow:scroll; max-height: 300px;\n}\nthead[data-v-3ec6ef7d] {\n    color:white;\n    background: #56baed;\n}\n\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-2123a6bd] {\n    font-size: 1.2em;\n    color: #56baed;\n}\ndiv[data-v-2123a6bd] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-2123a6bd] {\n    color: white;\n    background: #56baed;\n}\n.table-info-data[data-v-2123a6bd] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.rcorners2[data-v-2123a6bd] {\n    border: 2px solid lightgray;\n    padding: 20px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -42504,6 +43013,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_style_index_0_id_2123a6bd_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_style_index_0_id_2123a6bd_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_style_index_0_id_2123a6bd_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=style&index=0&id=9801f10c&scoped=true&lang=css&":
 /*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=style&index=0&id=9801f10c&scoped=true&lang=css& ***!
@@ -43327,6 +43866,47 @@ component.options.__file = "resources/js/components/choice_planned_unplanned.vue
 
 /***/ }),
 
+/***/ "./resources/js/components/downtimesReport.vue":
+/*!*****************************************************!*\
+  !*** ./resources/js/components/downtimesReport.vue ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true& */ "./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true&");
+/* harmony import */ var _downtimesReport_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./downtimesReport.vue?vue&type=script&lang=js& */ "./resources/js/components/downtimesReport.vue?vue&type=script&lang=js&");
+/* harmony import */ var _downtimesReport_vue_vue_type_style_index_0_id_2123a6bd_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& */ "./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _downtimesReport_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "2123a6bd",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/downtimesReport.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/endPO_Declaration.vue":
 /*!*******************************************************!*\
   !*** ./resources/js/components/endPO_Declaration.vue ***!
@@ -43872,6 +44452,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/downtimesReport.vue?vue&type=script&lang=js&":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/downtimesReport.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./downtimesReport.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/endPO_Declaration.vue?vue&type=script&lang=js&":
 /*!********************************************************************************!*\
   !*** ./resources/js/components/endPO_Declaration.vue?vue&type=script&lang=js& ***!
@@ -44113,6 +44709,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&":
+/*!**************************************************************************************************************!*\
+  !*** ./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& ***!
+  \**************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_style_index_0_id_2123a6bd_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=style&index=0&id=2123a6bd&scoped=true&lang=css&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/endPO_Declaration.vue?vue&type=style&index=0&id=9801f10c&scoped=true&lang=css&":
 /*!****************************************************************************************************************!*\
   !*** ./resources/js/components/endPO_Declaration.vue?vue&type=style&index=0&id=9801f10c&scoped=true&lang=css& ***!
@@ -44341,6 +44950,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_choice_planned_unplanned_vue_vue_type_template_id_3ec6ef7d_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_choice_planned_unplanned_vue_vue_type_template_id_3ec6ef7d_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./choice_planned_unplanned.vue?vue&type=template&id=3ec6ef7d&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/choice_planned_unplanned.vue?vue&type=template&id=3ec6ef7d&scoped=true&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true&":
+/*!************************************************************************************************!*\
+  !*** ./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true& ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_downtimesReport_vue_vue_type_template_id_2123a6bd_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true&");
 
 
 /***/ }),
@@ -45540,6 +46166,726 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true&":
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/downtimesReport.vue?vue&type=template&id=2123a6bd&scoped=true& ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [
+    _c(
+      "div",
+      { staticClass: "col" },
+      [
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.site,
+                    expression: "site"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "site", id: "site" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[0], function(site) {
+                  return [
+                    _c("option", { domProps: { value: site.name } }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(site.name) +
+                          "\n                        "
+                      )
+                    ])
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "productionline" } }, [
+              _vm._v("Ligne de production : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.productionline,
+                    expression: "productionline"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "productionline", id: "productionline" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.productionline = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[1], function(productionline) {
+                  return [
+                    productionline.name === _vm.site
+                      ? [
+                          _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: productionline.productionline_name
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                                " +
+                                  _vm._s(productionline.productionline_name) +
+                                  "\n                            "
+                              )
+                            ]
+                          )
+                        ]
+                      : _vm._e()
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "btn btn-outline-info",
+          attrs: { type: "button", value: "Charger" },
+          on: {
+            click: function($event) {
+              return _vm.load()
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm.show === 1
+          ? [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", {}, [
+                _c("table", { staticClass: "table" }, [
+                  _vm._m(1),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("1. No production planned (PP)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["PP"][0].Duration === null
+                          ? [_c("td", [_vm._v("0 mn")])]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["PP"][0].Duration) +
+                                    " mn"
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("2. Planned Maintenance Activities (PM)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["PM"][0].Duration === null
+                          ? [_c("td", [_vm._v("0 mn")])]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["PM"][0].Duration) +
+                                    " mn"
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("3. Capital project implementation (CP)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["CP"][0].Duration === null
+                          ? [_c("td", [_vm._v("0 mn")])]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["CP"][0].Duration) +
+                                    " mn"
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("4. Breaks, meeting, shift change (BM)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["BM"][0].Duration === null
+                          ? [_c("td", [_vm._v("0 mn")])]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["BM"][0].Duration) +
+                                    " mn"
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", {}, [
+                _c("table", { staticClass: "table" }, [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("1. Cleaning in place (CIP)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["CIP"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["CIP"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["CIP"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("2. Change-Over (COV)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["COV"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["COV"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["COV"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("3. Batch Number Change (BNC)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["BNC"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["BNC"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["BNC"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("4. Unplanned External Events (UEE)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["UEE"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["UEE"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["UEE"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("5. Unplanned Shutdown of Machine (USM)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["USM"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["USM"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["USM"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("6. Filler Unplanned Shutdown (UEE)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["FUS"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FUS"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FUS"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("br"),
+              _vm._v(" "),
+              _c("div", {}, [
+                _c("table", { staticClass: "table" }, [
+                  _vm._m(3),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("1. Reduced Rate at Filler (RRF)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["RRF"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["RRF"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["RRF"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("2.  Reduced Rate at a Machine (RRM)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["RRM"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["RRM"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["RRM"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("3. Filler Own Stoppage (FOS)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["FOS"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FOS"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FOS"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v("4. Filler Stoppage by other Machine (FSM)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.allEvents["FSM"][0].Duration === null
+                          ? [
+                              _c("td", [_vm._v("0 mn")]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v("0")])
+                            ]
+                          : [
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FSM"][0].Duration) +
+                                    "  mn"
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.allEvents["FSM"][0].nbEvents) + " "
+                                )
+                              ])
+                            ]
+                      ],
+                      2
+                    )
+                  ])
+                ])
+              ])
+            ]
+          : _vm._e()
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "col" }, [
+      _c("p", [_vm._v("\n            Fenetre de production\n\n        ")]),
+      _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
+      _c("div", { staticClass: "d-flex" }, [
+        _c("label", { attrs: { for: "startingPO" } }, [_vm._v("De")]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.beginningDate,
+              expression: "beginningDate"
+            }
+          ],
+          staticClass: " ",
+          attrs: { type: "date", id: "startingPO", required: "" },
+          domProps: { value: _vm.beginningDate },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.beginningDate = $event.target.value
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("label", { attrs: { for: "endingPO" } }, [_vm._v("A")]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.endingDate,
+              expression: "endingDate"
+            }
+          ],
+          attrs: { type: "date", id: "endingPO", required: "" },
+          domProps: { value: _vm.endingDate },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.endingDate = $event.target.value
+            }
+          }
+        })
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col" }, [
+        _c("p", [
+          _vm._v("\n                        Plant Operating Time : ...mn "),
+          _c("br"),
+          _vm._v("\n                        Planned Production Time : ...mn "),
+          _c("br"),
+          _vm._v("\n                        Load factor : ... % "),
+          _c("br")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col" }, [
+        _c("p", [
+          _vm._v("\n                        Volume packed : ...L "),
+          _c("br"),
+          _vm._v("\n                        Nber of Production Order : ... "),
+          _c("br"),
+          _vm._v("\n                        Nber of items Produced : ... "),
+          _c("br")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [
+          _vm._v("Planned Downtime (Prioritize list)")
+        ]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Unplanned Downtime ")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nber Events")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Speed Losses ")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nber Events")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=template&id=9801f10c&scoped=true&":
 /*!*****************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/endPO_Declaration.vue?vue&type=template&id=9801f10c&scoped=true& ***!
@@ -46520,7 +47866,7 @@ var staticRenderFns = [
                   type: "radio",
                   id: "answer4",
                   name: "reponseQuestion",
-                  value: "Filler Own Stoppage By An Other"
+                  value: "Filler Own Stoppage By An Other Machine"
                 }
               }),
               _vm._v(" "),
@@ -46784,24 +48130,8 @@ var render = function() {
               _vm._v("\n                    Page 1\n                ")
             ]),
             _vm._v(" "),
-            _c("option", { attrs: { value: "packagingLineID2" } }, [
+            _c("option", { attrs: { value: "downtimesReport" } }, [
               _vm._v("\n                    Page 2\n                ")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "packagingLineID3" } }, [
-              _vm._v("\n                    Page 3\n                ")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "packagingLineID4" } }, [
-              _vm._v("\n                    Page 4\n                ")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "packagingLineID" } }, [
-              _vm._v("\n                    Page 5\n                ")
-            ]),
-            _vm._v(" "),
-            _c("option", { attrs: { value: "packagingLineID" } }, [
-              _vm._v("\n                    Page 6\n                ")
             ])
           ]
         ),
