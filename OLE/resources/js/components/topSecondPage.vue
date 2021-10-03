@@ -36,7 +36,7 @@
                                 <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">Type</th>
-                                    <th scope="col">Date de saisie</th>
+                                    <th scope="col">Heure de saisie</th>
                                     <th scope="col">Durée (minutes)</th>
                                     <th scope="col">Commentaire</th>
 

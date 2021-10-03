@@ -49419,7 +49419,7 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Type")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Date de saisie")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Heure de saisie")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Durée (minutes)")]),
         _vm._v(" "),
