@@ -21,6 +21,8 @@ Route::get('/', function () {
 **/
 Route::get('/', indexLoginController::class.'@index');
 
+Route::get('/unplannedDowntimeDashboard', \App\Http\Controllers\FormController::class.'@unplannedDowntimeDashboard');
+
 Route::get('/endPO/{productionName}/endPO', \App\Http\Controllers\FormController::class.'@endPO');
 
 Route::get('/{productionName}/plannedDowntime/{downtimeReason}', \App\Http\Controllers\FormController::class.'@plannedDowntime_Event');
@@ -30,8 +32,6 @@ Route::get('login/{typeLogin}', indexLoginController::class.'@loginPage');
 Route::get('/teamInfo', \App\Http\Controllers\FormController::class.'@index');
 
 Route::get('/packagingLineID', \App\Http\Controllers\FormController::class.'@indexAdmin');
-
-
 
 Route::get('/summary', \App\Http\Controllers\FormController::class.'@summary');
 

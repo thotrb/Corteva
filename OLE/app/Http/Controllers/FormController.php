@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\DB;
 
 class FormController extends Controller
 {
+
+    public function unplannedDowntimeDashboard() {
+        return view('unplannedDowntimeDashboard');
+    }
+
     public function index()
     {
         return view('teamInfo');
@@ -97,7 +102,6 @@ class FormController extends Controller
         $productionLines = DB::table('ole_productionline')
             ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
             ->select('ole_productionline.id', 'ole_productionline.productionline_name', 'ole_productionline.worksiteID', 'worksite.name')
-
             ->get();
 
         $tab = array(
@@ -107,8 +111,6 @@ class FormController extends Controller
 
 
         return response()->json($tab);
-
-
     }
 
 
@@ -269,6 +271,13 @@ class FormController extends Controller
         return response()->json($PO);
 
 
+
+    }
+
+    //getEvents for the unplanned dashboard page
+    public function getEventsUD($dateFrom, $dateTo) {
+
+       
 
     }
 
