@@ -12,25 +12,11 @@
                         Page 1
                     </option>
 
-                    <option value="packagingLineID2">
+                    <option value="downtimesReport">
                         Page 2
                     </option>
 
-                    <option value="packagingLineID3">
-                        Page 3
-                    </option>
 
-                    <option value="packagingLineID4">
-                        Page 4
-                    </option>
-
-                    <option value="packagingLineID">
-                        Page 5
-                    </option>
-
-                    <option value="packagingLineID">
-                        Page 6
-                    </option>
                 </select>
 
                 <button class="btn btn-outline-success" type="button" v-on:click="nextPage()">
@@ -59,7 +45,7 @@
         methods: {
             nextPage: function () {
                 console.log(this.url + this.selection);
-                //window.location.href = this.url + this.s;
+                window.location.href = this.url + this.selection;
             },
         },
     }

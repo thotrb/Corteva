@@ -25,6 +25,8 @@ import store from './store/index';
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 Vue.component('navbar', require('./components/navbar.vue').default);
 
+Vue.component('downtimesReport', require('./components/downtimesReport.vue').default);
+
 Vue.component('packagingID', require('./components/packagingLineID.vue').default);
 
 Vue.component('choiceLogin', require('./components/choiceLogin.vue').default);

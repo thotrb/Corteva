@@ -1,7 +1,7 @@
 <template>
     <div class="row">
-
         <!--
+
         machine : {{machines}}
         <br/>
 
@@ -252,10 +252,12 @@
 
 
                 if (this.productionline !== '') {
+
                     this.$store.dispatch('fetchMachines', index);
+                    this.index = index;
+                    this.show = 1;
+
                 }
-                this.index = index;
-                this.show = 1;
             },
         },
 

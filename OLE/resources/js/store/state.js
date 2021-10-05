@@ -17,6 +17,7 @@ let state = {
     assignation : [],
     PO : [],
     machines : [],
+    allEvents : [],
     worksiteID: -1,
     productionlineID: -1,
     token: localStorage.getItem('access_token'),

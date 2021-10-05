@@ -52,6 +52,23 @@ let actions = {
         })
     },
 
+    fecthAllEvents({commit}, parameters) {
+
+        var site = parameters[0];
+        var productionLine = parameters[1];
+        var beginningDate = parameters[2];
+        var endingDate = parameters[3];
+
+        axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}`)
+            .then(res => {
+                commit('FETCH_ALL_EVENTS', res.data);
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
+
+
     fetchEvents({commit}, parameters) {
 
         axios.get(`/api/events/${parameters[1]}/${parameters[2]}`)

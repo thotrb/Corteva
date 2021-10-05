@@ -42,16 +42,12 @@
     <br/>
     <br/>
 
-    <packaging-i-d></packaging-i-d>
-
-
+    <downtimes-report></downtimes-report>
 
 </body>
 </div>
 
 </html>
 
-
 <script async src="{{mix('js/app.js')}}"></script>
-
 

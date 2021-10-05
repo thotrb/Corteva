@@ -172,7 +172,7 @@
                         <label for="answer4" class="checkbox labelsAnswer">
                             <input type="radio"
                                    id="answer4" name="reponseQuestion"
-                                   value="Filler Own Stoppage By An Other" class="response">
+                                   value="Filler Own Stoppage By An Other Machine" class="response">
                             <span>Remplisseur mis à l'arrêt par une autre source</span>
                         </label>
 
@@ -614,7 +614,7 @@
                 return new Promise(resolve => {
                     setTimeout(() => {
                         resolve('resolved');
-                    }, 500);
+                    }, 1000);
                 });
 
 
@@ -732,7 +732,7 @@
 
             },
 
-            confirmSpeedloss: function () {
+            confirmSpeedloss: async function () {
 
                 var responses = document.getElementsByClassName('response');
                 var reason = '';
@@ -752,6 +752,8 @@
                 console.log(this.speedLossEvent);
 
                 this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
+                await this.resolveAfter1Second();
+
                 window.location.reload();
             }
 

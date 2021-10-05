@@ -63,6 +63,10 @@ let mutations = {
         return state.machines = machines;
     },
 
+    FETCH_ALL_EVENTS(state, events){
+        return state.allEvents = events;
+    },
+
 
     CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent){
         state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);

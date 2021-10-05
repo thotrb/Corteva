@@ -11,7 +11,7 @@ class ole_speedLoss extends Model
 
     use HasFactory;
     public $timestamps = true;
-    protected $fillable = ['OLE', 'productionline', 'comment', 'reason'];
+    protected $fillable = ['OLE', 'productionline', 'duration', 'comment', 'reason'];
 
 
 }
