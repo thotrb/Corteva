@@ -342,7 +342,7 @@
                 }
 
 
-                this.$store.dispatch('create_PO', POElement);
+                //this.$store.dispatch('create_PO', POElement);
 
 
 

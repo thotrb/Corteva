@@ -27,27 +27,22 @@
             height: 100vh;
             margin: 0;
         }
+
         -->
 
     </style>
 </head>
-<div id="app">
 
-<header>
-        <navbar></navbar>
-</header>
 
 <body>
+<div id="app">
 
-    <br/>
-    <br/>
+    <navbar></navbar>
 
     <packaging-i-d></packaging-i-d>
-
-
+</div>
 
 </body>
-</div>
 
 </html>
 

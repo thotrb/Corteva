@@ -28,252 +28,289 @@ class FormController extends Controller
         return view('downtimesReport');
     }
 
-    public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate)
+    public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate, $PONumber)
     {
         $site = DB::table('ole_productionline')
             ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
             ->where('worksite.name', '=', $site)
             ->where('ole_productionline.productionline_name', '=', $productionLine)
+            ->where('ole_pos.number', '=', $PONumber)
             ->get();
 
 
-        $date1 = explode("-", $beginningDate);
-        $beginningYear = $date1[0];
-        $beginningMonth = $date1[1];
-        $beginningDay = $date1[2];
+        if(count($site) > 0){
+            $date1 = explode("-", $beginningDate);
+            $beginningYear = $date1[0];
+            $beginningMonth = $date1[1];
+            $beginningDay = $date1[2];
 
-        $date2 = explode("-", $endingDate);
-        $endingYear = $date2[0];
-        $endingMonth = $date2[1];
-        $endingDay = $date2[2];
+            $date2 = explode("-", $endingDate);
+            $endingYear = $date2[0];
+            $endingMonth = $date2[1];
+            $endingDay = $date2[2];
 
-        $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear.'-'.$beginningMonth.'-'.$beginningDay)->startOfDay();
-        $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
+            $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear.'-'.$beginningMonth.'-'.$beginningDay)->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
 
 
 
-        $BM = DB::table('ole_planned_events')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Pause')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+            $BM = DB::table('ole_planned_events')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Pause')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->orWhere(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Reunion')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+                })
+                ->orWhere(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Reunion')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->orWhere(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Pas de production prevue')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+                })
+                ->orWhere(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Pas de production prevue')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
-            ->get();
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                ->get();
 
 
-        $CP = DB::table('ole_planned_events')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Implementation de projet')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+            $CP = DB::table('ole_planned_events')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Implementation de projet')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
-            ->get();
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                ->get();
 
 
 
-        $PM = DB::table('ole_planned_events')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Maintenance')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+            $PM = DB::table('ole_planned_events')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Maintenance')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
-            ->get();
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                ->get();
 
 
-        $PP = DB::table('ole_planned_events')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_planned_events.reason', '=', 'Pas de production prevue')
-                    -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+            $PP = DB::table('ole_planned_events')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_planned_events.reason', '=', 'Pas de production prevue')
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
-            ->get();
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                ->get();
 
 
-        $CIP = DB::table('ole_unplanned_event_cips')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_cips.productionline', '=', $site[0]->productionline_name)
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_cips.created_at)'), [$startDate, $endDate]);
+            $CIP = DB::table('ole_unplanned_event_cips')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_cips.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_cips.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
-            ->get();
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                ->get();
 
 
-        $COV = DB::table('ole_unplanned_event_changing_clients')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_changing_clients.productionline', '=', $site[0]->productionline_name)
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_clients.created_at)'), [$startDate, $endDate]);
+            $COV = DB::table('ole_unplanned_event_changing_clients')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_changing_clients.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_clients.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $BNC = DB::table('ole_unplanned_event_changing_formats')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_changing_formats.productionline', '=', $site[0]->productionline_name)
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_formats.created_at)'), [$startDate, $endDate]);
+            $BNC = DB::table('ole_unplanned_event_changing_formats')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_changing_formats.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_formats.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $UEE = DB::table('ole_unplanned_event_unplanned_downtimes')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate])
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Autres');
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+            $UEE = DB::table('ole_unplanned_event_unplanned_downtimes')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate])
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Autres');
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $USM = DB::table('ole_unplanned_event_unplanned_downtimes')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Saturation aval')
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+            $USM = DB::table('ole_unplanned_event_unplanned_downtimes')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Saturation aval')
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->orWhere(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Manque bouteille')
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+                })
+                ->orWhere(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Manque bouteille')
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->orWhere(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Autres')
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+                })
+                ->orWhere(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Autres')
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
 
-        $FUS = DB::table('ole_unplanned_event_unplanned_downtimes')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Saturation aval')
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+            $FUS = DB::table('ole_unplanned_event_unplanned_downtimes')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Saturation aval')
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->orWhere(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Manque bouteille')
-                    -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+                })
+                ->orWhere(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Manque bouteille')
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
 
-        $RRF = DB::table('ole_speed_losses')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_speed_losses.reason', '=', 'Reduced Rate At Filler')
-                    -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+            $RRF = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Reduced Rate At Filler')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $RRM = DB::table('ole_speed_losses')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_speed_losses.reason', '=', 'Reduce Rate At An Other Machine')
-                    -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+            $RRM = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Reduce Rate At An Other Machine')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $FOS = DB::table('ole_speed_losses')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage')
-                    -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+            $FOS = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
 
-        $FSM = DB::table('ole_speed_losses')
-            ->where(function($query) use ($endDate, $startDate, $site) {
-                $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
-                    ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage By An Other Machine')
-                    -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+            $FSM = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage By An Other Machine')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
 
-            })
-            ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
+                })
+                ->select(DB::raw('SUM(duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
-            ->get();
+                ->get();
 
 
+            $POInformations = DB::table('ole_pos')
+                ->where('ole_pos.number', '=', $PONumber)
+                ->get();
 
-        $tab = array(
 
-            'BM' => $BM,
-            'CP' => $CP,
-            'PM' => $PM,
-            'PP' => $PP,
-            'CIP' => $CIP,
-            'COV' => $COV,
-            'BNC' => $BNC,
-            'UEE' => $UEE,
-            'USM' => $USM,
-            'FUS' => $FUS,
-            'RRF' => $RRF,
-            'RRM' => $RRM,
-            'FOS' => $FOS,
-            'FSM' => $FSM
 
-        );
+            $tab = array(
 
+                'BM' => $BM,
+                'CP' => $CP,
+                'PM' => $PM,
+                'PP' => $PP,
+                'CIP' => $CIP,
+                'COV' => $COV,
+                'BNC' => $BNC,
+                'UEE' => $UEE,
+                'USM' => $USM,
+                'FUS' => $FUS,
+                'RRF' => $RRF,
+                'RRM' => $RRM,
+                'FOS' => $FOS,
+                'FSM' => $FSM,
+                'POInfo' => $POInformations
 
+            );
+
+
+
+        }else{
+            $tab = array(
+
+                'BM' => null,
+                'CP' => null,
+                'PM' => null,
+                'PP' => null,
+                'CIP' => null,
+                'COV' => null,
+                'BNC' => null,
+                'UEE' => null,
+                'USM' => null,
+                'FUS' => null,
+                'RRF' => null,
+                'RRM' => null,
+                'FOS' => null,
+                'FSM' => null,
+                'POInfo' => null
+
+            );
+
+
+        }
         return response()->json($tab);
+
+
+
+
 
 
     }

@@ -1,8 +1,9 @@
 <template>
-    <nav class="navbar navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="images/icon.png" alt="" width="100" height="60">
+    <div class="nv">
+
+        <nav class="navbar">
+            <a class="navbar-brand" v-bind:href="url + 'packagingLineID' ">
+                <img src="images/icon.png" alt="" width="200" height="130">
             </a>
 
             <div class="d-flex">
@@ -25,9 +26,9 @@
 
             </div>
 
+        </nav>
+    </div>
 
-        </div>
-    </nav>
 </template>
 
 <script>
@@ -53,4 +54,8 @@
 
 <style scoped>
 
+    .nv {
+        background: white;
+        width: 100%;
+    }
 </style>

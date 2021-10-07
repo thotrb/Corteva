@@ -27,25 +27,24 @@
             height: 100vh;
             margin: 0;
         }
+
         -->
 
     </style>
 </head>
-<div id="app">
 
 <header>
-        <navbar></navbar>
 </header>
 
 <body>
+<div id="app">
 
-    <br/>
-    <br/>
+    <navbar></navbar>
 
     <downtimes-report></downtimes-report>
+</div>
 
 </body>
-</div>
 
 </html>
 

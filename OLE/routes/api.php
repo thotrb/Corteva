@@ -46,7 +46,7 @@ Route::get('productionlineID/{productionline}', FormController::class.'@getProdu
 
 Route::get('productionlineID/{productionline}', FormController::class.'@getProductionlineID');
 
-Route::get('allevents/{site}/{productionLine}/{beginningDate}/{endingDate}', FormController::class.'@getAllEventsPeriod');
+Route::get('allevents/{site}/{productionLine}/{beginningDate}/{endingDate}/{PONumber}', FormController::class.'@getAllEventsPeriod');
 
 Route::post('assignation', FormController::class.'@createAssignement');
 
