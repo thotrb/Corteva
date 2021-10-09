@@ -58,8 +58,9 @@ let actions = {
         var productionLine = parameters[1];
         var beginningDate = parameters[2];
         var endingDate = parameters[3];
+        var PONumber = parameters[4];
 
-        axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}`)
+        axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}/${PONumber}`)
             .then(res => {
                 commit('FETCH_ALL_EVENTS', res.data);
             }).catch(err => {
