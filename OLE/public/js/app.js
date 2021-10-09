@@ -5449,15 +5449,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
   data: function data() {
     return {
-      months: ['January', 'February', 'Mars', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      years: [],
+      yearsAfterFrom: [],
+      currentYear: new Date().getFullYear(),
+      startYear: 2000,
       unplannedDowntimesCategories: ['Cleaning in Place (CIP)', 'Change Over (COV)', 'Batch Number Change (BNC)'],
-      downtimeTableHeaderCols: [],
-      unplannedDowntimesMonthly: {},
       yearlyDowntimes: {
         cip: {
           hours: 20,
@@ -5474,37 +5490,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           count: 30,
           avgHours: 3
         }
-      }
+      },
+      site: '',
+      productionLine: ''
     };
   },
   methods: {
-    calculateMonthsAfterFrom: function calculateMonthsAfterFrom() {
-      var monthFrom = document.getElementById("select-month-from").value;
-      var monthsInInterval = [];
+    calculateYearsAfterFrom: function calculateYearsAfterFrom() {
+      var selectedYear = document.getElementById('select-year-from').value;
+      this.yearsAfterFrom = [];
 
-      for (var i = this.months.indexOf(monthFrom); i < this.months.length; i++) {
-        monthsInInterval.push(this.months[i]);
+      for (var i = selectedYear; i <= this.currentYear; i++) {
+        this.yearsAfterFrom.push(i);
       }
-
-      this.monthsAfterFrom = monthsInInterval;
     },
-    calculateTableHeaders: function calculateTableHeaders() {
-      var monthFrom = document.getElementById("select-month-from").value;
-      var monthTo = document.getElementById("select-month-to").value;
-      var headers = [];
+    siteSelected: function siteSelected() {
+      if (document.getElementById("site-selection").value) document.querySelector('div.production-window').style.visibility = 'visible';else document.querySelector('div.production-window').style.visibility = 'hidden';
+    },
+    loadTable: function loadTable() {},
+    test: function test() {
+      var selectedSite = document.getElementById('site-selection').value;
+      var selectedPL = document.getElementById('pl-selection').value; //Api accepts dates in the format yyyy-mm-dd
 
-      for (var i = this.months.indexOf(monthFrom); i <= this.months.indexOf(monthTo); i++) {
-        headers.push(this.months[i]);
-      }
-
-      this.downtimeTableHeaderCols = headers;
+      var dateFrom = document.getElementById('select-year-from').value + '-01-01';
+      var dateTo = document.getElementById('select-year-to').value + '-31-12';
+      var params = [selectedSite, selectedPL, dateFrom, dateTo];
+      this.$store.dispatch('fetchAllEvents', params);
+      console.log(this.allEvents);
     }
   },
   mounted: function mounted() {
-    this.monthsAfterFrom = this.months;
-    this.downtimeTableHeaderCols = this.months;
+    this.$store.dispatch('fetchSites'); //Populate years array
+
+    for (var i = this.startYear; i <= this.currentYear; i++) {
+      this.years.push(i);
+    }
+
+    this.yearsAfterFrom = this.years;
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'allEvents']))
 });
 
 /***/ }),
@@ -5909,22 +5933,23 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js"
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('navbar', __webpack_require__(/*! ./components/navbar.vue */ "./resources/js/components/navbar.vue").default);
-Vue.component('downtimesReport', __webpack_require__(/*! ./components/downtimesReport.vue */ "./resources/js/components/downtimesReport.vue").default);
-Vue.component('packagingID', __webpack_require__(/*! ./components/packagingLineID.vue */ "./resources/js/components/packagingLineID.vue").default);
-Vue.component('choiceLogin', __webpack_require__(/*! ./components/choiceLogin.vue */ "./resources/js/components/choiceLogin.vue").default);
-Vue.component('login', __webpack_require__(/*! ./components/login.vue */ "./resources/js/components/login.vue").default);
-Vue.component('teamInfo', __webpack_require__(/*! ./components/teamInfo.vue */ "./resources/js/components/teamInfo.vue").default);
-Vue.component('topSecondPage', __webpack_require__(/*! ./components/topSecondPage.vue */ "./resources/js/components/topSecondPage.vue").default);
-Vue.component('bottomSecondPage', __webpack_require__(/*! ./components/bottomSecondPage.vue */ "./resources/js/components/bottomSecondPage.vue").default);
-Vue.component('choice_planned_unplanned', __webpack_require__(/*! ./components/choice_planned_unplanned.vue */ "./resources/js/components/choice_planned_unplanned.vue").default);
-Vue.component('unplanned_pannel1', __webpack_require__(/*! ./components/unplanned_pannel1.vue */ "./resources/js/components/unplanned_pannel1.vue").default);
-Vue.component('unplanned_pannel_unplanned2', __webpack_require__(/*! ./components/unplanned_pannel_unplanned2.vue */ "./resources/js/components/unplanned_pannel_unplanned2.vue").default);
-Vue.component('CIP_Declaration', __webpack_require__(/*! ./components/CIP_Declaration.vue */ "./resources/js/components/CIP_Declaration.vue").default);
-Vue.component('Changingformat_Declaration', __webpack_require__(/*! ./components/Changingformat_Declaration.vue */ "./resources/js/components/Changingformat_Declaration.vue").default);
-Vue.component('ClientChanging_Declaration', __webpack_require__(/*! ./components/Clientchanging_Declaration.vue */ "./resources/js/components/Clientchanging_Declaration.vue").default);
-Vue.component('plannedDowntime_Declaration', __webpack_require__(/*! ./components/plannedDowntime_Declaration.vue */ "./resources/js/components/plannedDowntime_Declaration.vue").default);
-Vue.component('endPO_Declaration', __webpack_require__(/*! ./components/endPO_Declaration.vue */ "./resources/js/components/endPO_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('navbar', __webpack_require__(/*! ./components/navbar.vue */ "./resources/js/components/navbar.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('downtimesReport', __webpack_require__(/*! ./components/downtimesReport.vue */ "./resources/js/components/downtimesReport.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('packagingID', __webpack_require__(/*! ./components/packagingLineID.vue */ "./resources/js/components/packagingLineID.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('choiceLogin', __webpack_require__(/*! ./components/choiceLogin.vue */ "./resources/js/components/choiceLogin.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('login', __webpack_require__(/*! ./components/login.vue */ "./resources/js/components/login.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('teamInfo', __webpack_require__(/*! ./components/teamInfo.vue */ "./resources/js/components/teamInfo.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('topSecondPage', __webpack_require__(/*! ./components/topSecondPage.vue */ "./resources/js/components/topSecondPage.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('bottomSecondPage', __webpack_require__(/*! ./components/bottomSecondPage.vue */ "./resources/js/components/bottomSecondPage.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('choice_planned_unplanned', __webpack_require__(/*! ./components/choice_planned_unplanned.vue */ "./resources/js/components/choice_planned_unplanned.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel1', __webpack_require__(/*! ./components/unplanned_pannel1.vue */ "./resources/js/components/unplanned_pannel1.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel_unplanned2', __webpack_require__(/*! ./components/unplanned_pannel_unplanned2.vue */ "./resources/js/components/unplanned_pannel_unplanned2.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('CIP_Declaration', __webpack_require__(/*! ./components/CIP_Declaration.vue */ "./resources/js/components/CIP_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('Changingformat_Declaration', __webpack_require__(/*! ./components/Changingformat_Declaration.vue */ "./resources/js/components/Changingformat_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('ClientChanging_Declaration', __webpack_require__(/*! ./components/Clientchanging_Declaration.vue */ "./resources/js/components/Clientchanging_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('plannedDowntime_Declaration', __webpack_require__(/*! ./components/plannedDowntime_Declaration.vue */ "./resources/js/components/plannedDowntime_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('endPO_Declaration', __webpack_require__(/*! ./components/endPO_Declaration.vue */ "./resources/js/components/endPO_Declaration.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeDashboard', __webpack_require__(/*! ./components/unplannedDowntimeDashboard.vue */ "./resources/js/components/unplannedDowntimeDashboard.vue").default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -6034,7 +6059,7 @@ var actions = {
       console.log(err);
     });
   },
-  fecthAllEvents: function fecthAllEvents(_ref4, parameters) {
+  fetchAllEvents: function fetchAllEvents(_ref4, parameters) {
     var commit = _ref4.commit;
     var site = parameters[0];
     var productionLine = parameters[1];
@@ -11227,7 +11252,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1320px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -49772,10 +49797,99 @@ var render = function() {
     _vm._m(0),
     _vm._v(" "),
     _c("div", { staticClass: "d-flex selection-menu" }, [
-      _vm._m(1),
+      _c("div", { staticClass: "d-flex site-pl-selection" }, [
+        _c("div", { staticClass: "d-flex" }, [
+          _c("label", { attrs: { for: "site-selection" } }, [_vm._v("Site: ")]),
+          _vm._v(" "),
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.site,
+                  expression: "site"
+                }
+              ],
+              attrs: { id: "site-selection" },
+              on: {
+                change: [
+                  function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  },
+                  function($event) {
+                    return _vm.siteSelected()
+                  }
+                ]
+              }
+            },
+            [
+              _vm._l(_vm.sites[0], function(site) {
+                return [
+                  _c(
+                    "option",
+                    { key: site.name, domProps: { value: site.name } },
+                    [_vm._v(_vm._s(site.name))]
+                  )
+                ]
+              })
+            ],
+            2
+          )
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("label", { attrs: { for: "pl-selection" } }, [
+            _vm._v("Production line: ")
+          ]),
+          _vm._v(" "),
+          _c(
+            "select",
+            { attrs: { id: "pl-selection" } },
+            [
+              _vm._l(_vm.sites[1], function(productionLine) {
+                return [
+                  productionLine.name === _vm.site
+                    ? [
+                        _c(
+                          "option",
+                          {
+                            key: productionLine.productionline_name,
+                            domProps: {
+                              value: productionLine.productionline_name
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(productionLine.productionline_name) +
+                                "\n                            "
+                            )
+                          ]
+                        )
+                      ]
+                    : _vm._e()
+                ]
+              })
+            ],
+            2
+          )
+        ])
+      ]),
       _vm._v(" "),
       _c("div", { staticClass: "d-flex production-window" }, [
-        _vm._m(2),
+        _vm._m(1),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex interval-selection" }, [
           _c("span", [_vm._v("From")]),
@@ -49783,19 +49897,18 @@ var render = function() {
           _c(
             "select",
             {
-              attrs: { id: "select-month-from" },
+              attrs: { id: "select-year-from" },
               on: {
                 change: function($event) {
-                  _vm.calculateMonthsAfterFrom()
-                  _vm.calculateTableHeaders()
+                  return _vm.calculateYearsAfterFrom()
                 }
               }
             },
             [
-              _vm._l(_vm.months, function(month) {
+              _vm._l(_vm.years, function(year) {
                 return [
-                  _c("option", { key: month, domProps: { value: month } }, [
-                    _vm._v(_vm._s(month))
+                  _c("option", { key: year, domProps: { value: year } }, [
+                    _vm._v(_vm._s(year))
                   ])
                 ]
               })
@@ -49808,16 +49921,22 @@ var render = function() {
           _c(
             "select",
             {
-              attrs: { id: "select-month-to" },
+              attrs: { id: "select-year-to" },
               on: {
                 change: function($event) {
-                  return _vm.calculateTableHeaders()
+                  return _vm.loadTable()
                 }
               }
             },
             [
-              _vm._l(_vm.months, function(month) {
-                return [_c("option", { key: month }, [_vm._v(_vm._s(month))])]
+              _vm._l(_vm.yearsAfterFrom, function(year) {
+                return [
+                  year == _vm.currentYear
+                    ? _c("option", { key: year, attrs: { selected: "" } }, [
+                        _vm._v(_vm._s(year))
+                      ])
+                    : _c("option", { key: year }, [_vm._v(_vm._s(year))])
+                ]
               })
             ],
             2
@@ -49880,7 +49999,7 @@ var render = function() {
                             _c(
                               "tr",
                               { staticStyle: { visibility: "hidden" } },
-                              [_vm._v(" -- ")]
+                              [_vm._v("-----")]
                             ),
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
@@ -49949,7 +50068,19 @@ var render = function() {
         ],
         2
       )
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            return _vm.test()
+          }
+        }
+      },
+      [_vm._v("TESTE")]
+    )
   ])
 }
 var staticRenderFns = [
@@ -49959,26 +50090,6 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "row container-title" }, [
       _c("span", [_vm._v("Unplanned Downtime Dashboard")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "d-flex site-pl-selection" }, [
-      _c("div", { staticClass: "d-flex" }, [
-        _c("label", { attrs: { for: "site-selection" } }, [_vm._v("Site: ")]),
-        _vm._v(" "),
-        _c("select", { attrs: { id: "site-selection" } })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "d-flex" }, [
-        _c("label", { attrs: { for: "pl-selection" } }, [
-          _vm._v("Production line: ")
-        ]),
-        _vm._v(" "),
-        _c("select", { attrs: { id: "pl-selection" } })
-      ])
     ])
   },
   function() {

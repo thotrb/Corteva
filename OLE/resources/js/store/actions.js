@@ -52,7 +52,7 @@ let actions = {
         })
     },
 
-    fecthAllEvents({commit}, parameters) {
+    fetchAllEvents({commit}, parameters) {
 
         var site = parameters[0];
         var productionLine = parameters[1];

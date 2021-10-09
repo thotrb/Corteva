@@ -11,11 +11,23 @@
             <div class="d-flex site-pl-selection">
                 <div class="d-flex">
                     <label for="site-selection">Site: </label>
-                    <select id="site-selection"></select>
+                    <select id="site-selection" v-model="site" v-on:change="siteSelected();">
+                        <template v-for="site of sites[0]">
+                            <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
+                        </template>
+                    </select>
                 </div>
                 <div class="d-flex">
                     <label for="pl-selection">Production line: </label>
-                    <select id="pl-selection"></select>
+                    <select id="pl-selection">
+                        <template v-for="productionLine of sites[1]">
+                            <template v-if="productionLine.name === site">
+                                <option v-bind:key="productionLine.productionline_name" v-bind:value="productionLine.productionline_name">
+                                    {{productionLine.productionline_name}}
+                                </option>
+                            </template>
+                        </template>
+                    </select>
                 </div>
             </div>
 
@@ -26,22 +38,23 @@
                 </div>
                 <div class="d-flex interval-selection">
                     <span>From</span>
-                    <select id="select-month-from" v-on:change="calculateMonthsAfterFrom(); calculateTableHeaders();">
-                        <template v-for="month of months">
-                            <option v-bind:key="month" v-bind:value="month">{{month}}</option>
+                    <select id="select-year-from" v-on:change="calculateYearsAfterFrom();">
+                        <template v-for="year of years">
+                            <option v-bind:key="year" v-bind:value="year">{{year}}</option>
                         </template>
                     </select>
                     <span>to</span>
-                    <select id="select-month-to" v-on:change="calculateTableHeaders()">
-                        <template v-for="month of months">
-                            <option :key="month">{{month}}</option>
+                    <select id="select-year-to" v-on:change="loadTable();">
+                        <template v-for="year of yearsAfterFrom">
+                            <option v-if="year == currentYear" :key="year" selected>{{year}}</option>
+                            <option v-else :key="year">{{year}}</option>
                         </template>
                     </select>
                 </div>
             </div>
         </div>
 
-        <!-- Downtime table, yeraly and average information container-->
+        <!-- Downtime table, yearly and average information container-->
         <div class="d-flex table-ya-container">
             <!-- Downtime table -->
             <div class="d-flex container-table">
@@ -64,7 +77,7 @@
                                 </th>
                                 <template v-for="month of months">
                                     <td :key="month">
-                                        <tr style="visibility: hidden;"> -- </tr>
+                                        <tr style="visibility: hidden;">-----</tr>
                                         <tr class="table-sub-row">{{month}}</tr>
                                         <tr class="table-sub-row">{{month}}</tr>
                                     </td>
@@ -92,6 +105,7 @@
                 </template>
             </div>
         </div>
+        <button v-on:click="test()">TESTE</button>
     </div>
 </template>
 
@@ -103,10 +117,12 @@
 
         data() {
             return {
-                months: ['January', 'February', 'Mars', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                years: [],
+                yearsAfterFrom: [],
+                currentYear: (new Date()).getFullYear(),
+                startYear: 2000,
                 unplannedDowntimesCategories: ['Cleaning in Place (CIP)', 'Change Over (COV)', 'Batch Number Change (BNC)'],
-                downtimeTableHeaderCols: [],
-                unplannedDowntimesMonthly: {},
                 yearlyDowntimes: {
                     cip: {
                         hours: 20,
@@ -123,41 +139,50 @@
                         count: 30,
                         avgHours: 3
                     }
-                }
+                },
+                site: '',
+                productionLine: ''
             }
         },
 
         methods: {
-          calculateMonthsAfterFrom: function () {
-            let monthFrom = document.getElementById("select-month-from").value;
-            let monthsInInterval = [];
-            for (let i = this.months.indexOf(monthFrom); i < this.months.length; i++) {
-                monthsInInterval.push(this.months[i]);
-            }
-            this.monthsAfterFrom = monthsInInterval;
+          calculateYearsAfterFrom: function () {
+              const selectedYear = document.getElementById('select-year-from').value;
+              this.yearsAfterFrom = [];
+              for (let i = selectedYear; i <= this.currentYear; i++) this.yearsAfterFrom.push(i);
+
           },
+          siteSelected: function () {
+              if (document.getElementById("site-selection").value) document.querySelector('div.production-window').style.visibility = 'visible';
+              else document.querySelector('div.production-window').style.visibility = 'hidden';
+          },
+          loadTable: function () {
+              
+          },
+          test: function () {
+              const selectedSite = document.getElementById('site-selection').value;
+              const selectedPL = document.getElementById('pl-selection').value;
 
-          calculateTableHeaders: function () {
-              let monthFrom = document.getElementById("select-month-from").value;
-              let monthTo = document.getElementById("select-month-to").value;
-              let headers = [];
+              //Api accepts dates in the format yyyy-mm-dd
+              const dateFrom = document.getElementById('select-year-from').value + '-01-01';
+              const dateTo = document.getElementById('select-year-to').value + '-31-12';
+              const params = [selectedSite, selectedPL, dateFrom, dateTo];
 
-              for (let i = this.months.indexOf(monthFrom); i <= this.months.indexOf(monthTo); i++) {
-                  headers.push(this.months[i]);
-              }
-
-              this.downtimeTableHeaderCols = headers;
+              this.$store.dispatch('fetchAllEvents', params);
+              console.log(this.allEvents)
           }
         },
 
         mounted() {
-            this.monthsAfterFrom = this.months;
-            this.downtimeTableHeaderCols = this.months;
             this.$store.dispatch('fetchSites');
+
+            //Populate years array
+            for (let i = this.startYear; i <= this.currentYear; i++) this.years.push(i);
+            this.yearsAfterFrom = this.years;
         },
 
         computed: {
-            ...mapGetters(['sites'])
+            ...mapGetters(['sites', 'allEvents'])
         }
     }
 </script>
@@ -166,7 +191,7 @@
         flex-direction: column;
         background-color: white;
         padding: 20px;
-        min-width: 1320px;
+        min-width: 1000px;
         border-radius: 5px;
         margin-top: 20px;
     }
@@ -196,6 +221,7 @@
         padding: 10px 5px;
         height: 91px;
         margin-left: auto;
+        visibility: hidden;
     }
 
     div.production-window > div {

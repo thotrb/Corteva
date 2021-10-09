@@ -33,6 +33,22 @@ class FormController extends Controller
         return view('downtimesReport');
     }
 
+    public function getUnplannedDowntimeEvents($productionLine, $beginningYear, $endingYear) {
+
+        $cip = DB::table('ole_unplanned_event_cips')
+            ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_cips.creates_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_cips.creates_at', '<=', $endingYear)
+            ->get();
+
+        $cov = DB::table('ole_unplanned_event_changing_clients')
+            ->where('ole_unplanned_event_changing_clients.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_changing_clients.creates_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_changing_clients.creates_at', '<=', $endingYear)
+            ->get();
+        
+    }
+
     public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate)
     {
         $site = DB::table('ole_productionline')
