@@ -4560,6 +4560,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "packagingLineID",
@@ -49047,7 +49062,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex" }, [
+  return _c("div", { staticClass: "row" }, [
     _c("br"),
     _vm._v(" "),
     _c(
@@ -49092,9 +49107,9 @@ var render = function() {
                   return [
                     _c("option", { domProps: { value: site.name } }, [
                       _vm._v(
-                        "\n                            " +
+                        "\n                                " +
                           _vm._s(site.name) +
-                          "\n                        "
+                          "\n                            "
                       )
                     ])
                   ]
@@ -49156,9 +49171,9 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(productionline.productionline_name) +
-                                  "\n                            "
+                                  "\n                                "
                               )
                             ]
                           )
@@ -49212,14 +49227,16 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("h1", [_vm._v("\n            Packaging Line ID\n        ")]),
+        _c("h1", [_vm._v("\n                Packaging Line ID\n            ")]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _vm.show === 1
           ? [
               _c("h2", [
-                _vm._v("\n                Liste des machines\n            ")
+                _vm._v(
+                  "\n                    Liste des machines\n                "
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
@@ -49255,7 +49272,9 @@ var render = function() {
               _c("br"),
               _vm._v(" "),
               _c("h2", [
-                _vm._v("\n                Liste des formats\n            ")
+                _vm._v(
+                  "\n                    Liste des formats\n                "
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
@@ -49332,9 +49351,9 @@ var render = function() {
                         return [
                           _c("option", { domProps: { value: product.name } }, [
                             _vm._v(
-                              "\n                                " +
+                              "\n                                    " +
                                 _vm._s(product.name) +
-                                "\n                            "
+                                "\n                                "
                             )
                           ])
                         ]
@@ -49388,9 +49407,9 @@ var render = function() {
                             { domProps: { value: formulation.formulation } },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(formulation.formulation) +
-                                  "\n                            "
+                                  "\n                                "
                               )
                             ]
                           )
