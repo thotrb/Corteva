@@ -5621,6 +5621,15 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+//
+//
+//
 //
 //
 //
@@ -5736,33 +5745,76 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
   data: function data() {
-    return {
+    var data = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       years: [],
       yearsAfterFrom: [],
       currentYear: new Date().getFullYear(),
       startYear: 2000,
-      unplannedDowntimesCategories: ['Cleaning in Place (CIP)', 'Change Over (COV)', 'Batch Number Change (BNC)'],
-      yearlyDowntimes: {
-        cip: {
-          hours: 20,
-          count: 30,
-          avgHours: 3
-        },
-        cov: {
-          hours: 20,
-          count: 30,
-          avgHours: 3
-        },
-        bnc: {
-          hours: 20,
-          count: 30,
-          avgHours: 3
-        }
+      unplannedDowntimesCategories: {
+        cip: 'Cleaning in Place (CIP)',
+        cov: 'Change Over (COV)',
+        bnc: 'Batch Number Change (BNC)'
+      },
+      downtimes: {
+        cip: {},
+        cov: {},
+        bnc: {}
       },
       site: '',
       productionLine: ''
+    }; //Populate downtimes array
+
+    var _iterator = _createForOfIteratorHelper(data.months),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var month = _step.value;
+        data.downtimes.cip[month] = {
+          totalNb: undefined,
+          totalDuration: undefined,
+          events: []
+        };
+        data.downtimes.cov[month] = {
+          totalNb: undefined,
+          totalDuration: undefined,
+          events: []
+        };
+        data.downtimes.bnc[month] = {
+          totalNb: undefined,
+          totalDuration: undefined,
+          events: []
+        };
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+
+    data.downtimes.cip.general = {
+      totalNb: undefined,
+      totalDuration: undefined,
+      average: undefined
     };
+    data.downtimes.cov.general = {
+      totalNb: undefined,
+      totalDuration: undefined,
+      average: undefined
+    };
+    data.downtimes.bnc.general = {
+      totalNb: undefined,
+      totalDuration: undefined,
+      average: undefined
+    }; //Populate years array
+
+    for (var i = data.startYear; i <= data.currentYear; i++) {
+      data.years.push(i);
+    }
+
+    data.yearsAfterFrom = data.years;
+    return data;
   },
   methods: {
     calculateYearsAfterFrom: function calculateYearsAfterFrom() {
@@ -5773,31 +5825,120 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.yearsAfterFrom.push(i);
       }
     },
-    siteSelected: function siteSelected() {
-      if (document.getElementById("site-selection").value) document.querySelector('div.production-window').style.visibility = 'visible';else document.querySelector('div.production-window').style.visibility = 'hidden';
+    productionLineSelected: function productionLineSelected() {
+      if (document.getElementById("pl-selection").value) {
+        document.querySelector('div.production-window').style.visibility = 'visible';
+        this.chargeUnplannedEventsData();
+      } else document.querySelector('div.production-window').style.visibility = 'hidden';
     },
-    loadTable: function loadTable() {},
-    test: function test() {
-      var selectedSite = document.getElementById('site-selection').value;
-      var selectedPL = document.getElementById('pl-selection').value; //Api accepts dates in the format yyyy-mm-dd
+    getMonth: function getMonth(dateString) {
+      return parseInt(dateString.substring(5, 7));
+    },
+    createDowntimeObject: function createDowntimeObject() {
+      var _iterator2 = _createForOfIteratorHelper(this.months),
+          _step2;
 
-      var dateFrom = document.getElementById('select-year-from').value + '-01-01';
-      var dateTo = document.getElementById('select-year-to').value + '-31-12';
-      var params = [selectedSite, selectedPL, dateFrom, dateTo];
-      this.$store.dispatch('fetchAllEvents', params);
-      console.log(this.allEvents);
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var month = _step2.value;
+          this.downtimes.cip[month] = {
+            totalNb: 0,
+            totalDuration: 0,
+            events: []
+          };
+          this.downtimes.cov[month] = {
+            totalNb: 0,
+            totalDuration: 0,
+            events: []
+          };
+          this.downtimes.bnc[month] = {
+            totalNb: 0,
+            totalDuration: 0,
+            events: []
+          };
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+    },
+    chargeUnplannedEventsData: function chargeUnplannedEventsData() {
+      var _this = this;
+
+      var selectedPL = document.getElementById('pl-selection').value;
+      var dateFrom = document.getElementById('select-year-from').value;
+      var dateTo = document.getElementById('select-year-to').value;
+      var params = [selectedPL, dateFrom, dateTo];
+      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
+        var events = _this.$store.getters['unplannedDowntimeEvents'];
+        console.log(events);
+      }); //Wait for data
+
+      this.resolveAfter(1000).then(function () {
+        //A new downtime object is created to delete previous data
+        _this.createDowntimeObject();
+
+        var totalDuration = {
+          cip: 0,
+          cov: 0,
+          bnc: 0
+        };
+        var totalNb = {
+          cip: 0,
+          cov: 0,
+          bnc: 0
+        };
+        var years = dateTo - dateFrom + 1;
+
+        for (var _i = 0, _arr = ['cip', 'cov', 'bnc']; _i < _arr.length; _i++) {
+          var type = _arr[_i];
+
+          var _iterator3 = _createForOfIteratorHelper(_this.unplannedDowntimeEvents[0][type.toUpperCase()]),
+              _step3;
+
+          try {
+            for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+              var event = _step3.value;
+
+              var monthCreated = _this.getMonth(event.created_at);
+
+              var month = _this.months[monthCreated - 1];
+
+              _this.downtimes[type][month].events.push(event);
+
+              _this.downtimes[type][month].totalNb++;
+              _this.downtimes[type][month].totalDuration += event.total_duration;
+              totalDuration[type] += event.total_duration;
+              totalNb[type]++;
+            }
+          } catch (err) {
+            _iterator3.e(err);
+          } finally {
+            _iterator3.f();
+          }
+
+          var avgYearlyNb = totalNb[type] / years;
+          var avgYearlyDuration = totalDuration[type] / years;
+          var avgDuration = avgYearlyDuration / avgYearlyNb;
+          _this.downtimes[type].general.totalNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
+          _this.downtimes[type].general.totalDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
+          _this.downtimes[type].general.average = (avgDuration ? avgDuration : 0).toFixed(2);
+        }
+      });
+    },
+    resolveAfter: function resolveAfter(miliseconds) {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          return resolve();
+        }, miliseconds);
+      });
     }
   },
   mounted: function mounted() {
-    this.$store.dispatch('fetchSites'); //Populate years array
-
-    for (var i = this.startYear; i <= this.currentYear; i++) {
-      this.years.push(i);
-    }
-
-    this.yearsAfterFrom = this.years;
+    this.$store.dispatch('fetchSites');
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'allEvents']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'unplannedDowntimeEvents']))
 });
 
 /***/ }),
@@ -6287,9 +6428,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+
 var actions = {
   retrieveToken: function retrieveToken(context, credentials) {
-    axios.post("/api/log/".concat(credentials[0], "/").concat(credentials[1])).then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/log/".concat(credentials[0], "/").concat(credentials[1])).then(function (res) {
       console.log(res);
       var token;
 
@@ -6304,7 +6448,7 @@ var actions = {
   },
   fetchUsers: function fetchUsers(_ref, parameters) {
     var commit = _ref.commit;
-    axios.get("/api/users/".concat(parameters[0])).then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/users/".concat(parameters[0])).then(function (res) {
       console.log(res.data);
       commit('FETCH_USER', res.data);
     })["catch"](function (err) {
@@ -6313,7 +6457,7 @@ var actions = {
   },
   fetchSites: function fetchSites(_ref2, parameters) {
     var commit = _ref2.commit;
-    axios.get("/api/sites").then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/sites").then(function (res) {
       console.log(res.data);
       commit('FETCH_SITES', res.data);
     })["catch"](function (err) {
@@ -6322,28 +6466,39 @@ var actions = {
   },
   fetchMachines: function fetchMachines(_ref3, productionlineID) {
     var commit = _ref3.commit;
-    axios.get("/api/machines/".concat(productionlineID)).then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/machines/".concat(productionlineID)).then(function (res) {
       commit('FETCH_MACHINES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchAllEvents: function fetchAllEvents(_ref4, parameters) {
+  fetchDowntimeEvents: function fetchDowntimeEvents(_ref4, parameters) {
     var commit = _ref4.commit;
+    var productionLine = parameters[0];
+    var startYear = parameters[1];
+    var endYear = parameters[2];
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/unplannedDowntimeEvents/".concat(productionLine, "/").concat(startYear, "/").concat(endYear)).then(function (res) {
+      commit('FETCH_UNPLANNED_DOWNTIME_EVENTS', res.data);
+    })["catch"](function (err) {
+      return console.log(err);
+    });
+  },
+  fetchAllEvents: function fetchAllEvents(_ref5, parameters) {
+    var commit = _ref5.commit;
     var site = parameters[0];
     var productionLine = parameters[1];
     var beginningDate = parameters[2];
     var endingDate = parameters[3];
     var PONumber = parameters[4];
-    axios.get("/api/allevents/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate, "/").concat(PONumber)).then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/allevents/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate, "/").concat(PONumber)).then(function (res) {
       commit('FETCH_ALL_EVENTS', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchEvents: function fetchEvents(_ref5, parameters) {
-    var commit = _ref5.commit;
-    axios.get("/api/events/".concat(parameters[1], "/").concat(parameters[2])).then(function (res) {
+  fetchEvents: function fetchEvents(_ref6, parameters) {
+    var commit = _ref6.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/events/".concat(parameters[1], "/").concat(parameters[2])).then(function (res) {
       //console.log(res.data);
       if (parameters[0] === 1) {
         commit('FETCH_EVENTS1', res.data);
@@ -6354,35 +6509,35 @@ var actions = {
       console.log(err);
     });
   },
-  fetchPO: function fetchPO(_ref6, parameters) {
-    var commit = _ref6.commit;
-    axios.get("/api/pos/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
+  fetchPO: function fetchPO(_ref7, parameters) {
+    var commit = _ref7.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/pos/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       //console.log(res.data);
       commit('FETCH_PO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchSpeedLosses: function fetchSpeedLosses(_ref7, parameters) {
-    var commit = _ref7.commit;
-    axios.get("/api/speedLosses/".concat(parameters[1], "/").concat(parameters[0])).then(function (res) {
+  fetchSpeedLosses: function fetchSpeedLosses(_ref8, parameters) {
+    var commit = _ref8.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/speedLosses/".concat(parameters[1], "/").concat(parameters[0])).then(function (res) {
       commit('FETCH_SPEEDLOSSES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchDowntimeReason: function fetchDowntimeReason(_ref8, parameters) {
-    var commit = _ref8.commit;
-    axios.get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
+  fetchDowntimeReason: function fetchDowntimeReason(_ref9, parameters) {
+    var commit = _ref9.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref9, parameters) {
-    var commit = _ref9.commit;
-    axios.get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
+  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref10, parameters) {
+    var commit = _ref10.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
       console.log('Je passe ici');
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_2', res.data);
@@ -6390,109 +6545,109 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref10, machineName) {
-    var commit = _ref10.commit;
-    axios.get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
+  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref11, machineName) {
+    var commit = _ref11.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_MACHINE_ISSUE', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getWorksiteID: function getWorksiteID(_ref11, worksite) {
-    var commit = _ref11.commit;
-    axios.get("/api/worksiteID/".concat(worksite)).then(function (res) {
+  getWorksiteID: function getWorksiteID(_ref12, worksite) {
+    var commit = _ref12.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/worksiteID/".concat(worksite)).then(function (res) {
       commit('FETCH_WORKSITEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getProductionlineID: function getProductionlineID(_ref12, productionline) {
-    var commit = _ref12.commit;
-    axios.get("/api/productionlineID/".concat(productionline)).then(function (res) {
+  getProductionlineID: function getProductionlineID(_ref13, productionline) {
+    var commit = _ref13.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/productionlineID/".concat(productionline)).then(function (res) {
       commit('FETCH_PRODUCTIONLINEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkAssignation: function checkAssignation(_ref13, assignation) {
-    var commit = _ref13.commit;
-    axios.get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
+  checkAssignation: function checkAssignation(_ref14, assignation) {
+    var commit = _ref14.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref14, potab) {
-    var commit = _ref14.commit;
+  create_PO: function create_PO(_ref15, potab) {
+    var commit = _ref15.commit;
 
     for (var i = 0; i < potab.length; i++) {
-      axios.post("/api/PO", potab[i]).then(function (res) {
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/PO", potab[i]).then(function (res) {
         commit('CREATE_PO', res.data);
       })["catch"](function (err) {
         console.log(err);
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref15, assignation) {
-    var commit = _ref15.commit;
-    axios.post("/api/assignation", assignation).then(function (res) {
+  storeAssignation: function storeAssignation(_ref16, assignation) {
+    var commit = _ref16.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref16, event) {
-    var commit = _ref16.commit;
-    axios.post("/api/unplannedEvent/changingFormat", event).then(function (res) {
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref17, event) {
+    var commit = _ref17.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref17, event) {
-    var commit = _ref17.commit;
-    axios.post("/api/unplannedEvent/clientChanging", event).then(function (res) {
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref18, event) {
+    var commit = _ref18.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref18, event) {
-    var commit = _ref18.commit;
-    axios.post("/api/unplannedEvent/CIP", event).then(function (res) {
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref19, event) {
+    var commit = _ref19.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref19, event) {
-    var commit = _ref19.commit;
-    axios.post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref20, event) {
+    var commit = _ref20.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref20, event) {
-    var commit = _ref20.commit;
-    axios.post("/api/plannedEvent", event).then(function (res) {
+  create_plannedEvent: function create_plannedEvent(_ref21, event) {
+    var commit = _ref21.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref21, PONumber) {
-    var commit = _ref21.commit;
-    axios.post("/api/stopPO/".concat(PONumber), PONumber).then(function (res) {
+  stop_PO: function stop_PO(_ref22, PONumber) {
+    var commit = _ref22.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/stopPO/".concat(PONumber), PONumber).then(function (res) {
       commit('STOP_PO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref22, event) {
-    var commit = _ref22.commit;
-    axios.post("/api/speedLoss", event).then(function (res) {
+  create_SpeedLoss: function create_SpeedLoss(_ref23, event) {
+    var commit = _ref23.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
       console.log(err);
@@ -6532,6 +6687,9 @@ var getters = {
   },
   allEvents: function allEvents(state) {
     return state.allEvents;
+  },
+  unplannedDowntimeEvents: function unplannedDowntimeEvents(state) {
+    return state.unplannedDowntimeEvents;
   },
   machines: function machines(state) {
     return state.machines;
@@ -6658,6 +6816,9 @@ var mutations = {
   FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
     return state.allEvents = events;
   },
+  FETCH_UNPLANNED_DOWNTIME_EVENTS: function FETCH_UNPLANNED_DOWNTIME_EVENTS(state, events) {
+    return state.unplannedDowntimeEvents = events;
+  },
   CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME: function CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent) {
     state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
   },
@@ -6722,7 +6883,8 @@ var state = {
   allEvents: [],
   worksiteID: -1,
   productionlineID: -1,
-  token: localStorage.getItem('access_token')
+  token: localStorage.getItem('access_token'),
+  unplannedDowntimeEvents: []
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
 
@@ -11546,7 +11708,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -50346,27 +50508,28 @@ var render = function() {
               ],
               attrs: { id: "site-selection" },
               on: {
-                change: [
-                  function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  },
-                  function($event) {
-                    return _vm.siteSelected()
-                  }
-                ]
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.site = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
               }
             },
             [
+              _c(
+                "option",
+                { attrs: { disabled: "", selected: "", value: "" } },
+                [_vm._v("-- Select --")]
+              ),
+              _vm._v(" "),
               _vm._l(_vm.sites[0], function(site) {
                 return [
                   _c(
@@ -50388,8 +50551,21 @@ var render = function() {
           _vm._v(" "),
           _c(
             "select",
-            { attrs: { id: "pl-selection" } },
+            {
+              attrs: { id: "pl-selection" },
+              on: {
+                change: function($event) {
+                  return _vm.productionLineSelected()
+                }
+              }
+            },
             [
+              _c(
+                "option",
+                { attrs: { disabled: "", selected: "", value: "" } },
+                [_vm._v("-- Select --")]
+              ),
+              _vm._v(" "),
               _vm._l(_vm.sites[1], function(productionLine) {
                 return [
                   productionLine.name === _vm.site
@@ -50432,7 +50608,8 @@ var render = function() {
               attrs: { id: "select-year-from" },
               on: {
                 change: function($event) {
-                  return _vm.calculateYearsAfterFrom()
+                  _vm.calculateYearsAfterFrom()
+                  _vm.chargeUnplannedEventsData()
                 }
               }
             },
@@ -50456,7 +50633,7 @@ var render = function() {
               attrs: { id: "select-year-to" },
               on: {
                 change: function($event) {
-                  return _vm.loadTable()
+                  return _vm.chargeUnplannedEventsData()
                 }
               }
             },
@@ -50501,7 +50678,9 @@ var render = function() {
           _c(
             "tbody",
             [
-              _vm._l(_vm.unplannedDowntimesCategories, function(cat) {
+              _vm._l(Object.keys(_vm.unplannedDowntimesCategories), function(
+                cat
+              ) {
                 return [
                   _c(
                     "tr",
@@ -50512,7 +50691,9 @@ var render = function() {
                         { staticClass: "side", attrs: { scope: "col" } },
                         [
                           _c("tr", { staticClass: "table-row-title" }, [
-                            _vm._v(_vm._s(cat))
+                            _vm._v(
+                              _vm._s(_vm.unplannedDowntimesCategories[cat])
+                            )
                           ]),
                           _vm._v(" "),
                           _c("tr", { staticClass: "table-sub-row" }, [
@@ -50527,7 +50708,7 @@ var render = function() {
                       _vm._v(" "),
                       _vm._l(_vm.months, function(month) {
                         return [
-                          _c("td", { key: month }, [
+                          _c("td", { key: month, staticClass: "table-data" }, [
                             _c(
                               "tr",
                               { staticStyle: { visibility: "hidden" } },
@@ -50535,11 +50716,13 @@ var render = function() {
                             ),
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
-                              _vm._v(_vm._s(month))
+                              _vm._v(
+                                _vm._s(_vm.downtimes[cat][month].totalDuration)
+                              )
                             ]),
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
-                              _vm._v(_vm._s(month))
+                              _vm._v(_vm._s(_vm.downtimes[cat][month].totalNb))
                             ])
                           ])
                         ]
@@ -50564,19 +50747,21 @@ var render = function() {
               _c("div", { key: cat, staticClass: "d-flex ya-info-row" }, [
                 _c("div", { staticClass: "d-flex" }, [
                   _c("span", { staticStyle: { "font-weight": "bold" } }, [
-                    _vm._v(_vm._s(cat.toUpperCase()))
+                    _vm._v(_vm._s("Yearly " + cat.toUpperCase()))
                   ]),
                   _vm._v(" "),
                   _c("span", [
                     _vm._v(
-                      " " + _vm._s(_vm.yearlyDowntimes[cat].hours) + " Hours"
+                      " " +
+                        _vm._s(_vm.downtimes[cat].general.totalDuration) +
+                        " Hours"
                     )
                   ]),
                   _vm._v(" "),
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.yearlyDowntimes[cat].count) +
+                        _vm._s(_vm.downtimes[cat].general.totalNb) +
                         " " +
                         _vm._s(cat.toUpperCase())
                     )
@@ -50590,7 +50775,9 @@ var render = function() {
                   _vm._v(" "),
                   _c("span", [
                     _vm._v(
-                      " " + _vm._s(_vm.yearlyDowntimes[cat].avgHours) + " Hours"
+                      " " +
+                        _vm._s(_vm.downtimes[cat].general.average) +
+                        " Hours"
                     )
                   ])
                 ])
@@ -50600,19 +50787,7 @@ var render = function() {
         ],
         2
       )
-    ]),
-    _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            return _vm.test()
-          }
-        }
-      },
-      [_vm._v("TESTE")]
-    )
+    ])
   ])
 }
 var staticRenderFns = [

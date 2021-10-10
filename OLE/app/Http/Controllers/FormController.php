@@ -35,17 +35,33 @@ class FormController extends Controller
 
     public function getUnplannedDowntimeEvents($productionLine, $beginningYear, $endingYear) {
 
-        $cip = DB::table('ole_unplanned_event_cips')
+        $CIP = DB::table('ole_unplanned_event_cips')
             ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_cips.creates_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_cips.creates_at', '<=', $endingYear)
+            ->whereYear('ole_unplanned_event_cips.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_cips.created_at', '<=', $endingYear)
             ->get();
 
-        $cov = DB::table('ole_unplanned_event_changing_clients')
+        $COV = DB::table('ole_unplanned_event_changing_clients')
             ->where('ole_unplanned_event_changing_clients.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_changing_clients.creates_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_changing_clients.creates_at', '<=', $endingYear)
+            ->whereYear('ole_unplanned_event_changing_clients.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_changing_clients.created_at', '<=', $endingYear)
             ->get();
+
+        $BNC = DB::table('ole_unplanned_event_changing_formats')
+            ->where('ole_unplanned_event_changing_formats.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_changing_formats.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_changing_formats.created_at', '<=', $endingYear)
+            ->get();
+
+
+        
+        $tab = array([
+            'CIP' => $CIP,
+            'COV' => $COV,
+            'BNC' => $BNC
+        ]);
+
+        return response()->json($tab);
         
     }
 

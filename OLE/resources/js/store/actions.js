@@ -1,3 +1,5 @@
+import axios from "axios";
+
 let actions = {
 
 
@@ -50,6 +52,18 @@ let actions = {
             }).catch(err => {
             console.log(err)
         })
+    },
+
+    fetchDowntimeEvents({commit}, parameters) {
+
+        const productionLine = parameters[0];
+        const startYear = parameters[1];
+        const endYear = parameters[2];
+
+        axios.get(`/api/unplannedDowntimeEvents/${productionLine}/${startYear}/${endYear}`)
+            .then(res => {
+                commit('FETCH_UNPLANNED_DOWNTIME_EVENTS', res.data);
+            }).catch(err => console.log(err));
     },
 
     fetchAllEvents({commit}, parameters) {

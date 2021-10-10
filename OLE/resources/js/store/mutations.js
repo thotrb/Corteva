@@ -67,6 +67,9 @@ let mutations = {
         return state.allEvents = events;
     },
 
+    FETCH_UNPLANNED_DOWNTIME_EVENTS(state, events) {
+        return state.unplannedDowntimeEvents = events;
+    },
 
     CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent){
         state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
