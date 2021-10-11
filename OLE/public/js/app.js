@@ -5741,6 +5741,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
@@ -5927,16 +5934,31 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         }
       });
     },
-    resolveAfter: function resolveAfter(miliseconds) {
+    resolveAfter: function resolveAfter(milliseconds) {
       return new Promise(function (resolve) {
         setTimeout(function () {
           return resolve();
-        }, miliseconds);
+        }, milliseconds);
+      });
+    },
+    createCharts: function createCharts() {
+      var cipChart = new Chart('cip-chart', {
+        type: 'bar',
+        data: {}
       });
     }
   },
   mounted: function mounted() {
-    this.$store.dispatch('fetchSites');
+    var _this2 = this;
+
+    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
+
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+    document.head.appendChild(chartJs);
+    setTimeout(function () {
+      return _this2.createCharts();
+    }, 2000);
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'unplannedDowntimeEvents']))
 });
@@ -11708,7 +11730,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    display: flex;\n    justify-content: center;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -50787,7 +50809,9 @@ var render = function() {
         ],
         2
       )
-    ])
+    ]),
+    _vm._v(" "),
+    _vm._m(2)
   ])
 }
 var staticRenderFns = [
@@ -50805,6 +50829,27 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "d-flex title" }, [
       _c("span", [_vm._v("Production Window")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "chart-container" }, [
+      _c("canvas", {
+        staticClass: "chart",
+        attrs: { id: "cip-chart", width: "400", height: "400" }
+      }),
+      _vm._v(" "),
+      _c("canvas", {
+        staticClass: "chart",
+        attrs: { id: "cov-chart", width: "400", height: "400" }
+      }),
+      _vm._v(" "),
+      _c("canvas", {
+        staticClass: "chart",
+        attrs: { id: "bnc-chart", width: "400", height: "400" }
+      })
     ])
   }
 ]

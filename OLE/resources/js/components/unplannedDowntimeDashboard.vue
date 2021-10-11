@@ -109,6 +109,13 @@
                 </template>
             </div>
         </div>
+
+        <!-- Downtime graphs-->
+        <div class="chart-container">
+            <canvas class="chart" id="cip-chart" width="400" height="400"></canvas>
+            <canvas class="chart" id="cov-chart" width="400" height="400"></canvas>
+            <canvas class="chart" id="bnc-chart" width="400" height="400"></canvas>
+        </div>
     </div>
 </template>                                                                                           
 
@@ -233,15 +240,30 @@
 
           },
 
-          resolveAfter: function (miliseconds) {
+          resolveAfter: function (milliseconds) {
                 return new Promise(resolve => {
-                    setTimeout(() => resolve(), miliseconds);
+                    setTimeout(() => resolve(), milliseconds);
                 });
-            },
+          },
+
+          createCharts: function () {
+              var cipChart = new Chart('cip-chart', {
+                  type: 'bar',
+                  data: {}
+              });
+          }
+
         },
 
         mounted() {
             this.$store.dispatch('fetchSites');
+
+            //Load chart.js into vue component
+            let chartJs = document.createElement('script');
+            chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+            document.head.appendChild(chartJs);
+            
+            setTimeout(() => this.createCharts(), 2000);
         },
 
         computed: {
@@ -345,6 +367,11 @@
 
     div.container-table td.table-data > tr {
         text-align: center;
+    }
+
+    div.chart-container {
+        display: flex;
+        justify-content: center;
     }
         
     thead {
