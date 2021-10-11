@@ -30,6 +30,8 @@ Vue.component('packagingID', require('./components/packagingLineID.vue').default
 
 Vue.component('choiceLogin', require('./components/choiceLogin.vue').default);
 
+Vue.component('monthlyLoadFactor', require('./components/monthlyLoadFactor.vue').default);
+
 Vue.component('login', require('./components/login.vue').default);
 
 Vue.component('teamInfo', require('./components/teamInfo.vue').default);

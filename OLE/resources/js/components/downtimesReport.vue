@@ -1,5 +1,8 @@
+
 <template>
-    <div class="d-flex">
+    <div class="d-flex" id="component">
+
+        <!--{{ allEvents['SITE']}}-->
 
         <!--{{allEvents['CP']}}-->
 
@@ -44,14 +47,6 @@
             </div>
 
 
-            <div class="d-flex">
-                <form>
-                    <label class="" for="PO">Numéro de PO : </label>
-                    <input type="text" id="PO" class="" v-model="PONumber">
-                </form>
-            </div>
-
-
             <br/>
             <input v-on:click="load()" type="button" class="btn btn-outline-info" value="Charger">
 
@@ -65,18 +60,18 @@
 
                     <div class="col">
                         <p>
-                            Plant Operating Time : {{ allEvents['POInfo'][0].plantOperatingTime}} mn <br/>
-                            Planned Production Time : {{ allEvents['POInfo'][0].plannedProductionTime}} mn <br/>
-                            Load factor : {{ allEvents['POInfo'][0].loadFactor}} % <br/>
+                            Plant Operating Time :<!-- {{ allEvents['POInfo'][0].plantOperatingTime}}--> mn <br/>
+                            Planned Production Time : <!--{{ allEvents['POInfo'][0].plannedProductionTime}} -->mn <br/>
+                            Load factor :<!-- {{ allEvents['POInfo'][0].loadFactor}}--> % <br/>
                         </p>
                     </div>
 
                     <div class="col">
 
                         <p>
-                            Volume packed : {{ allEvents['POInfo'][0].volumePacked}} L <br/>
-                            Nber of Production Order : {{ allEvents['POInfo'][0].nbProductionOrder}} <br/>
-                            Nber of items Produced : {{ allEvents['POInfo'][0].nbItemProductionOrder}} <br/>
+                            Volume packed :<!-- {{ allEvents['POInfo'][0].volumePacked}} --> L <br/>
+                            Nber of Production Order : {{ allEvents['SITE'].length}} <br/>
+                            Nber of items Produced : {{ qtyProduced }}<br/>
 
                         </p>
 
@@ -359,7 +354,7 @@
                             Planned Downtime (PD)
                         </p>
                         <p>
-                            ..%
+                            {{plannedProductionTime / plannedDowntimes * 100}}%
                         </p>
                     </div>
 
@@ -372,7 +367,7 @@
                             Unplanned Downtime (UD)
                         </p>
                         <p>
-                            ..%
+                            {{operatingTime / unplannedDowntimes * 100}}%
                         </p>
                     </div>
 
@@ -458,6 +453,7 @@
 </template>
 
 <script>
+
     import {mapGetters} from "vuex";
 
     export default {
@@ -477,7 +473,22 @@
                 username: sessionStorage.getItem("username"),
                 index: -1,
                 show: 0,
-                PONumber: '',
+                qtyProduced: 0,
+
+
+                productsName: [],
+                quantityArray :[],
+                formatArray : [],
+
+                plannedDowntimes: 0,
+                unplannedDowntimes: 0,
+                plannedProductionTime: 0,
+                operatingTime: 0,
+                netOperatingTime: 0,
+                performance:0,
+                availability:0,
+                quality:0,
+                OLE:0,
             }
         },
 
@@ -498,17 +509,18 @@
                     tab.push(this.productionline);
                     tab.push(this.beginningDate);
                     tab.push(this.endingDate);
-                    tab.push(this.PONumber);
 
                     this.$store.dispatch('fecthAllEvents', tab);
                     await this.resolveAfter15Second();
                     this.show = 1;
-                    await this.resolveAfter05Second();
+                    await this.resolveAfter15Second();
+
+                    this.loadArray();
+
+                    this.loadProductionTime();
+
 
                     this.circle();
-
-
-                    this.index = index;
                     this.pieCharts();
 
 
@@ -520,6 +532,32 @@
 
             },
 
+            loadArray : function (){
+                for (let i = 0; i < this.allEvents['SITE'].length; i++) {
+                    this.quantityArray[i] = 0;
+                    this.formatArray[i] = '';
+                }
+                for (let i = 0; i < this.allEvents['SITE'].length; i++) {
+
+                    this.qtyProduced += this.allEvents['SITE'][i].qtyProduced;
+
+                    if (!this.productsName.includes(this.allEvents['SITE'][i].product)) {
+                        this.productsName.push(this.allEvents['SITE'][i].product);
+                    }
+
+                    let index = this.productsName.indexOf(this.allEvents['SITE'][i].product);
+
+                    this.quantityArray[index] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase;
+                    this.formatArray[index] =  this.allEvents['SITE'][i].size;
+                }
+
+                console.log(this.productsName);
+                console.log(this.quantityArray);
+                console.log(this.formatArray);
+
+
+            },
+
             resolveAfter15Second: function () {
                 return new Promise(resolve => {
                     setTimeout(() => {
@@ -528,13 +566,144 @@
                 });
             },
 
+            loadProductionTime : function(){
+
+                var sommePlannedEvents = 0;
+                var sommeUnplannedEvents = 0;
+
+                var sommeQtyProduced = 0;
+                var sommeRejection = 0;
+
+                var fillerCounter = 0;
+                var caperCounter =0;
+                var labelerCounter = 0;
+                var wieghtBoxCounter = 0;
+
+                this.netOperatingTime = 0;
+
+
+
+                for (let i = 0; i < this.allEvents['EVENTS'].length; i++) {
+
+                        let PO = this.allEvents['EVENTS'][i];
+                        sommeQtyProduced += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1;
+                        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1+ PO.labelerRejection * 1+ PO.weightBoxRejection * 1;
+                        fillerCounter += PO.fillerCounter * 1;
+                        caperCounter  += PO.caperCounter * 1;
+                        labelerCounter += PO.labelerCounter * 1;
+                        wieghtBoxCounter  += PO.weightBoxCounter * 1;
+                        this.netOperatingTime  += (this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1) / this.allEvents['EVENTS'][i].idealRate * 1;
+                        if (this.allEvents['EVENTS'][i].kind === 0) {
+                            sommePlannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
+                        } else {
+                            sommeUnplannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
+                        }
+                 }
+
+                var sommeWorkingTime = 0;
+                for (let j = 0; j < this.allEvents['SITE'].length; j++) {
+                    sommeWorkingTime += this.allEvents['SITE'][j].workingDuration * 1;
+                }
+
+                this.plannedDowntimes = sommePlannedEvents;
+                this.unplannedDowntimes = sommeUnplannedEvents;
+
+
+                this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
+                this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+
+                this.availability= this.operatingTime / this.plannedProductionTime * 100;
+
+                this.performance = this.netOperatingTime / this.operatingTime;
+
+                if(sommeRejection===0 && fillerCounter === 0 && caperCounter === 0
+                    && labelerCounter === 0 && wieghtBoxCounter ===0){
+                    this.quality = 100;
+                }else{
+                    var s =  (fillerCounter-sommeQtyProduced) +  (caperCounter-sommeQtyProduced)
+                    +  (labelerCounter-sommeQtyProduced) +  (wieghtBoxCounter-sommeQtyProduced);
+                    this.quality = (sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s) * 100;
+
+                }
+
+
+
+                if(this.operatingTime ===0){
+                    this.availability = 0;
+
+                }
+
+                if(this.netOperatingTime ===0){
+                    this.performance = 0;
+                    this.unplannedDowntimes = 1;
+                }
+
+                if(this.plannedProductionTime ===0){
+                    this.plannedDowntimes = 1;
+                }
+
+                this.OLE = this.availability * this.performance * this.quality;
+
+                console.log('Planned Downtime : ' + sommePlannedEvents);
+                console.log('Unplanned Downtime : ' + sommeUnplannedEvents);
+                console.log('Planned Production Time : ' + this.plannedProductionTime);
+                console.log('Operating Time : ' + this.operatingTime);
+
+                console.log('NOT : ' + sommePlannedEvents);
+                console.log('Availability : ' + this.availability);
+                console.log('Performance : ' + this.performance);
+                console.log('Operating Time : ' + this.operatingTime);
+
+
+
+
+
+
+            },
+
             pieCharts: function () {
+
+/**
+                var data = [];
+                for(let i=0; i<this.productsName.length; i++){
+                    let item = {
+                      y:  this.quantityArray[i],
+                        label: this.productsName[i]
+                    };
+                    data.push(item);
+                }
+
+
+
+                var chart = new CanvasJS.Chart("can", {
+                    animationEnabled: true,
+                    title: {
+                        text: "Desktop Search Engine Market Share - 2016"
+                    },
+                    data: [{
+                        type: "pie",
+                        startAngle: 240,
+                        yValueFormatString: "##0.00\"%\"",
+                        indexLabel: "{label} {y}",
+                        dataPoints: data,
+                    }]
+                });
+
+                chart.render();
+**/
+
+
+                var data = [];
+                for(let i=0; i<this.productsName.length; i++){
+                    data.push(this.quantityArray[i]);
+                }
                 var canvas = document.getElementById("can");
                 var ctx = canvas.getContext("2d");
                 var lastend = 0;
-                var data = [200, 60, 15]; // If you add more data values make sure you add more colors
+
+
                 var myTotal = 0; // Automatically calculated so don't touch
-                var myColor = ['red', 'green', 'blue']; // Colors of each slice
+                var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
 
                 for (var e = 0; e < data.length; e++) {
                     myTotal += data[e];
@@ -550,6 +719,7 @@
                     ctx.fill();
                     lastend += Math.PI * 2 * (data[i] / myTotal);
                 }
+
 
 
                 canvas = document.getElementById("can2");
@@ -577,7 +747,7 @@
 
             },
 
-            resolveAfter05Second : function (){
+            resolveAfter05Second: function () {
                 return new Promise(resolve => {
                     setTimeout(() => {
                         resolve('resolved');
@@ -591,9 +761,9 @@
                 var context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.allEvents['POInfo'][0].Availability >= 70 && this.allEvents['POInfo'][0].Availability < 95) {
+                if (this.availability >= 70 && this.availability  < 95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.allEvents['POInfo'][0].Availability >= 95) {
+                } else if (this.availability  >= 95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -601,16 +771,16 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.allEvents['POInfo'][0].Availability, 70, 90);
+                context.fillText(this.availability, 70, 90);
 
 
                 canvas = document.getElementById("Performance");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.allEvents['POInfo'][0].Performance >= 70 && this.allEvents['POInfo'][0].Performance < 95) {
+                if (this.performance  >= 70 && this.performance  < 95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.allEvents['POInfo'][0].Performance >= 95) {
+                } else if (this.performance  >= 95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -618,15 +788,15 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.allEvents['POInfo'][0].Performance, 70, 90);
+                context.fillText(this.performance , 70, 90);
 
                 canvas = document.getElementById("Quality");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.allEvents['POInfo'][0].Quality >= 70 && this.allEvents['POInfo'][0].Quality < 95) {
+                if (this.quality  >= 70 && this.quality < 95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.allEvents['POInfo'][0].Quality >= 95) {
+                } else if (this.quality >= 95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -634,15 +804,15 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.allEvents['POInfo'][0].Quality, 70, 90);
+                context.fillText(this.quality, 70, 90);
 
                 canvas = document.getElementById("OLE");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.allEvents['POInfo'][0].OLE >= 70 && this.allEvents['POInfo'][0].OLE < 95) {
+                if (this.OLE >= 70 && this.OLE < 95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.allEvents['POInfo'][0].OLE >= 95) {
+                } else if (this.OLE >= 95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -650,7 +820,7 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.allEvents['POInfo'][0].OLE, 70, 90);
+                context.fillText(this.OLE, 70, 90);
 
 
             },
@@ -677,6 +847,10 @@
             document.getElementById("startingPO").setAttribute("max", today);
             document.getElementById("endingPO").setAttribute("max", today);
 
+
+            let externalScript = document.createElement('script');
+            externalScript.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
+            document.head.appendChild(externalScript)
         }
         ,
 

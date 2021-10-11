@@ -58,9 +58,8 @@ let actions = {
         var productionLine = parameters[1];
         var beginningDate = parameters[2];
         var endingDate = parameters[3];
-        var PONumber = parameters[4];
 
-        axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}/${PONumber}`)
+        axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}`)
             .then(res => {
                 commit('FETCH_ALL_EVENTS', res.data);
             }).catch(err => {
@@ -160,7 +159,17 @@ let actions = {
 
         axios.get(`/api/assignation/${assignation.username}/${assignation.po}/${assignation.productionline}`)
             .then(res => {
-                commit('CREATE_ASSIGNATION', res.data)
+                commit('FECTH_ASSIGNATION', res.data)
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
+    getNetOPTime({commit}, GMID) {
+
+        axios.get(`/api/netOP/${GMID}`)
+            .then(res => {
+                commit('FETCH_NETOP', res.data)
             }).catch(err => {
             console.log(err)
         })
@@ -245,8 +254,17 @@ let actions = {
 
     },
 
-    stop_PO({commit}, PONumber) {
-        axios.post(`/api/stopPO/${PONumber}`, PONumber)
+    stop_PO({commit}, array) {
+        var PO = array[0];
+        var availability =  array[1];
+        var performance =  array[2];
+        var quality =  array[3];
+        var OLE =  array[4];
+        var quantityProduced = array[5];
+        var totalDuration = array[6];
+
+
+        axios.post(`/api/stopPO/${PO}/${availability}/${performance}/${quality}/${OLE}/${quantityProduced}/${totalDuration}`, PO)
             .then(res => {
                 commit('STOP_PO', res.data)
             }).catch(err => {

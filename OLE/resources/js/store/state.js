@@ -16,6 +16,7 @@ let state = {
     speedLoss : [],
     assignation : [],
     PO : [],
+    netOP: [],
     machines : [],
     allEvents : [],
     worksiteID: -1,

@@ -21,7 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('users/{username}', FormController::class.'@get');
 
-Route::get('machines', FormController::class.'@getMachines');
+Route::get('machines/{productionlineID}', FormController::class.'@getMachines');
 
 Route::get('sites', FormController::class.'@getSites');
 
@@ -46,7 +46,11 @@ Route::get('productionlineID/{productionline}', FormController::class.'@getProdu
 
 Route::get('productionlineID/{productionline}', FormController::class.'@getProductionlineID');
 
-Route::get('allevents/{site}/{productionLine}/{beginningDate}/{endingDate}/{PONumber}', FormController::class.'@getAllEventsPeriod');
+Route::get('allevents/{site}/{productionLine}/{beginningDate}/{endingDate}', FormController::class.'@getAllEventsPeriod');
+
+Route::get('assignation/{username}/{po}/{productionline}', FormController::class.'@isAssignationPossible');
+
+Route::get('netOP/{GMID}', FormController::class.'@getNetOP');
 
 Route::post('assignation', FormController::class.'@createAssignement');
 
@@ -54,7 +58,7 @@ Route::post('PO',FormController::class.'@createPO');
 
 Route::post('log/{username}/{password}', FormController::class.'@log');
 
-Route::post('stopPO/{PONumber}', FormController::class.'@stopPO');
+Route::post('stopPO/{PO}/{availability}/{performance}/{quality}/{OLE}/{quantityProduced}/{totalDuration', FormController::class.'@stopPO');
 
 Route::post('unplannedEvent/changingFormat', FormController::class.'@saveUnplannedEvent_Changingformat');
 

@@ -33,6 +33,7 @@ Route::get('/packagingLineID', \App\Http\Controllers\FormController::class.'@ind
 
 Route::get('/downtimesReport', \App\Http\Controllers\FormController::class.'@downtimesReport');
 
+Route::get('/monthlyLoadFactor', \App\Http\Controllers\FormController::class.'@monthlyLoadFactor');
 
 Route::get('/summary', \App\Http\Controllers\FormController::class.'@summary');
 

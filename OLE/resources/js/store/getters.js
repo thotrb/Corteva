@@ -49,9 +49,18 @@ let getters = {
         return state.speedLoss
     },
 
+    assignation: state => {
+        return state.assignation
+    },
+
     downtimeReasons: state => {
 
         return state.downtimeReasons
+    },
+
+    netOP: state => {
+
+        return state.netOP
     },
 
     downtimeReasons_2: state => {

@@ -3,6 +3,7 @@
 
     <div>
 
+
         <template v-if="displayNumber === 0">
             <div align="center">
                 <div align="center" class="col productionName rcorners2">
@@ -34,65 +35,67 @@
                     </div>
 
                     <div class="form-group row blockInput">
-                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">Quantité finale produite</label>
+                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">Quantité finale produite <br>(en
+                            nombre de caisse) </label>
                         <div class="col-sm-10">
-                            <input type="number" id="finalQuantityProduced" class="form-control-plaintext rcorners2" v-model="finalQuantityProduced">
+                            <input type="number" id="finalQuantityProduced" class="form-control-plaintext rcorners2"
+                                   v-model="finalQuantityProduced">
                         </div>
                     </div>
 
+                    <button class="btn btn-primary d-flex align-items-center btn-info" type="button"
+                            @click.prevent="validateCalculation()">
+                        Valider
+                    </button>
+
+
                 </form>
+                <br/>
+                <br/>
 
+                <template v-if="valider === 1">
+                    <div align="center" class="rcorners2">
 
-                <div align="center" class="rcorners2">
+                        <div align="left">
 
-                    <div align="left">
+                            TOTAL PO PRODUCTION TIME (min): {{totalProductionTime}}
+                            <br/>
+                            TOTAL PO OPERATING TIME (min): {{totalOperatingTime}}
+                            <br/>
+                            DIFFERENCE (min): {{totalProductionTime - totalOperatingTime}}
+                            <br/>
 
+                            TOTAL PO PERFORMANCE (%) : {{performance * 100}}
+                        </div>
 
-                        TOTAL PO OPERATING TIME (min): {{ ( (endPO.toString().split(':')[0]*60 +
-                        endPO.toString().split(':')[1])
-                        - (startPO.toString().split(':')[0]*60 + startPO.toString().split(':')[1])) }}
                         <br/>
-                        TOTAL PO NET OPERATING TIME (min): {{(endPO.toString().split(':')[0]*60 +
-                        endPO.toString().split(':')[1])
-                        - (startPO.toString().split(':')[0]*60 + startPO.toString().split(':')[1])
-                        - total_dowtimes}}
-                        <br/>
-                        TOTAL PO PERFORMANCE (%) : {{ ( (endPO.toString().split(':')[0]*60 +
-                        endPO.toString().split(':')[1])
-                        - (startPO.toString().split(':')[0]*60 + startPO.toString().split(':')[1]) - total_dowtimes) /
 
-                        ( (endPO.toString().split(':')[0]*60 + endPO.toString().split(':')[1])
-                        - (startPO.toString().split(':')[0]*60 + startPO.toString().split(':')[1]) )
+                        <template v-if="speedLoss.length <= 0">
+                            <h4>Aucune perte de performance enregistrée</h4>
+                        </template>
+                        <template v-else>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Raison</th>
+                                    <th scope="col">Commentaire</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="event in speedLoss">
+                                    <tr>
+                                        <th scope="row">{{event.reason}}</th>
+                                        <td>{{event.comment}}</td>
+                                    </tr>
+                                </template>
 
-                        *100}}
+                                </tbody>
+
+                            </table>
+                        </template>
                     </div>
 
-                    <br/>
-
-                    <template v-if="speedLoss.length <= 0">
-                        <h4>Aucune perte de performance enregistrée</h4>
-                    </template>
-                    <template v-else>
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">Raison</th>
-                                <th scope="col">Commentaire</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="event in speedLoss">
-                                <tr>
-                                    <th scope="row">{{event.reason}}</th>
-                                    <td>{{event.comment}}</td>
-                                </tr>
-                            </template>
-
-                            </tbody>
-
-                        </table>
-                    </template>
-                </div>
+                </template>
 
 
                 <div align="right">
@@ -101,24 +104,28 @@
                         Annuler
                     </button>
                 </div>
-                <div class="d-flex flex-row justify-content-between align-items-center bg-white">
-                    <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
-                            @click.prevent="backPage()">
-                        Retour
-                    </button>
 
-                    <button class="btn btn-primary d-flex align-items-center btn-warning" id="addReasonButton"
-                            type="button"
-                            @click.prevent="addSpeedLoss()">
-                        Justification perte de performance
-                    </button>
+                <template v-if="valider===1">
+
+                    <div class="d-flex flex-row justify-content-between align-items-center bg-white">
+                        <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
+                                @click.prevent="backPage()">
+                            Retour
+                        </button>
+
+                        <button class="btn btn-primary d-flex align-items-center btn-warning" id="addReasonButton"
+                                type="button"
+                                @click.prevent="addSpeedLoss()">
+                            Justification perte de performance
+                        </button>
 
 
-                    <button class="btn btn-primary border-success align-items-center btn-success" type="button"
-                            @click.prevent="validateInformations()">
-                        OK
-                    </button>
-                </div>
+                        <button class="btn btn-primary border-success align-items-center btn-success" type="button"
+                                @click.prevent="validateInformations()">
+                            OK
+                        </button>
+                    </div>
+                </template>
 
 
             </div>
@@ -250,10 +257,10 @@
                     <tr>
                         <th scope="row">Rejection</th>
                         <td>
-                            <input type="number" id="FillerRejection" class="rcorners2"  v-model="FillerRejection">
+                            <input type="number" id="FillerRejection" class="rcorners2" v-model="FillerRejection">
                         </td>
                         <td>
-                            <input type="number" id="CaperRejection" class="rcorners2"  v-model="CaperRejection">
+                            <input type="number" id="CaperRejection" class="rcorners2" v-model="CaperRejection">
                         </td>
                         <td>
                             <input type="number" id="EtiqueteuseRejection" class="rcorners2"
@@ -293,11 +300,13 @@
             <br>
 
             <span>
-                 TOTAL PO OPERATING TIME (min):  {{totalOperatingTime}}
+
+                TOTAL PO PRODUCTION TIME (min): {{totalProductionTime}}
                 <br/>
-                TOTAL PO NET OPERATING TIME (min): {{totalNetOperatingTime}}
+                TOTAL PO OPERATING TIME (min): {{totalOperatingTime}}
                 <br/>
-                TOTAL PO PERFORMANCE (%) : {{ 100 * totalNetOperatingTime / totalOperatingTime}}
+                DIFFERENCE (min): {{totalProductionTime - totalOperatingTime}}
+                <br/>
             </span>
 
             <br/>
@@ -332,10 +341,6 @@
 
 
             <h5>Qualité</h5>
-
-            <span>
-                 TOTAL PO QUALITY(min):  {{totalPOQuality}}
-            </span>
 
             <br/>
 
@@ -393,11 +398,13 @@
 
             <span>
 
-                 Disponibilité (%) :  {{availability}}
+                 Disponibilité (%) :  {{availability * 100}}
                 <br/>
-                 Performance (%) :  {{availability}}
+                 Performance (%) :  {{performance * 100}}
                 <br/>
-                 OLE (%) :  {{availability}}
+                 Qualité (%) :  {{quality * 100}}
+                <br/>
+                 OLE (%) :  {{OLE * 100}}
 
             </span>
 
@@ -444,21 +451,23 @@
         data() {
             return {
 
-                total_dowtimes: sessionStorage.getItem("sommeUnplannedEvent"),
+                totalUnplannedDowtimes: sessionStorage.getItem("sommeUnplannedEvents"),
+                totalPlannedDowtimes: sessionStorage.getItem("sommePlannedEvents"),
+
 
                 indice: sessionStorage.getItem("indice"),
 
                 startPO: 0,
-/**
-                case11: 0,
-                case12: 0,
-                case13: 0,
-                case14: 0,
-                case21: 0,
-                case22: 0,
-                case23: 0,
-                case24: 0,
-**/
+                /**
+                 case11: 0,
+                 case12: 0,
+                 case13: 0,
+                 case14: 0,
+                 case21: 0,
+                 case22: 0,
+                 case23: 0,
+                 case24: 0,
+                 **/
                 FillerCounter: 0,
                 CaperCounter: 0,
                 EtiqueteuseCounter: 0,
@@ -467,8 +476,8 @@
                 CaperRejection: 0,
                 EtiqueteuseRejection: 0,
                 WieghtBoxRejection: 0,
-                availability : 0,
-                performance : 0,
+                availability: 0,
+                performance: 0,
 
                 finalQuantityProduced: 0,
 
@@ -503,15 +512,91 @@
 
                 totalNetOperatingTime: 0,
 
+                totalProductionTime: 0,
+
                 totalPOQuality: 0,
 
                 endPO: 0,
+
+                GMID: sessionStorage.getItem("GMIDCODE"),
+
+                valider: 0,
+
+                nbBottlesFilled: 0,
+
+                totalDuration: 0,
+
+
 
             };
         },
 
         methods: {
 
+            validateCalculation: async function () {
+                console.log(document.getElementById('endingPO').value);
+
+
+                var splitted1 = this.startPO.toString().split(':');
+                var splitted2 = this.endPO.toString().split(':');
+
+                var time1 = 0;
+                var time2 = 0;
+                if (splitted2[0] >= splitted1[0]) {
+
+                    time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
+
+                    time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
+
+                    this.totalOperatingTime = time2 - time1;
+
+                    this.totalProductionTime = time2 - time1;
+
+                    this.totalDuration = time2 - time1;
+
+
+                } else {
+
+                    time1 = 24 * 60 - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1);
+
+                    time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
+
+                    this.totalOperatingTime = time1 + time2;
+
+                    this.totalProductionTime = time1 + time2;
+
+                    this.totalDuration = time2 - time1;
+
+
+                }
+
+
+                this.totalProductionTime -= (this.totalPlannedDowtimes);
+                this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
+                this.availability = this.totalOperatingTime / this.totalProductionTime;
+
+
+                //this.$store.dispatch('getNetOPTime', this.parameters);
+
+
+                await this.$store.dispatch('getNetOPTime', this.GMID);
+                await this.resolveAfter1Second();
+                console.log(this.netOP);
+
+                this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+
+                this.totalNetOperatingTime = (this.finalQuantityProduced * this.netOP.bottlesPerCase) / this.netOP.idealRate;
+
+                console.log('NET OP : ' + this.totalNetOperatingTime);
+
+                this.performance = this.totalNetOperatingTime / this.totalOperatingTime;
+
+                console.log('Perf : ' + this.performance);
+
+                this.valider = 1;
+
+
+            },
 
             backPage: function () {
                 window.location.href = this.url + 'summary';
@@ -526,45 +611,31 @@
             },
 
             displayQualityIndicators: function () {
-/**
-                this.case11 = document.getElementById('FillerCounter').value;
-                this.case12 = document.getElementById('CaperCounter').value;
-                this.case13 = document.getElementById('EtiqueteuseCounter').value;
-                this.case14 = document.getElementById('WieghtBoxCounter').value;
-                this.case21 = document.getElementById('FillerRejection').value;
-                this.case22 = document.getElementById('CaperRejection').value;
-                this.case23 = document.getElementById('EtiqueteuseRejection').value;
-                this.case24 = document.getElementById('WieghtBoxRejection').value;
-**/
+                /**
+                 this.case11 = document.getElementById('FillerCounter').value;
+                 this.case12 = document.getElementById('CaperCounter').value;
+                 this.case13 = document.getElementById('EtiqueteuseCounter').value;
+                 this.case14 = document.getElementById('WieghtBoxCounter').value;
+                 this.case21 = document.getElementById('FillerRejection').value;
+                 this.case22 = document.getElementById('CaperRejection').value;
+                 this.case23 = document.getElementById('EtiqueteuseRejection').value;
+                 this.case24 = document.getElementById('WieghtBoxRejection').value;
+                 **/
 
 
-                this.totalPOQuality =  parseInt(this.finalQuantityProduced, 10) /
-                    ( ( parseInt(this.finalQuantityProduced, 10) + this.FillerCounter + this.CaperCounter + this.EtiqueteuseCounter + this.WieghtBoxCounter)
-                        + (this.FillerRejection -  parseInt(this.finalQuantityProduced, 10) ) + (this.CaperRejection -  parseInt(this.finalQuantityProduced, 10) )
-                        + (this.EtiqueteuseRejection -  parseInt(this.finalQuantityProduced, 10) ) + (this.WieghtBoxRejection -  parseInt(this.finalQuantityProduced, 10)));
+                this.totalPOQuality = parseInt(this.finalQuantityProduced, 10) /
+                    ((parseInt(this.finalQuantityProduced, 10) + this.FillerCounter + this.CaperCounter + this.EtiqueteuseCounter + this.WieghtBoxCounter)
+                        + (this.FillerRejection - parseInt(this.finalQuantityProduced, 10)) + (this.CaperRejection - parseInt(this.finalQuantityProduced, 10))
+                        + (this.EtiqueteuseRejection - parseInt(this.finalQuantityProduced, 10)) + (this.WieghtBoxRejection - parseInt(this.finalQuantityProduced, 10)));
 
 
 
-/**
-                console.log("QUALITY : " + this.totalPOQuality);
-                console.log("QUALITY : " + this.finalQuantityProduced);
-                console.log("QUALITY : " + this.FillerCounter);
-                console.log("QUALITY : " + this.CaperCounter);
-                console.log("QUALITY : " + this.EtiqueteuseCounter);
-                console.log("QUALITY : " + this.WieghtBoxCounter);
-
-                console.log("QUALITY : " + this.FillerRejection);
-                console.log("QUALITY : " + this.CaperRejection);
-                console.log("QUALITY : " + this.EtiqueteuseRejection);
-                console.log("QUALITY : " + this.WieghtBoxRejection);
-**/
                 this.displayNumber = 3;
 
             },
 
             saveEndPO: async function () {
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
-
 
                 var pos = sessionStorage.getItem("pos").split(',');
                 pos.splice(this.indice, 1);
@@ -576,7 +647,25 @@
                 }
 
 
-                this.$store.dispatch('stop_PO', this.endPO);
+                this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
+
+
+                var array  = [];
+                array.push(this.endPO);
+                array.push(this.availability);
+                array.push(this.performance);
+                array.push(this.quality);
+                array.push(this.OLE);
+                array.push(this.finalQuantityProduced);
+                array.push(this.totalDuration);
+
+
+                this.$store.dispatch('stop_PO', array);
+
+
+
+
+
 
                 this.parameters.push(this.username);
                 this.$store.dispatch('fetchUsers', this.parameters);
@@ -620,23 +709,25 @@
 
             },
 
+            isRejectionNull: function () {
+                return this.FillerRejection === 0 && this.CaperRejection === 0
+                    && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0;
+            },
+
+            isCompteurNull: function () {
+                return this.FillerCounter === 0 && this.CaperCounter === 0 && this.EtiqueteuseCounter === 0
+                    && this.WieghtBoxCounter === 0;
+            },
+
 
             validateInformations: async function () {
 
+                this.valider = 0;
+
                 if (this.displayNumber === 0) {
 
-                    console.log(document.getElementById('endingPO').value);
 
-                    this.totalOperatingTime = (this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1])
-                        - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1]);
-
-
-                    this.totalNetOperatingTime = (this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1])
-                        - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1])
-                        - this.total_dowtimes;
-
-
-                    this.availability = 100 * 8 * 60;
+                    //this.availability = 100 * 8 * 60;
 
                     //recuperer la ligne de production
                     var productionLine = sessionStorage.getItem("productionName");
@@ -651,80 +742,46 @@
 
                     console.log('JE TESTE MA FONCTION');
 
-                    //recuperer les PO number
-                    var parameters = [];
-                    parameters.push(shiftLetter);
-                    parameters.push(site);
-
-
-                    await this.$store.dispatch('fetchPO', parameters);
-
-                    await this.resolveAfter1Second();
-
-                    console.log(this.pos);
-
-                    var sumUnplannedDuration = 0;
-                    var sumPlannedDuration = 0;
-
-                    for(let i =0; i<this.pos.length; i++){
-                        var tab = [];
-                        tab.push(1);
-                        tab.push(this.pos[i].po);
-                        tab.push(productionLine);
-
-                        await this.$store.dispatch('fetchEvents', tab);
-                        await this.resolveAfter1Second();
-
-                        console.log('EVENTS');
-
-                        console.log(this.events1);
-
-
-                        for (let j = 0; j < this.events1.length; j++) {
-                            if(this.events1[j].kind === 1){
-                                sumUnplannedDuration += this.events1[j].total_duration;
-                            }else{
-                                sumPlannedDuration += this.events1[j].total_duration;
-                            }
-                        }
-
-
-                    }
-
-                    console.log('SOMME totale : ' + sumUnplannedDuration + sumPlannedDuration);
-
-                    this.availability = this.availability - (sumPlannedDuration - sumUnplannedDuration) / (sumPlannedDuration);
-
-
-                    var sumNetOperatingTime = 0;
-                    var sumTotalOperatingTime = 0;
-                    for(let j =0; j<this.pos.length; j++){
-
-                        if(this.pos[j].po !== sessionStorage.getItem("pos").split(',')[this.indice]){
-                            sumNetOperatingTime += this.pos[j].totalNetOperatingTime;
-                            sumTotalOperatingTime += this.pos[j].totalOperatingTime;
-                        }else{
-                            sumNetOperatingTime += this.totalNetOperatingTime;
-                            sumTotalOperatingTime += this.totalOperatingTime;
-                        }
-                    }
-
-                    this.performance = 100 * sumNetOperatingTime + sumTotalOperatingTime;
-
-
-
-                    //100 *SUM ( for all the PO of the shift including the last one ( even not achieved ) ) TOTAL PO NET OPERATING TIME
-                    /// SUM ( for all the PO of the shift including the last one ( even not achieved ) ) TOTAL PO OPERATING TIME
-
-                    //this.$store.dispatch('fetchEventsShift', parameters);
-
-
-                    /**
-                     if (sessionStorage.getItem("TOTAL_PO_OPERATING_TIME") === null) {
-                        sessionStorage.TOTAL_PO_OPERATING_TIME = totalOperatingTime;
+                    if (this.isCompteurNull() && this.isRejectionNull()) {
+                        this.quality = 1;
                     } else {
-                        sessionStorage.setItem("TOTAL_PO_OPERATING_TIME", totalOperatingTime);
-                    }**/
+
+                        var N = this.nbBottlesFilled;
+                        var summRejection = this.FillerRejection + this.CaperRejection +
+                            this.EtiqueteuseRejection + this.WieghtBoxRejection;
+                        var summCompteur = (this.FillerCounter - this.nbBottlesFilled) + (this.CaperCounter - this.nbBottlesFilled)
+                            + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
+
+                        this.quality = N / (N + summRejection + summCompteur);
+                    }
+
+
+                    this.OLE = this.quality * this.availability * this.performance;
+
+                    if (sessionStorage.getItem("quality") === null) {
+                        sessionStorage.quality = this.quality;
+                    } else {
+                        sessionStorage.setItem("quality", this.quality);
+                    }
+
+                    if (sessionStorage.getItem("performance") === null) {
+                        sessionStorage.performance = this.performance;
+                    } else {
+                        sessionStorage.setItem("performance", this.performance);
+                    }
+
+                    if (sessionStorage.getItem("availability") === null) {
+                        sessionStorage.availability = this.availability;
+                    } else {
+                        sessionStorage.setItem("availability", this.availability);
+                    }
+
+                    if (sessionStorage.getItem("OLE") === null) {
+                        sessionStorage.OLE = this.OLE;
+                    } else {
+                        sessionStorage.setItem("OLE", this.OLE);
+                    }
+
 
                 }
 
@@ -758,7 +815,8 @@
             }
 
 
-        },
+        }
+        ,
 
         mounted() {
 
@@ -783,15 +841,18 @@
             this.$store.dispatch('fetchSpeedLosses', tab);
 
 
-        },
+        }
+        ,
 
         computed: {
-            ...mapGetters([
-                'speedLoss',
-                'user',
-                'pos',
-                'events1',
-            ])
+            ...
+                mapGetters([
+                    'speedLoss',
+                    'user',
+                    'pos',
+                    'events1',
+                    'netOP',
+                ])
         }
 
 

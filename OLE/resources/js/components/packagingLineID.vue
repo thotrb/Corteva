@@ -140,65 +140,6 @@
 
                 <br/>
 
-                <div class="d-flex">
-
-                    <form>
-
-                        <label class="" for="product">Produit : </label>
-
-                        <select name="product" id="product" class="form-select" v-model="product">
-                            <template v-for="product in machines[2]">
-                                <option v-bind:value="product.name">
-                                    {{product.name}}
-                                </option>
-
-                            </template>
-                        </select>
-                    </form>
-
-                </div>
-
-
-                <div class="d-flex">
-                    <form>
-                        <label class="" for="formulationType">Type de Formulation : </label>
-
-                        <select name="formulationType" id="formulationType" class="form-select"
-                                v-model="formulationType">
-                            <template v-for="formulation in machines[3]">
-                                <option v-bind:value="formulation.formulation">
-                                    {{formulation.formulation}}
-                                </option>
-
-                            </template>
-                        </select>
-                    </form>
-
-                </div>
-
-
-                <div class="d-flex">
-                    <form>
-                        <label class="" for="oleReporting">OLE Reporting : </label>
-                        <div class="col-sm-10">
-                            <input type="text" id="oleReporting" class="form-control-plaintext rcorners2"
-                                   v-model="reporting">
-                        </div>
-                    </form>
-                </div>
-
-                <div class="d-flex">
-
-                    <form>
-                        <label class="" for="oleReporting">OLE Tool : </label>
-                        <div class="col-sm-10">
-                            <input type="text" id="oleTool" class="form-control-plaintext rcorners2" v-model="tool">
-                        </div>
-                    </form>
-
-                </div>
-
-                <br/>
             </template>
         </div>
     </div>
