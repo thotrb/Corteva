@@ -27,7 +27,10 @@ let getters = {
         return state.allEvents;
     },
 
-
+    unplannedDowntimeEvents: state => {
+        return state.unplannedDowntimeEvents;
+    },
+    
     machines : state => {
         return state.machines;
     },

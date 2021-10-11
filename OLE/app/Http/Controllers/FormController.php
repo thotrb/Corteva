@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\DB;
 
 class FormController extends Controller
 {
+
+    public function unplannedDowntimeDashboard() {
+        return view('unplannedDowntimeDashboard');
+    }
+
     public function index()
     {
         return view('teamInfo');
@@ -28,7 +33,40 @@ class FormController extends Controller
         return view('downtimesReport');
     }
 
-    public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate)
+
+    public function getUnplannedDowntimeEvents($productionLine, $beginningYear, $endingYear) {
+
+        $CIP = DB::table('ole_unplanned_event_cips')
+            ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_cips.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_cips.created_at', '<=', $endingYear)
+            ->get();
+
+        $COV = DB::table('ole_unplanned_event_changing_clients')
+            ->where('ole_unplanned_event_changing_clients.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_changing_clients.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_changing_clients.created_at', '<=', $endingYear)
+            ->get();
+
+        $BNC = DB::table('ole_unplanned_event_changing_formats')
+            ->where('ole_unplanned_event_changing_formats.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_changing_formats.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_changing_formats.created_at', '<=', $endingYear)
+            ->get();
+
+
+
+        $tab = array([
+            'CIP' => $CIP,
+            'COV' => $COV,
+            'BNC' => $BNC
+        ]);
+
+        return response()->json($tab);
+
+    }
+
+    public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate, $PONumber)
     {
         $site = DB::table('ole_productionline')
             ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
@@ -474,8 +512,6 @@ class FormController extends Controller
 
 
         return response()->json($tab);
-
-
     }
 
 
@@ -645,6 +681,12 @@ class FormController extends Controller
             ->where('ole_products.GMID', '=', $GMID)
             ->first();
         return response()->json($netOp);
+
+    }
+    //getEvents for the unplanned dashboard page
+    public function getEventsUD($dateFrom, $dateTo) {
+
+       
 
     }
 

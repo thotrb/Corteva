@@ -27,12 +27,13 @@ Route::get('sites', FormController::class.'@getSites');
 
 Route::get('machines/{productionlineID}', FormController::class.'@getMachines');
 
-
 Route::get('speedLosses/{PO}/{productionLine}', FormController::class.'@get_speedLosses');
 
 Route::get('pos/{shift}/{site}', FormController::class.'@getPOsFromShift');
 
 Route::get('events/{PO}/{productionLine}', FormController::class.'@getEvents');
+
+Route::get('unplannedDowntimeEvents/{productionLine}/{startYear}/{endYear}', FormController::class.'@getUnplannedDowntimeEvents');
 
 Route::get('summary/{productionName}/{downTimeType}', FormController::class.'@getDowntimeReasons');
 

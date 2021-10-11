@@ -9,6 +9,7 @@ require('./bootstrap');
 window.Vue = require('vue').default;
 
 
+import Vue from 'vue';
 import store from './store/index';
 
 
@@ -56,6 +57,8 @@ Vue.component('ClientChanging_Declaration', require('./components/Clientchanging
 Vue.component('plannedDowntime_Declaration', require('./components/plannedDowntime_Declaration.vue').default);
 
 Vue.component('endPO_Declaration', require('./components/endPO_Declaration.vue').default);
+
+Vue.component('unplannedDowntimeDashboard', require('./components/unplannedDowntimeDashboard.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

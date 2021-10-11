@@ -1,5 +1,20 @@
 <template>
-    <div class="d-flex">
+    <div class="row">
+        <!--
+
+        machine : {{machines}}
+        <br/>
+
+        <h1>
+            production : {{productionline}}
+        </h1>
+
+
+        <h1>
+            index : {{index}}
+        </h1>
+
+-->
 
         <br/>
 
@@ -190,7 +205,6 @@
 
         mounted() {
             this.$store.dispatch('fetchSites');
-
         },
 
         computed: {
