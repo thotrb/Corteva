@@ -67,9 +67,20 @@ let mutations = {
         return state.allEvents = events;
     },
 
+<<<<<<< HEAD
+    FECTH_ASSIGNATION(state, assignation){
+        return state.assignation.push(assignation);
+    },
+
+    FETCH_NETOP(state, data){
+        return state.netOP = data ;
+    },
+
+=======
     FETCH_UNPLANNED_DOWNTIME_EVENTS(state, events) {
         return state.unplannedDowntimeEvents = events;
     },
+>>>>>>> ecad6dbc0e578f5a90c4ae77397c0ccb44f3a198
 
     CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent){
         state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : jeu. 30 sep. 2021 à 08:33
+-- Généré le : lun. 11 oct. 2021 à 17:13
 -- Version du serveur :  10.4.17-MariaDB
 -- Version de PHP : 7.3.27
 
@@ -91,11 +91,7 @@ CREATE TABLE `ole_assignement_team_pos` (
 
 INSERT INTO `ole_assignement_team_pos` (`id`, `created_at`, `updated_at`, `username`, `productionline`, `po`, `shift`, `worksite`) VALUES
 (1, '2021-09-22 07:46:09', '0000-00-00 00:00:00', 'thotrb', 1, 'titi', 'A', 1),
-(2, '2021-09-22 07:46:09', '0000-00-00 00:00:00', 'thotrb', 5, 'toto', 'A', 1),
-(7, '2021-09-22 11:29:58', '2021-09-22 11:29:58', 'thotrb', 1, 'titi', 'A', 1),
-(8, '2021-09-22 11:29:59', '2021-09-22 11:29:59', 'thotrb', 5, 'toto', 'A', 1),
-(9, '2021-09-29 15:38:06', '2021-09-29 15:38:06', 'thotrb', 1, 'titi', 'A', 1),
-(10, '2021-09-29 15:38:07', '2021-09-29 15:38:07', 'thotrb', 5, 'toto', 'A', 1);
+(2, '2021-09-22 07:46:09', '0000-00-00 00:00:00', 'thotrb', 5, 'toto', 'A', 1);
 
 -- --------------------------------------------------------
 
@@ -197,14 +193,14 @@ CREATE TABLE `ole_machines` (
 
 INSERT INTO `ole_machines` (`id`, `name`, `operation`, `fabricant`, `modele`, `productionlineID`, `denomination_ordre`, `ordre`) VALUES
 (1, 'Depalettiseur', 'Manual', 'NA', 'NA', 1, 'M1', 1),
-(2, 'Rotary', 'Automated', 'SERAC', 'R1V1', 1, 'Filler/Caper', 2),
+(2, 'Remplisseuse', 'Automated', 'SERAC', 'R1V1', 1, 'Filler/Caper', 2),
 (3, 'Laser bouteille', '', '', '', 0, '0', 0),
 (4, 'Etiqueteuse bouteille', 'Automated', 'PE Labeler', 'XXX', 1, 'M2', 3),
 (5, 'Encaisseuse', 'Manual', 'NA', 'NA', 1, 'M4', 5),
 (6, 'Palettiseur', 'Manual', 'NA', 'NA', 1, 'M8', 9),
 (7, 'Peseur de caisse', 'Automated', 'METTLER TOLEDO', 'MT-20', 1, 'M7', 8),
 (8, 'Scelleur de caisse', 'Automated', 'LANTECH', 'CS-300', 1, 'M6', 7),
-(9, 'Former de caisse', 'Semi-Auto', 'LANTECH', 'C-300', 1, 'M5', 6),
+(9, 'Formeur de caisse', 'Semi-Auto', 'LANTECH', 'C-300', 1, 'M5', 6),
 (10, 'Applicateur bouteille', 'Automated', 'SERAC', 'RX20', 1, 'M3', 4);
 
 -- --------------------------------------------------------
@@ -246,21 +242,29 @@ CREATE TABLE `ole_pos` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `number` varchar(50) NOT NULL,
+  `GMID-Code` varchar(50) NOT NULL,
+  `productionline_name` varchar(50) NOT NULL,
   `state` int(1) NOT NULL DEFAULT 1 COMMENT '0:a l''arret, 1:en cours',
   `totalOperatingTime` int(10) NOT NULL,
-  `totalNetOperatingTime` int(10) NOT NULL
+  `totalNetOperatingTime` int(10) NOT NULL,
+  `Availability` float(5,2) NOT NULL,
+  `Performance` float(5,2) NOT NULL,
+  `Quality` float(5,2) NOT NULL,
+  `OLE` float(5,2) NOT NULL,
+  `qtyProduced` int(11) NOT NULL,
+  `workingDuration` int(8) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `ole_pos`
 --
 
-INSERT INTO `ole_pos` (`id`, `created_at`, `updated_at`, `number`, `state`, `totalOperatingTime`, `totalNetOperatingTime`) VALUES
-(1, '2021-09-16 08:37:15', '0000-00-00 00:00:00', 'titi', 0, 0, 0),
-(2, '2021-09-16 08:37:15', '0000-00-00 00:00:00', 'toto', 0, 0, 0),
-(3, '2021-09-16 09:07:55', '2021-09-16 06:37:25', 't1', 0, 0, 0),
-(4, '2021-09-16 09:08:27', '2021-09-16 06:37:25', 't2', 0, 0, 0),
-(24, '2021-09-20 11:02:38', '2021-09-20 11:02:38', 'lala', 1, 0, 0);
+INSERT INTO `ole_pos` (`id`, `created_at`, `updated_at`, `number`, `GMID-Code`, `productionline_name`, `state`, `totalOperatingTime`, `totalNetOperatingTime`, `Availability`, `Performance`, `Quality`, `OLE`, `qtyProduced`, `workingDuration`) VALUES
+(1, '2021-10-10 15:24:18', '0000-00-00 00:00:00', 'titi', '87507', 'F52', 0, 0, 0, 72.00, 64.00, 98.00, 78.00, 200, 0),
+(2, '2021-10-10 15:24:27', '0000-00-00 00:00:00', 'toto', '87507', 'F52', 0, 0, 0, 1.00, 0.67, 1.00, 0.67, 100, 0),
+(3, '2021-10-10 15:12:56', '2021-09-16 06:37:25', 't1', '335871', 'F53', 0, 0, 0, 0.00, 0.00, 0.00, 0.00, 0, 0),
+(4, '2021-10-10 15:12:57', '2021-09-16 06:37:25', 't2', '335871', 'F53', 0, 0, 0, 0.00, 0.00, 0.00, 0.00, 0, 0),
+(24, '2021-10-10 15:24:36', '2021-09-20 11:02:38', 'lala', '335871', 'F52', 1, 0, 0, 0.00, 0.00, 0.00, 0.00, 50, 0);
 
 -- --------------------------------------------------------
 
@@ -290,17 +294,67 @@ INSERT INTO `ole_productionline` (`id`, `productionline_name`, `worksiteID`) VAL
 
 CREATE TABLE `ole_products` (
   `id` int(11) NOT NULL,
-  `name` varchar(150) NOT NULL,
-  `productionlineID` int(10) NOT NULL
+  `product` varchar(150) NOT NULL,
+  `GMID` varchar(50) NOT NULL,
+  `size` varchar(20) NOT NULL,
+  `idealRate` float(7,2) NOT NULL,
+  `bottlesPerCase` int(7) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `ole_products`
 --
 
-INSERT INTO `ole_products` (`id`, `name`, `productionlineID`) VALUES
-(1, 'Bouteille 1', 1),
-(2, 'Bouteille 2', 1);
+INSERT INTO `ole_products` (`id`, `product`, `GMID`, `size`, `idealRate`, `bottlesPerCase`) VALUES
+(3, 'SUCCESSNATURALY BTLPE1X1GL USA', '87507', '4L', 20.00, 4),
+(4, 'SUCCESSNATURALY BTLHPE4X1QT EN', '101223', '1L', 40.00, 12),
+(5, 'CONSERVESC BTLHPE4X4X1QT USA', '124042', '1L', 40.00, 12),
+(6, 'SUCCESS BTLHPE4X4X1L CAN', '138087', '1L', 40.00, 12),
+(7, 'GF120NFBAIT BTLHPE4X1GL USA GF1111', '225830', '4L', 20.00, 4),
+(8, 'GF120FFBAIT BTLHPE4X3.78L CAN GF1111', '275681', '4L', 20.00, 4),
+(9, 'RADIANTSC BTLHPE4X1GL USA', '295528', '4L', 20.00, 4),
+(10, 'RADIANTSC BTLHPE4X4X1QT USA', '295529', '1L', 40.00, 12),
+(11, 'CONSERVESC BTLHPE4X4X1QT PRI', '335871', '1L', 40.00, 12),
+(12, 'GF120NFNATURALYTEFFB BTLFPE4X4L PAK', '336953', '4L', 20.00, 4),
+(13, 'ENTRUST BTLHPE12X1L CAN', '11039846', '1L', 40.00, 12),
+(14, 'NATURALUREFLYBAIT BTLHPE2X10L AUS', '11045177', '10L', 10.00, 2),
+(15, 'INTREPIDEDGE BTLHPE4X1GL USA', '11045655', '4L', 20.00, 4),
+(16, 'SUCCESSNATURALYTE BTLHPE12X1QT USA', '97018444', '1L', 40.00, 12),
+(17, 'ENTRUSTSC BTLHPE12X1QT USA', '97018807', '1L', 40.00, 12),
+(18, 'RADIANTSC BTLHPE12X1QT USA', '97018841', '1L', 40.00, 12),
+(19, 'RADIANTSC BTLHPE12X1QT PRI', '97019730', '1L', 40.00, 12),
+(20, 'ENTRUSTSC BTLHPE12X1QT PRI', '97019823', '1L', 40.00, 12),
+(21, 'MOZKILL120SC BTLHPE4X5L NGA', '99056786', '5L', 17.00, 4),
+(22, 'ENTRUSTSC BTLHPE4X4X1QT PRI', '99059298', '1L', 40.00, 12),
+(23, 'RADIANTSC BTLHPE4X4X1QT PRI', '99059340', '1L', 40.00, 12);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `ole_rejection_counters`
+--
+
+CREATE TABLE `ole_rejection_counters` (
+  `id` int(11) NOT NULL,
+  `po` varchar(50) NOT NULL,
+  `fillerCounter` int(11) NOT NULL,
+  `caperCounter` int(11) NOT NULL,
+  `labelerCounter` int(11) NOT NULL,
+  `weightBoxCounter` int(11) NOT NULL,
+  `fillerRejection` int(11) NOT NULL,
+  `caperRejection` int(11) NOT NULL,
+  `labelerRejection` int(11) NOT NULL,
+  `weightBoxRejection` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table `ole_rejection_counters`
+--
+
+INSERT INTO `ole_rejection_counters` (`id`, `po`, `fillerCounter`, `caperCounter`, `labelerCounter`, `weightBoxCounter`, `fillerRejection`, `caperRejection`, `labelerRejection`, `weightBoxRejection`) VALUES
+(1, 'titi', 0, 0, 0, 0, 0, 0, 0, 0),
+(2, 'lala', 0, 0, 0, 0, 0, 0, 0, 0),
+(3, 'toto', 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -314,6 +368,7 @@ CREATE TABLE `ole_speed_losses` (
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `OLE` varchar(50) NOT NULL,
   `productionline` varchar(50) NOT NULL,
+  `duration` int(50) NOT NULL,
   `reason` varchar(150) NOT NULL,
   `comment` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -322,10 +377,10 @@ CREATE TABLE `ole_speed_losses` (
 -- Déchargement des données de la table `ole_speed_losses`
 --
 
-INSERT INTO `ole_speed_losses` (`id`, `created_at`, `updated_at`, `OLE`, `productionline`, `reason`, `comment`) VALUES
-(2, '2021-09-05 10:57:51', '2021-09-05 10:57:51', 'titi', 'F52', 'Filler Own Stoppage By An Other', 'comment'),
-(3, '2021-09-15 15:07:04', '2021-09-15 15:07:04', 'titi', 'F53', 'Reduced Rate At Filler', 'zizihz'),
-(4, '2021-09-20 11:16:07', '2021-09-20 11:16:07', 'lala', 'F53', 'Reduce Rate At An Other Machine', 'Commentaire');
+INSERT INTO `ole_speed_losses` (`id`, `created_at`, `updated_at`, `OLE`, `productionline`, `duration`, `reason`, `comment`) VALUES
+(3, '2021-09-15 15:07:04', '2021-09-15 15:07:04', 'titi', 'F53', 0, 'Reduced Rate At Filler', 'zizihz'),
+(4, '2021-09-20 11:16:07', '2021-09-20 11:16:07', 'lala', 'F53', 0, 'Reduce Rate At An Other Machine', 'Commentaire'),
+(5, '2021-10-02 13:50:50', '2021-10-02 13:50:50', 'titi', 'F52', 0, 'Filler Own Stoppage', 'lalalalala');
 
 -- --------------------------------------------------------
 
@@ -373,14 +428,6 @@ CREATE TABLE `ole_unplanned_event_changing_formats` (
   `kind` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `ole_unplanned_event_changing_formats`
---
-
-INSERT INTO `ole_unplanned_event_changing_formats` (`id`, `created_at`, `updated_at`, `OLE`, `productionline`, `predicted_duration`, `total_duration`, `comment`, `type`, `kind`) VALUES
-(1, '2021-09-02 08:47:17', '2021-09-02 08:47:17', 'titi', '', 5, 20, 'lala', 'Changement de format', 1),
-(5, '2021-09-15 14:44:22', '2021-09-15 14:44:22', 'titi', 'F52', 60, 230, 'dzihziodhiodzhiozh', 'Changement de format', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -401,14 +448,6 @@ CREATE TABLE `ole_unplanned_event_cips` (
   `kind` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `ole_unplanned_event_cips`
---
-
-INSERT INTO `ole_unplanned_event_cips` (`id`, `created_at`, `updated_at`, `OLE`, `previous_bulk`, `predicted_duration`, `total_duration`, `comment`, `productionline`, `type`, `kind`) VALUES
-(1, '2021-09-02 09:49:55', '2021-09-02 09:49:55', 'titi', 'prevBulk', 5, 25, 'lala', 'F52', 'CIP', 1),
-(2, '2021-09-06 13:49:09', '2021-09-06 13:49:09', 'titi', 'prevBulk', 5, 50, 'problème machine', 'F52', 'CIP', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -427,26 +466,6 @@ CREATE TABLE `ole_unplanned_event_unplanned_downtimes` (
   `comment` text CHARACTER SET utf8mb4 NOT NULL DEFAULT '\' \'',
   `type` varchar(255) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'Arret non planifie',
   `kind` int(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `ole_unplanned_event_unplanned_downtimes`
---
-
-INSERT INTO `ole_unplanned_event_unplanned_downtimes` (`id`, `created_at`, `updated_at`, `OLE`, `productionline`, `implicated_machine`, `component`, `total_duration`, `comment`, `type`, `kind`) VALUES
-(1, '2021-09-05 20:31:16', '2021-09-05 20:31:16', 'titi', 'F52', 'Laser bouteille', 'Tourelle de dosage', 10, 'comm', 'Arret non planifie', 1),
-(2, '2021-09-15 14:36:40', '2021-09-15 14:36:40', 'titi', 'F52', 'Tourelle de vissage', 'Tourelle de vissage', 40, 'djozojdzojdz', 'Arret non planifie', 1);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `password_resets`
---
-
-CREATE TABLE `password_resets` (
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -587,6 +606,12 @@ ALTER TABLE `ole_products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `ole_rejection_counters`
+--
+ALTER TABLE `ole_rejection_counters`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `ole_speed_losses`
 --
 ALTER TABLE `ole_speed_losses`
@@ -615,12 +640,6 @@ ALTER TABLE `ole_unplanned_event_cips`
 --
 ALTER TABLE `ole_unplanned_event_unplanned_downtimes`
   ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `password_resets`
---
-ALTER TABLE `password_resets`
-  ADD KEY `password_resets_email_index` (`email`);
 
 --
 -- Index pour la table `teamInfo`
@@ -661,7 +680,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT pour la table `ole_assignement_team_pos`
 --
 ALTER TABLE `ole_assignement_team_pos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT pour la table `ole_downtimeReason`
@@ -709,13 +728,19 @@ ALTER TABLE `ole_productionline`
 -- AUTO_INCREMENT pour la table `ole_products`
 --
 ALTER TABLE `ole_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT pour la table `ole_rejection_counters`
+--
+ALTER TABLE `ole_rejection_counters`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `ole_speed_losses`
 --
 ALTER TABLE `ole_speed_losses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `ole_unplanned_event_changing_clients`
@@ -739,7 +764,7 @@ ALTER TABLE `ole_unplanned_event_cips`
 -- AUTO_INCREMENT pour la table `ole_unplanned_event_unplanned_downtimes`
 --
 ALTER TABLE `ole_unplanned_event_unplanned_downtimes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `teamInfo`

@@ -33,6 +33,7 @@ class FormController extends Controller
         return view('downtimesReport');
     }
 
+
     public function getUnplannedDowntimeEvents($productionLine, $beginningYear, $endingYear) {
 
         $CIP = DB::table('ole_unplanned_event_cips')
@@ -54,7 +55,7 @@ class FormController extends Controller
             ->get();
 
 
-        
+
         $tab = array([
             'CIP' => $CIP,
             'COV' => $COV,
@@ -62,7 +63,7 @@ class FormController extends Controller
         ]);
 
         return response()->json($tab);
-        
+
     }
 
     public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate, $PONumber)
@@ -70,13 +71,16 @@ class FormController extends Controller
         $site = DB::table('ole_productionline')
             ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
             ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
+            ->join('ole_products', 'ole_pos.GMID-Code', '=', 'ole_products.GMID')
+            ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
             ->where('worksite.name', '=', $site)
             ->where('ole_productionline.productionline_name', '=', $productionLine)
-            ->where('ole_pos.number', '=', $PONumber)
             ->get();
 
 
+
         if(count($site) > 0){
+
             $date1 = explode("-", $beginningDate);
             $beginningYear = $date1[0];
             $beginningMonth = $date1[1];
@@ -89,6 +93,8 @@ class FormController extends Controller
 
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear.'-'.$beginningMonth.'-'.$beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
+
+
 
 
 
@@ -292,9 +298,57 @@ class FormController extends Controller
                 ->get();
 
 
-            $POInformations = DB::table('ole_pos')
-                ->where('ole_pos.number', '=', $PONumber)
+            $plannedEvents = DB::table('ole_planned_events')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_planned_events.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_planned_events.created_at)'), [$startDate, $endDate]);
+                })
                 ->get();
+
+            $changingClients = DB::table('ole_unplanned_event_changing_clients')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_changing_clients.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_clients.created_at)'), [$startDate, $endDate]);
+                })
+               ->get();
+
+            $CIPBis = DB::table('ole_unplanned_event_cips')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_cips.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_cips.created_at)'), [$startDate, $endDate]);
+                })
+                ->get();
+
+
+
+            $unplanned = DB::table('ole_unplanned_event_unplanned_downtimes')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
+                })
+                ->get();
+
+            $changingFormats = DB::table('ole_unplanned_event_changing_formats')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_unplanned_event_changing_formats.productionline', '=', $site[0]->productionline_name)
+                        -> whereBetween(DB::raw('DATE(ole_unplanned_event_changing_formats.created_at)'), [$startDate, $endDate]);
+                })
+                ->get()
+                ->union($changingClients)
+                ->union($CIPBis)
+                ->union($unplanned)
+                ->union($plannedEvents);
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -314,7 +368,8 @@ class FormController extends Controller
                 'RRM' => $RRM,
                 'FOS' => $FOS,
                 'FSM' => $FSM,
-                'POInfo' => $POInformations
+                'SITE' => $site,
+                'EVENTS' => $changingFormats
 
             );
 
@@ -337,7 +392,9 @@ class FormController extends Controller
                 'RRM' => null,
                 'FOS' => null,
                 'FSM' => null,
-                'POInfo' => null
+                'SITE' => null,
+                'EVENTS' => null,
+
 
             );
 
@@ -363,9 +420,9 @@ class FormController extends Controller
             ->where('ole_formats.productionlineID', '=', $productionlineID)
             ->get();
 
-        $products = DB::table('ole_products')
-            ->where('ole_products.productionlineID', '=', $productionlineID)
-            ->get();
+        //$products = DB::table('ole_products')
+          //  ->where('ole_products.productionlineID', '=', $productionlineID)
+            //->get();
 
         $formulations = DB::table('ole_formulations')
             ->where('ole_formulations.productionlineID', '=', $productionlineID)
@@ -375,7 +432,7 @@ class FormController extends Controller
 
             0 => $machines,
             1 => $formats,
-            2 => $products,
+            //2 => $products,
             3 => $formulations,
         );
 
@@ -395,6 +452,26 @@ class FormController extends Controller
     {
         return view('summary');
 
+    }
+
+    public function isAssignationPossible($username, $po, $productionline)
+    {
+
+
+        $assignation = DB::table('ole_assignement_team_pos')
+            ->where('ole_assignement_team_pos.username', '=', $username)
+            ->where('ole_assignement_team_pos.po', '=', $po)
+            ->where('ole_assignement_team_pos.productionline', '=', $productionline)
+            ->count();
+
+
+
+        return response()->json($assignation);
+
+    }
+
+    public function monthlyLoadFactor(){
+        return view('monthlyLoadFactor');
     }
 
     public function log($username, $password)
@@ -598,13 +675,20 @@ class FormController extends Controller
 
     }
 
+    public function getNetOP($GMID)
+    {
+        $netOp = DB::table('ole_products')
+            ->where('ole_products.GMID', '=', $GMID)
+            ->first();
+        return response()->json($netOp);
+
+    }
     //getEvents for the unplanned dashboard page
     public function getEventsUD($dateFrom, $dateTo) {
 
        
 
     }
-
 
     public function getEvents($PO, $productionLine)
     {
@@ -722,11 +806,11 @@ class FormController extends Controller
         return response()->json($event);
     }
 
-    public function stopPO($PONumber)
+    public function stopPO($PO, $availability, $performance, $quality, $OLE, $quantityProduced, $totalDuration)
     {
         $update = DB::update(
-            'update ole_pos set state = 0 where number = ?',
-            [$PONumber]
+            'update ole_pos set state = 0, performance = ?, availability = ?, quality = ?, OLE = ?, qtyProduced = ?, workingDuration = ? where number = ?',
+            [$performance, $availability, $quality, $OLE, $quantityProduced, $totalDuration, $PO]
         );
         return response()->json($update);
 

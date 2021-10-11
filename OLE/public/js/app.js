@@ -2411,32 +2411,54 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             sessionStorage.setItem("productionName", this.productionlines[indice / this.productionlines.length]);
           }
 
+          if (sessionStorage.getItem("GMIDCODE") === null) {
+            sessionStorage.GMIDCODE = sessionStorage.GMID.split(',')[indice / this.productionlines.length];
+          } else {
+            sessionStorage.setItem("GMIDCODE", sessionStorage.GMID.split(',')[indice / this.productionlines.length]);
+          }
+
           console.log('events1 : ' + this.productionlines[indice / this.productionlines.length]);
-          var s1 = 0;
+          var sommePlannedEvents = 0;
+          var sommeUnplannedEvents = 0;
 
           for (var _i = 0; _i < this.events1.length; _i++) {
-            console.log(this.events1[_i]);
-
+            //console.log(this.events1[i]);
             if (this.events1[_i].productionline === this.productionlines[indice / this.productionlines.length]) {
               console.log('events1');
               console.log(this.events1[_i]);
-              s1 += this.events1[_i].total_duration;
+
+              if (this.events1[_i].kind === 0) {
+                sommePlannedEvents += this.events1[_i].total_duration;
+              } else {
+                sommeUnplannedEvents += this.events1[_i].total_duration;
+              }
             }
           }
 
           for (var _i2 = 0; _i2 < this.events2.length; _i2++) {
             if (this.events2[_i2].productionline === this.productionlines[indice / this.productionlines.length]) {
-              s1 += this.events2[_i2].total_duration;
+              if (this.events2[_i2].kind === 0) {
+                sommePlannedEvents += this.events2[_i2].total_duration;
+              } else {
+                sommeUnplannedEvents += this.events2[_i2].total_duration;
+              }
             }
           } //console.log(this.events1);
 
 
-          console.log('SOMME : ' + s1);
+          console.log('UNPLANNED SOMME : ' + sommeUnplannedEvents);
+          console.log('PLANNED SOMME : ' + sommePlannedEvents);
 
-          if (sessionStorage.getItem("sommeUnplannedEvent") === null) {
-            sessionStorage.sommeUnplannedEvent = s1;
+          if (sessionStorage.getItem("sommeUnplannedEvents") === null) {
+            sessionStorage.sommeUnplannedEvents = sommeUnplannedEvents;
           } else {
-            sessionStorage.setItem("sommeUnplannedEvent", s1);
+            sessionStorage.setItem("sommeUnplannedEvents", sommeUnplannedEvents);
+          }
+
+          if (sessionStorage.getItem("sommePlannedEvents") === null) {
+            sessionStorage.sommePlannedEvents = sommePlannedEvents;
+          } else {
+            sessionStorage.setItem("sommePlannedEvents", sommePlannedEvents);
           }
 
           window.location.href = this.url + 'endPO/' + this.productionlines[indice / this.productionlines.length] + '/endPO';
@@ -2461,6 +2483,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.$store.dispatch('fetchEvents', tab);
       }
     }
+
+    console.log(sessionStorage.getItem("GMID").split(','));
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['events1', 'events2']))
 });
@@ -3166,11 +3190,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "downtimesReport",
@@ -3187,7 +3206,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       username: sessionStorage.getItem("username"),
       index: -1,
       show: 0,
-      PONumber: ''
+      qtyProduced: 0,
+      productsName: [],
+      quantityArray: [],
+      formatArray: [],
+      plannedDowntimes: 0,
+      unplannedDowntimes: 0,
+      plannedProductionTime: 0,
+      operatingTime: 0,
+      netOperatingTime: 0,
+      performance: 0,
+      availability: 0,
+      quality: 0,
+      OLE: 0
     };
   },
   methods: {
@@ -3216,19 +3247,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(this.productionline);
                 tab.push(this.beginningDate);
                 tab.push(this.endingDate);
-                tab.push(this.PONumber);
                 this.$store.dispatch('fecthAllEvents', tab);
-                _context.next = 12;
+                _context.next = 11;
                 return this.resolveAfter15Second();
 
-              case 12:
+              case 11:
                 this.show = 1;
-                _context.next = 15;
-                return this.resolveAfter05Second();
+                _context.next = 14;
+                return this.resolveAfter15Second();
 
-              case 15:
+              case 14:
+                this.loadArray();
+                this.loadProductionTime();
                 this.circle();
-                this.index = index;
                 this.pieCharts();
 
               case 18:
@@ -3250,6 +3281,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return load;
     }(),
+    loadArray: function loadArray() {
+      for (var i = 0; i < this.allEvents['SITE'].length; i++) {
+        this.quantityArray[i] = 0;
+        this.formatArray[i] = '';
+      }
+
+      for (var _i = 0; _i < this.allEvents['SITE'].length; _i++) {
+        this.qtyProduced += this.allEvents['SITE'][_i].qtyProduced;
+
+        if (!this.productsName.includes(this.allEvents['SITE'][_i].product)) {
+          this.productsName.push(this.allEvents['SITE'][_i].product);
+        }
+
+        var index = this.productsName.indexOf(this.allEvents['SITE'][_i].product);
+        this.quantityArray[index] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase;
+        this.formatArray[index] = this.allEvents['SITE'][_i].size;
+      }
+
+      console.log(this.productsName);
+      console.log(this.quantityArray);
+      console.log(this.formatArray);
+    },
     resolveAfter15Second: function resolveAfter15Second() {
       return new Promise(function (resolve) {
         setTimeout(function () {
@@ -3257,15 +3310,118 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, 1500);
       });
     },
+    loadProductionTime: function loadProductionTime() {
+      var sommePlannedEvents = 0;
+      var sommeUnplannedEvents = 0;
+      var sommeQtyProduced = 0;
+      var sommeRejection = 0;
+      var fillerCounter = 0;
+      var caperCounter = 0;
+      var labelerCounter = 0;
+      var wieghtBoxCounter = 0;
+      this.netOperatingTime = 0;
+
+      for (var i = 0; i < this.allEvents['EVENTS'].length; i++) {
+        var PO = this.allEvents['EVENTS'][i];
+        sommeQtyProduced += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1;
+        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounter += PO.fillerCounter * 1;
+        caperCounter += PO.caperCounter * 1;
+        labelerCounter += PO.labelerCounter * 1;
+        wieghtBoxCounter += PO.weightBoxCounter * 1;
+        this.netOperatingTime += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1 / this.allEvents['EVENTS'][i].idealRate * 1;
+
+        if (this.allEvents['EVENTS'][i].kind === 0) {
+          sommePlannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
+        } else {
+          sommeUnplannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
+        }
+      }
+
+      var sommeWorkingTime = 0;
+
+      for (var j = 0; j < this.allEvents['SITE'].length; j++) {
+        sommeWorkingTime += this.allEvents['SITE'][j].workingDuration * 1;
+      }
+
+      this.plannedDowntimes = sommePlannedEvents;
+      this.unplannedDowntimes = sommeUnplannedEvents;
+      this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
+      this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+      this.availability = this.operatingTime / this.plannedProductionTime * 100;
+      this.performance = this.netOperatingTime / this.operatingTime;
+
+      if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0 && labelerCounter === 0 && wieghtBoxCounter === 0) {
+        this.quality = 100;
+      } else {
+        var s = fillerCounter - sommeQtyProduced + (caperCounter - sommeQtyProduced) + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+        this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s) * 100;
+      }
+
+      if (this.operatingTime === 0) {
+        this.availability = 0;
+      }
+
+      if (this.netOperatingTime === 0) {
+        this.performance = 0;
+        this.unplannedDowntimes = 1;
+      }
+
+      if (this.plannedProductionTime === 0) {
+        this.plannedDowntimes = 1;
+      }
+
+      this.OLE = this.availability * this.performance * this.quality;
+      console.log('Planned Downtime : ' + sommePlannedEvents);
+      console.log('Unplanned Downtime : ' + sommeUnplannedEvents);
+      console.log('Planned Production Time : ' + this.plannedProductionTime);
+      console.log('Operating Time : ' + this.operatingTime);
+      console.log('NOT : ' + sommePlannedEvents);
+      console.log('Availability : ' + this.availability);
+      console.log('Performance : ' + this.performance);
+      console.log('Operating Time : ' + this.operatingTime);
+    },
     pieCharts: function pieCharts() {
+      /**
+                      var data = [];
+                      for(let i=0; i<this.productsName.length; i++){
+                          let item = {
+                            y:  this.quantityArray[i],
+                              label: this.productsName[i]
+                          };
+                          data.push(item);
+                      }
+      
+      
+      
+                      var chart = new CanvasJS.Chart("can", {
+                          animationEnabled: true,
+                          title: {
+                              text: "Desktop Search Engine Market Share - 2016"
+                          },
+                          data: [{
+                              type: "pie",
+                              startAngle: 240,
+                              yValueFormatString: "##0.00\"%\"",
+                              indexLabel: "{label} {y}",
+                              dataPoints: data,
+                          }]
+                      });
+      
+                      chart.render();
+      **/
+      var data = [];
+
+      for (var _i2 = 0; _i2 < this.productsName.length; _i2++) {
+        data.push(this.quantityArray[_i2]);
+      }
+
       var canvas = document.getElementById("can");
       var ctx = canvas.getContext("2d");
       var lastend = 0;
-      var data = [200, 60, 15]; // If you add more data values make sure you add more colors
-
       var myTotal = 0; // Automatically calculated so don't touch
 
-      var myColor = ['red', 'green', 'blue']; // Colors of each slice
+      var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
 
       for (var e = 0; e < data.length; e++) {
         myTotal += data[e];
@@ -3319,9 +3475,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.allEvents['POInfo'][0].Availability >= 70 && this.allEvents['POInfo'][0].Availability < 95) {
+      if (this.availability >= 70 && this.availability < 95) {
         context.fillStyle = "#FF8700";
-      } else if (this.allEvents['POInfo'][0].Availability >= 95) {
+      } else if (this.availability >= 95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3330,15 +3486,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.allEvents['POInfo'][0].Availability, 70, 90);
+      context.fillText(this.availability, 70, 90);
       canvas = document.getElementById("Performance");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.allEvents['POInfo'][0].Performance >= 70 && this.allEvents['POInfo'][0].Performance < 95) {
+      if (this.performance >= 70 && this.performance < 95) {
         context.fillStyle = "#FF8700";
-      } else if (this.allEvents['POInfo'][0].Performance >= 95) {
+      } else if (this.performance >= 95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3347,15 +3503,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.allEvents['POInfo'][0].Performance, 70, 90);
+      context.fillText(this.performance, 70, 90);
       canvas = document.getElementById("Quality");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.allEvents['POInfo'][0].Quality >= 70 && this.allEvents['POInfo'][0].Quality < 95) {
+      if (this.quality >= 70 && this.quality < 95) {
         context.fillStyle = "#FF8700";
-      } else if (this.allEvents['POInfo'][0].Quality >= 95) {
+      } else if (this.quality >= 95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3364,15 +3520,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.allEvents['POInfo'][0].Quality, 70, 90);
+      context.fillText(this.quality, 70, 90);
       canvas = document.getElementById("OLE");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.allEvents['POInfo'][0].OLE >= 70 && this.allEvents['POInfo'][0].OLE < 95) {
+      if (this.OLE >= 70 && this.OLE < 95) {
         context.fillStyle = "#FF8700";
-      } else if (this.allEvents['POInfo'][0].OLE >= 95) {
+      } else if (this.OLE >= 95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3381,7 +3537,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.allEvents['POInfo'][0].OLE, 70, 90);
+      context.fillText(this.OLE, 70, 90);
     }
   },
   mounted: function mounted() {
@@ -3403,6 +3559,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     today = yyyy + '-' + mm + '-' + dd;
     document.getElementById("startingPO").setAttribute("max", today);
     document.getElementById("endingPO").setAttribute("max", today);
+    var externalScript = document.createElement('script');
+    externalScript.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
+    document.head.appendChild(externalScript);
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
 });
@@ -3861,6 +4020,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 var today = new Date();
 
@@ -3873,20 +4039,21 @@ var today = new Date();
   },
   data: function data() {
     return {
-      total_dowtimes: sessionStorage.getItem("sommeUnplannedEvent"),
+      totalUnplannedDowtimes: sessionStorage.getItem("sommeUnplannedEvents"),
+      totalPlannedDowtimes: sessionStorage.getItem("sommePlannedEvents"),
       indice: sessionStorage.getItem("indice"),
       startPO: 0,
 
       /**
-                      case11: 0,
-                      case12: 0,
-                      case13: 0,
-                      case14: 0,
-                      case21: 0,
-                      case22: 0,
-                      case23: 0,
-                      case24: 0,
-      **/
+       case11: 0,
+       case12: 0,
+       case13: 0,
+       case14: 0,
+       case21: 0,
+       case22: 0,
+       case23: 0,
+       case24: 0,
+       **/
       FillerCounter: 0,
       CaperCounter: 0,
       EtiqueteuseCounter: 0,
@@ -3914,11 +4081,77 @@ var today = new Date();
       },
       totalOperatingTime: 0,
       totalNetOperatingTime: 0,
+      totalProductionTime: 0,
       totalPOQuality: 0,
-      endPO: 0
+      endPO: 0,
+      GMID: sessionStorage.getItem("GMIDCODE"),
+      valider: 0,
+      nbBottlesFilled: 0,
+      totalDuration: 0
     };
   },
   methods: {
+    validateCalculation: function () {
+      var _validateCalculation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var splitted1, splitted2, time1, time2;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                console.log(document.getElementById('endingPO').value);
+                splitted1 = this.startPO.toString().split(':');
+                splitted2 = this.endPO.toString().split(':');
+                time1 = 0;
+                time2 = 0;
+
+                if (splitted2[0] >= splitted1[0]) {
+                  time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
+                  time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
+                  this.totalOperatingTime = time2 - time1;
+                  this.totalProductionTime = time2 - time1;
+                  this.totalDuration = time2 - time1;
+                } else {
+                  time1 = 24 * 60 - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1);
+                  time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
+                  this.totalOperatingTime = time1 + time2;
+                  this.totalProductionTime = time1 + time2;
+                  this.totalDuration = time2 - time1;
+                }
+
+                this.totalProductionTime -= this.totalPlannedDowtimes;
+                this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
+                this.availability = this.totalOperatingTime / this.totalProductionTime; //this.$store.dispatch('getNetOPTime', this.parameters);
+
+                _context.next = 11;
+                return this.$store.dispatch('getNetOPTime', this.GMID);
+
+              case 11:
+                _context.next = 13;
+                return this.resolveAfter1Second();
+
+              case 13:
+                console.log(this.netOP);
+                this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+                this.totalNetOperatingTime = this.finalQuantityProduced * this.netOP.bottlesPerCase / this.netOP.idealRate;
+                console.log('NET OP : ' + this.totalNetOperatingTime);
+                this.performance = this.totalNetOperatingTime / this.totalOperatingTime;
+                console.log('Perf : ' + this.performance);
+                this.valider = 1;
+
+              case 20:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function validateCalculation() {
+        return _validateCalculation.apply(this, arguments);
+      }
+
+      return validateCalculation;
+    }(),
     backPage: function backPage() {
       window.location.href = this.url + 'summary';
     },
@@ -3930,38 +4163,24 @@ var today = new Date();
     },
     displayQualityIndicators: function displayQualityIndicators() {
       /**
-                      this.case11 = document.getElementById('FillerCounter').value;
-                      this.case12 = document.getElementById('CaperCounter').value;
-                      this.case13 = document.getElementById('EtiqueteuseCounter').value;
-                      this.case14 = document.getElementById('WieghtBoxCounter').value;
-                      this.case21 = document.getElementById('FillerRejection').value;
-                      this.case22 = document.getElementById('CaperRejection').value;
-                      this.case23 = document.getElementById('EtiqueteuseRejection').value;
-                      this.case24 = document.getElementById('WieghtBoxRejection').value;
-      **/
+       this.case11 = document.getElementById('FillerCounter').value;
+       this.case12 = document.getElementById('CaperCounter').value;
+       this.case13 = document.getElementById('EtiqueteuseCounter').value;
+       this.case14 = document.getElementById('WieghtBoxCounter').value;
+       this.case21 = document.getElementById('FillerRejection').value;
+       this.case22 = document.getElementById('CaperRejection').value;
+       this.case23 = document.getElementById('EtiqueteuseRejection').value;
+       this.case24 = document.getElementById('WieghtBoxRejection').value;
+       **/
       this.totalPOQuality = parseInt(this.finalQuantityProduced, 10) / (parseInt(this.finalQuantityProduced, 10) + this.FillerCounter + this.CaperCounter + this.EtiqueteuseCounter + this.WieghtBoxCounter + (this.FillerRejection - parseInt(this.finalQuantityProduced, 10)) + (this.CaperRejection - parseInt(this.finalQuantityProduced, 10)) + (this.EtiqueteuseRejection - parseInt(this.finalQuantityProduced, 10)) + (this.WieghtBoxRejection - parseInt(this.finalQuantityProduced, 10)));
-      /**
-                      console.log("QUALITY : " + this.totalPOQuality);
-                      console.log("QUALITY : " + this.finalQuantityProduced);
-                      console.log("QUALITY : " + this.FillerCounter);
-                      console.log("QUALITY : " + this.CaperCounter);
-                      console.log("QUALITY : " + this.EtiqueteuseCounter);
-                      console.log("QUALITY : " + this.WieghtBoxCounter);
-      
-                      console.log("QUALITY : " + this.FillerRejection);
-                      console.log("QUALITY : " + this.CaperRejection);
-                      console.log("QUALITY : " + this.EtiqueteuseRejection);
-                      console.log("QUALITY : " + this.WieghtBoxRejection);
-      **/
-
       this.displayNumber = 3;
     },
     saveEndPO: function () {
-      var _saveEndPO = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var pos;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      var _saveEndPO = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var pos, array;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
                 pos = sessionStorage.getItem("pos").split(',');
@@ -3973,22 +4192,31 @@ var today = new Date();
                   sessionStorage.setItem("pos", pos);
                 }
 
-                this.$store.dispatch('stop_PO', this.endPO);
+                this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
+                array = [];
+                array.push(this.endPO);
+                array.push(this.availability);
+                array.push(this.performance);
+                array.push(this.quality);
+                array.push(this.OLE);
+                array.push(this.finalQuantityProduced);
+                array.push(this.totalDuration);
+                this.$store.dispatch('stop_PO', array);
                 this.parameters.push(this.username);
                 this.$store.dispatch('fetchUsers', this.parameters);
-                _context.next = 9;
+                _context2.next = 18;
                 return this.resolveAfter1Second();
 
-              case 9:
+              case 18:
                 this.loadTable();
                 window.location.href = this.url + 'teamInfo';
 
-              case 11:
+              case 20:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function saveEndPO() {
@@ -4019,117 +4247,75 @@ var today = new Date();
         }, 1000);
       });
     },
+    isRejectionNull: function isRejectionNull() {
+      return this.FillerRejection === 0 && this.CaperRejection === 0 && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0;
+    },
+    isCompteurNull: function isCompteurNull() {
+      return this.FillerCounter === 0 && this.CaperCounter === 0 && this.EtiqueteuseCounter === 0 && this.WieghtBoxCounter === 0;
+    },
     validateInformations: function () {
-      var _validateInformations = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var productionLine, shiftLetter, site, parameters, sumUnplannedDuration, sumPlannedDuration, i, tab, j, sumNetOperatingTime, sumTotalOperatingTime, _j;
-
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+      var _validateInformations = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var productionLine, shiftLetter, site, N, summRejection, summCompteur;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                if (!(this.displayNumber === 0)) {
-                  _context2.next = 41;
-                  break;
-                }
+                this.valider = 0;
 
-                console.log(document.getElementById('endingPO').value);
-                this.totalOperatingTime = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1]);
-                this.totalNetOperatingTime = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1]) - this.total_dowtimes;
-                this.availability = 100 * 8 * 60; //recuperer la ligne de production
+                if (this.displayNumber === 0) {
+                  //this.availability = 100 * 8 * 60;
+                  //recuperer la ligne de production
+                  productionLine = sessionStorage.getItem("productionName"); //recuperer le nom du shift
 
-                productionLine = sessionStorage.getItem("productionName"); //recuperer le nom du shift
+                  shiftLetter = sessionStorage.typeTeam; //recuperer le nom du site
 
-                shiftLetter = sessionStorage.typeTeam; //recuperer le nom du site
+                  site = sessionStorage.site;
+                  console.log('JE TESTE MA FONCTION');
 
-                site = sessionStorage.site;
-                console.log('JE TESTE MA FONCTION'); //recuperer les PO number
-
-                parameters = [];
-                parameters.push(shiftLetter);
-                parameters.push(site);
-                _context2.next = 14;
-                return this.$store.dispatch('fetchPO', parameters);
-
-              case 14:
-                _context2.next = 16;
-                return this.resolveAfter1Second();
-
-              case 16:
-                console.log(this.pos);
-                sumUnplannedDuration = 0;
-                sumPlannedDuration = 0;
-                i = 0;
-
-              case 20:
-                if (!(i < this.pos.length)) {
-                  _context2.next = 35;
-                  break;
-                }
-
-                tab = [];
-                tab.push(1);
-                tab.push(this.pos[i].po);
-                tab.push(productionLine);
-                _context2.next = 27;
-                return this.$store.dispatch('fetchEvents', tab);
-
-              case 27:
-                _context2.next = 29;
-                return this.resolveAfter1Second();
-
-              case 29:
-                console.log('EVENTS');
-                console.log(this.events1);
-
-                for (j = 0; j < this.events1.length; j++) {
-                  if (this.events1[j].kind === 1) {
-                    sumUnplannedDuration += this.events1[j].total_duration;
+                  if (this.isCompteurNull() && this.isRejectionNull()) {
+                    this.quality = 1;
                   } else {
-                    sumPlannedDuration += this.events1[j].total_duration;
+                    N = this.nbBottlesFilled;
+                    summRejection = this.FillerRejection + this.CaperRejection + this.EtiqueteuseRejection + this.WieghtBoxRejection;
+                    summCompteur = this.FillerCounter - this.nbBottlesFilled + (this.CaperCounter - this.nbBottlesFilled) + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
+                    this.quality = N / (N + summRejection + summCompteur);
+                  }
+
+                  this.OLE = this.quality * this.availability * this.performance;
+
+                  if (sessionStorage.getItem("quality") === null) {
+                    sessionStorage.quality = this.quality;
+                  } else {
+                    sessionStorage.setItem("quality", this.quality);
+                  }
+
+                  if (sessionStorage.getItem("performance") === null) {
+                    sessionStorage.performance = this.performance;
+                  } else {
+                    sessionStorage.setItem("performance", this.performance);
+                  }
+
+                  if (sessionStorage.getItem("availability") === null) {
+                    sessionStorage.availability = this.availability;
+                  } else {
+                    sessionStorage.setItem("availability", this.availability);
+                  }
+
+                  if (sessionStorage.getItem("OLE") === null) {
+                    sessionStorage.OLE = this.OLE;
+                  } else {
+                    sessionStorage.setItem("OLE", this.OLE);
                   }
                 }
 
-              case 32:
-                i++;
-                _context2.next = 20;
-                break;
-
-              case 35:
-                console.log('SOMME totale : ' + sumUnplannedDuration + sumPlannedDuration);
-                this.availability = this.availability - (sumPlannedDuration - sumUnplannedDuration) / sumPlannedDuration;
-                sumNetOperatingTime = 0;
-                sumTotalOperatingTime = 0;
-
-                for (_j = 0; _j < this.pos.length; _j++) {
-                  if (this.pos[_j].po !== sessionStorage.getItem("pos").split(',')[this.indice]) {
-                    sumNetOperatingTime += this.pos[_j].totalNetOperatingTime;
-                    sumTotalOperatingTime += this.pos[_j].totalOperatingTime;
-                  } else {
-                    sumNetOperatingTime += this.totalNetOperatingTime;
-                    sumTotalOperatingTime += this.totalOperatingTime;
-                  }
-                }
-
-                this.performance = 100 * sumNetOperatingTime + sumTotalOperatingTime; //100 *SUM ( for all the PO of the shift including the last one ( even not achieved ) ) TOTAL PO NET OPERATING TIME
-                /// SUM ( for all the PO of the shift including the last one ( even not achieved ) ) TOTAL PO OPERATING TIME
-                //this.$store.dispatch('fetchEventsShift', parameters);
-
-                /**
-                 if (sessionStorage.getItem("TOTAL_PO_OPERATING_TIME") === null) {
-                    sessionStorage.TOTAL_PO_OPERATING_TIME = totalOperatingTime;
-                } else {
-                    sessionStorage.setItem("TOTAL_PO_OPERATING_TIME", totalOperatingTime);
-                }**/
-
-              case 41:
                 this.displayNumber = 2;
 
-              case 42:
+              case 3:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       function validateInformations() {
@@ -4139,11 +4325,11 @@ var today = new Date();
       return validateInformations;
     }(),
     confirmSpeedloss: function () {
-      var _confirmSpeedloss = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+      var _confirmSpeedloss = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
         var responses, reason, i, comment;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 responses = document.getElementsByClassName('response');
                 reason = '';
@@ -4162,7 +4348,7 @@ var today = new Date();
                 this.speedLossEvent.reason = reason;
                 console.log(this.speedLossEvent);
                 this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
-                _context3.next = 11;
+                _context4.next = 11;
                 return this.resolveAfter1Second();
 
               case 11:
@@ -4170,10 +4356,10 @@ var today = new Date();
 
               case 12:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       function confirmSpeedloss() {
@@ -4199,7 +4385,7 @@ var today = new Date();
     console.log(tab);
     this.$store.dispatch('fetchSpeedLosses', tab);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(['speedLoss', 'user', 'pos', 'events1']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(['speedLoss', 'user', 'pos', 'events1', 'netOP']))
 });
 
 /***/ }),
@@ -4273,6 +4459,345 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "monthlyLoadFactor",
+  data: function data() {
+    return {
+      site: '',
+      productionline: '',
+      product: '',
+      formulationType: '',
+      reporting: '',
+      tool: '',
+      beginningDate: '',
+      endingDate: '',
+      username: sessionStorage.getItem("username"),
+      index: -1,
+      show: 0,
+      PONumber: ''
+    };
+  },
+  methods: {
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
+                  _context.next = 14;
+                  break;
+                }
+
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(this.beginningDate);
+                tab.push(this.endingDate);
+                tab.push(this.PONumber);
+                this.$store.dispatch('fecthAllEvents', tab);
+                _context.next = 12;
+                return this.resolveAfter15Second();
+
+              case 12:
+                this.show = 1;
+                this.index = index;
+
+              case 14:
+                this.show = 1;
+
+              case 15:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    resolveAfter05Second: function resolveAfter05Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 500);
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.$store.dispatch('fetchSites');
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=script&lang=js&":
 /*!*************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=script&lang=js& ***!
@@ -4284,6 +4809,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
 //
 //
 //
@@ -4353,65 +4882,6 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -5229,10 +5699,10 @@ var selectElem = document.getElementById('typeTeam');
         dcodesTab.push(DCODES[i].value);
       }
 
-      if (sessionStorage.getItem("dcodes") === null) {
-        sessionStorage.dcodes = dcodesTab;
+      if (sessionStorage.getItem("GMID") === null) {
+        sessionStorage.GMID = dcodesTab;
       } else {
-        sessionStorage.setItem("dcodes", dcodesTab);
+        sessionStorage.setItem("GMID", dcodesTab);
       }
 
       var POs = document.getElementsByClassName('PO');
@@ -5465,6 +5935,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "topSecondPage",
@@ -5542,7 +6014,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               console.log(_this.PO);
 
               if (!(_this.PO.length > 0 && _this.PO[0] !== "")) {
-                _context.next = 27;
+                _context.next = 29;
                 break;
               }
 
@@ -5550,7 +6022,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 7:
               if (!(i < _this.PO.length)) {
-                _context.next = 27;
+                _context.next = 29;
                 break;
               }
 
@@ -5581,16 +6053,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _this.$store.dispatch('checkAssignation', assignation);
 
             case 21:
-              console.log(assignation);
-              _context.next = 24;
+              _context.next = 23;
+              return _this.resolveAfter05Second();
+
+            case 23:
+              if (!(_this.assignation[i] === 0)) {
+                _context.next = 26;
+                break;
+              }
+
+              _context.next = 26;
               return _this.$store.dispatch('storeAssignation', assignation);
 
-            case 24:
+            case 26:
               i++;
               _context.next = 7;
               break;
 
-            case 27:
+            case 29:
             case "end":
               return _context.stop();
           }
@@ -5598,7 +6078,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, _callee);
     }))();
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['events1', 'events2', 'productionlineID', 'worksiteID']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['events1', 'events2', 'productionlineID', 'worksiteID', 'assignation']))
 });
 
 /***/ }),
@@ -6369,6 +6849,7 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('navbar', __webpack_require__
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('downtimesReport', __webpack_require__(/*! ./components/downtimesReport.vue */ "./resources/js/components/downtimesReport.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('packagingID', __webpack_require__(/*! ./components/packagingLineID.vue */ "./resources/js/components/packagingLineID.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('choiceLogin', __webpack_require__(/*! ./components/choiceLogin.vue */ "./resources/js/components/choiceLogin.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('monthlyLoadFactor', __webpack_require__(/*! ./components/monthlyLoadFactor.vue */ "./resources/js/components/monthlyLoadFactor.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('login', __webpack_require__(/*! ./components/login.vue */ "./resources/js/components/login.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('teamInfo', __webpack_require__(/*! ./components/teamInfo.vue */ "./resources/js/components/teamInfo.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('topSecondPage', __webpack_require__(/*! ./components/topSecondPage.vue */ "./resources/js/components/topSecondPage.vue").default);
@@ -6511,8 +6992,7 @@ var actions = {
     var productionLine = parameters[1];
     var beginningDate = parameters[2];
     var endingDate = parameters[3];
-    var PONumber = parameters[4];
-    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/allevents/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate, "/").concat(PONumber)).then(function (res) {
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/allevents/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate)).then(function (res) {
       commit('FETCH_ALL_EVENTS', res.data);
     })["catch"](function (err) {
       console.log(err);
@@ -6595,13 +7075,21 @@ var actions = {
   checkAssignation: function checkAssignation(_ref14, assignation) {
     var commit = _ref14.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
-      commit('CREATE_ASSIGNATION', res.data);
+      commit('FECTH_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref15, potab) {
+  getNetOPTime: function getNetOPTime(_ref15, GMID) {
     var commit = _ref15.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/netOP/".concat(GMID)).then(function (res) {
+      commit('FETCH_NETOP', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  create_PO: function create_PO(_ref16, potab) {
+    var commit = _ref16.commit;
 
     for (var i = 0; i < potab.length; i++) {
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/PO", potab[i]).then(function (res) {
@@ -6611,64 +7099,71 @@ var actions = {
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref16, assignation) {
-    var commit = _ref16.commit;
+  storeAssignation: function storeAssignation(_ref17, assignation) {
+    var commit = _ref17.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref17, event) {
-    var commit = _ref17.commit;
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref18, event) {
+    var commit = _ref18.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref18, event) {
-    var commit = _ref18.commit;
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref19, event) {
+    var commit = _ref19.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref19, event) {
-    var commit = _ref19.commit;
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref20, event) {
+    var commit = _ref20.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref20, event) {
-    var commit = _ref20.commit;
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref21, event) {
+    var commit = _ref21.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref21, event) {
-    var commit = _ref21.commit;
+  create_plannedEvent: function create_plannedEvent(_ref22, event) {
+    var commit = _ref22.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref22, PONumber) {
-    var commit = _ref22.commit;
-    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/stopPO/".concat(PONumber), PONumber).then(function (res) {
+  stop_PO: function stop_PO(_ref23, array) {
+    var commit = _ref23.commit;
+    var PO = array[0];
+    var availability = array[1];
+    var performance = array[2];
+    var quality = array[3];
+    var OLE = array[4];
+    var quantityProduced = array[5];
+    var totalDuration = array[6];
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/stopPO/".concat(PO, "/").concat(availability, "/").concat(performance, "/").concat(quality, "/").concat(OLE, "/").concat(quantityProduced, "/").concat(totalDuration), PO).then(function (res) {
       commit('STOP_PO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref23, event) {
-    var commit = _ref23.commit;
+  create_SpeedLoss: function create_SpeedLoss(_ref24, event) {
+    var commit = _ref24.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
@@ -6725,8 +7220,14 @@ var getters = {
   speedLoss: function speedLoss(state) {
     return state.speedLoss;
   },
+  assignation: function assignation(state) {
+    return state.assignation;
+  },
   downtimeReasons: function downtimeReasons(state) {
     return state.downtimeReasons;
+  },
+  netOP: function netOP(state) {
+    return state.netOP;
   },
   downtimeReasons_2: function downtimeReasons_2(state) {
     return state.downtimeReasons_2;
@@ -6788,88 +7289,9 @@ vue__WEBPACK_IMPORTED_MODULE_4__.default.use(vuex__WEBPACK_IMPORTED_MODULE_5__.d
 /*!*****************************************!*\
   !*** ./resources/js/store/mutations.js ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-var mutations = {
-  FETCH_USER: function FETCH_USER(state, user) {
-    return state.user = user;
-  },
-  FETCH_EVENTS1: function FETCH_EVENTS1(state, events) {
-    return state.events1 = events;
-  },
-  FETCH_EVENTS2: function FETCH_EVENTS2(state, events) {
-    return state.events2 = events;
-  },
-  FETCH_PO: function FETCH_PO(state, pos) {
-    return state.pos = pos;
-  },
-  FETCH_WORKSITEID: function FETCH_WORKSITEID(state, id) {
-    return state.worksiteID = id;
-  },
-  FETCH_PRODUCTIONLINEID: function FETCH_PRODUCTIONLINEID(state, id) {
-    return state.productionlineID = id;
-  },
-  FETCH_DOWNTIME_REASONS: function FETCH_DOWNTIME_REASONS(state, downtimeReasons) {
-    return state.downtimeReasons = downtimeReasons;
-  },
-  FETCH_DOWNTIME_REASONS_2: function FETCH_DOWNTIME_REASONS_2(state, downtimeReasons_2) {
-    return state.downtimeReasons_2 = downtimeReasons_2;
-  },
-  FETCH_SPEEDLOSSES: function FETCH_SPEEDLOSSES(state, speedLoss) {
-    return state.speedLoss = speedLoss;
-  },
-  FETCH_DOWNTIME_REASONS_MACHINE_ISSUE: function FETCH_DOWNTIME_REASONS_MACHINE_ISSUE(state, machineIssue) {
-    return state.machineIssue = machineIssue;
-  },
-  CREATE_PO: function CREATE_PO(state, POs) {
-    state.PO.unshift(POs);
-  },
-  FETCH_SITES: function FETCH_SITES(state, sites) {
-    return state.sites = sites;
-  },
-  FETCH_MACHINES: function FETCH_MACHINES(state, machines) {
-    return state.machines = machines;
-  },
-  FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
-    return state.allEvents = events;
-  },
-  FETCH_UNPLANNED_DOWNTIME_EVENTS: function FETCH_UNPLANNED_DOWNTIME_EVENTS(state, events) {
-    return state.unplannedDowntimeEvents = events;
-  },
-  CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME: function CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent) {
-    state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
-  },
-  CREATE_UNPLANNEDEVENT_CHANGINGFORMAT: function CREATE_UNPLANNEDEVENT_CHANGINGFORMAT(state, unplannedEvent) {
-    state.unplannedEvent_ChangingFormat.unshift(unplannedEvent);
-  },
-  CREATE_UNPLANNEDEVENT_CLIENTCHANGING: function CREATE_UNPLANNEDEVENT_CLIENTCHANGING(state, unplannedEvent) {
-    state.unplannedEvent_ClientChanging.unshift(unplannedEvent);
-  },
-  CREATE_ASSIGNATION: function CREATE_ASSIGNATION(state, assignation) {
-    state.assignation.unshift(assignation);
-  },
-  CREATE_UNPLANNEDEVENT_CIP: function CREATE_UNPLANNEDEVENT_CIP(state, unplannedEvent) {
-    state.unplannedEvent_CIP.unshift(unplannedEvent);
-  },
-  CREATE_PLANNEDEVENT: function CREATE_PLANNEDEVENT(state, plannedEvent) {
-    state.plannedEvent.unshift(plannedEvent);
-  },
-  CREATE_SPEEDLOSS: function CREATE_SPEEDLOSS(state, speedLoss) {
-    state.speedLoss.unshift(speedLoss);
-  },
-  STOP_PO: function STOP_PO(state, PO) {
-    state.PO.unshift(PO);
-  },
-  RETREIVETOKEN: function RETREIVETOKEN(state, token) {
-    state.token = token;
-  }
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (mutations);
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/resources/js/store/mutations.js: Unexpected token (70:0)\n\n\u001b[0m \u001b[90m 68 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 69 |\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 70 |\u001b[39m \u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<\u001b[39m \u001b[33mHEAD\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 71 |\u001b[39m     \u001b[33mFECTH_ASSIGNATION\u001b[39m(state\u001b[33m,\u001b[39m assignation){\u001b[0m\n\u001b[0m \u001b[90m 72 |\u001b[39m         \u001b[36mreturn\u001b[39m state\u001b[33m.\u001b[39massignation\u001b[33m.\u001b[39mpush(assignation)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 73 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n    at Parser._raise (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:788:17)\n    at Parser.raiseWithData (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:781:17)\n    at Parser.raise (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.unexpected (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:9929:16)\n    at Parser.parseIdentifierName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12150:18)\n    at Parser.parseIdentifier (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12128:23)\n    at Parser.parseMaybePrivateName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11418:19)\n    at Parser.parsePropertyName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11942:151)\n    at Parser.parsePropertyDefinition (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11825:22)\n    at Parser.parseObjectLike (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11741:25)\n    at Parser.parseExprAtom (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11265:23)\n    at Parser.parseExprSubscripts (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10914:23)\n    at Parser.parseUpdate (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10894:21)\n    at Parser.parseMaybeUnary (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10872:23)\n    at Parser.parseExprOps (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10733:23)\n    at Parser.parseMaybeConditional (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10707:23)");
 
 /***/ }),
 
@@ -6901,6 +7323,7 @@ var state = {
   speedLoss: [],
   assignation: [],
   PO: [],
+  netOP: [],
   machines: [],
   allEvents: [],
   worksiteID: -1,
@@ -11539,6 +11962,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\nhtml[data-v-172b28a4] {\n    background-color: #56baed;\n}\nbody[data-v-172b28a4] {\n    font-family: \"Poppins\", sans-serif;\n    height: 100vh;\n}\na[data-v-172b28a4] {\n    color: #92badd;\n    display:inline-block;\n    text-decoration: none;\n    font-weight: 400;\n}\nh2[data-v-172b28a4] {\n    text-align: center;\n    font-size: 16px;\n    font-weight: 600;\n    text-transform: uppercase;\n    display:inline-block;\n    margin: 40px 8px 10px 8px;\n    color: #cccccc;\n}\n\n\n\n/* STRUCTURE */\n.wrapper[data-v-172b28a4] {\n    display: flex;\n    align-items: center;\n    flex-direction: column;\n    justify-content: center;\n    width: 100%;\n    min-height: 100%;\n    padding: 20px;\n}\n#formContent[data-v-172b28a4] {\n    border-radius: 10px 10px 10px 10px;\n    background: #fff;\n    padding: 30px;\n    width: 90%;\n    max-width: 450px;\n    position: relative;\n    padding: 0px;\n    box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);\n    text-align: center;\n}\n#formFooter[data-v-172b28a4] {\n    background-color: #f6f6f6;\n    border-top: 1px solid #dce8f1;\n    padding: 25px;\n    text-align: center;\n    border-radius: 0 0 10px 10px;\n}\n\n\n\n/* TABS */\nh2.inactive[data-v-172b28a4] {\n    color: #cccccc;\n}\nh2.active[data-v-172b28a4] {\n    color: #0d0d0d;\n    border-bottom: 2px solid #5fbae9;\n}\n\n\n\n/* FORM TYPOGRAPHY*/\ninput[type=button][data-v-172b28a4], input[type=submit][data-v-172b28a4], input[type=reset][data-v-172b28a4]  {\n    background-color: #56baed;\n    border: none;\n    color: white;\n    padding: 15px 80px;\n    text-align: center;\n    text-decoration: none;\n    display: inline-block;\n    text-transform: uppercase;\n    font-size: 13px;\n    box-shadow: 0 10px 30px 0 rgba(95,186,233,0.4);\n    border-radius: 5px 5px 5px 5px;\n    margin: 5px 20px 40px 20px;\n    transition: all 0.3s ease-in-out;\n}\ninput[type=button][data-v-172b28a4]:hover, input[type=submit][data-v-172b28a4]:hover, input[type=reset][data-v-172b28a4]:hover  {\n    background-color: #39ace7;\n}\ninput[type=button][data-v-172b28a4]:active, input[type=submit][data-v-172b28a4]:active, input[type=reset][data-v-172b28a4]:active  {\n    transform: scale(0.95);\n}\ninput[type=text][data-v-172b28a4] {\n    background-color: #f6f6f6;\n    border: none;\n    color: #0d0d0d;\n    padding: 15px 32px;\n    text-align: center;\n    text-decoration: none;\n    display: inline-block;\n    font-size: 16px;\n    margin: 5px;\n    width: 85%;\n    border: 2px solid #f6f6f6;\n    transition: all 0.5s ease-in-out;\n    border-radius: 5px 5px 5px 5px;\n}\ninput[type=text][data-v-172b28a4]:focus {\n    background-color: #fff;\n    border-bottom: 2px solid #5fbae9;\n}\ninput[type=text][data-v-172b28a4]:placeholder {\n    color: #cccccc;\n}\ninput[type=password][data-v-172b28a4] {\n    background-color: #f6f6f6;\n    border: none;\n    color: #0d0d0d;\n    padding: 15px 32px;\n    text-align: center;\n    text-decoration: none;\n    display: inline-block;\n    font-size: 16px;\n    margin: 5px;\n    width: 85%;\n    border: 2px solid #f6f6f6;\n    transition: all 0.5s ease-in-out;\n    border-radius: 5px 5px 5px 5px;\n}\ninput[type=password][data-v-172b28a4]:focus {\n    background-color: #fff;\n    border-bottom: 2px solid #5fbae9;\n}\ninput[type=password][data-v-172b28a4]:placeholder {\n    color: #cccccc;\n}\n\n\n\n/* ANIMATIONS */\n\n/* Simple CSS3 Fade-in-down Animation */\n.fadeInDown[data-v-172b28a4] {\n    -webkit-animation-name: fadeInDown-data-v-172b28a4;\n    animation-name: fadeInDown-data-v-172b28a4;\n    -webkit-animation-duration: 1s;\n    animation-duration: 1s;\n    -webkit-animation-fill-mode: both;\n    animation-fill-mode: both;\n}\n@-webkit-keyframes fadeInDown-data-v-172b28a4 {\n0% {\n        opacity: 0;\n        transform: translate3d(0, -100%, 0);\n}\n100% {\n        opacity: 1;\n        transform: none;\n}\n}\n@keyframes fadeInDown-data-v-172b28a4 {\n0% {\n        opacity: 0;\n        transform: translate3d(0, -100%, 0);\n}\n100% {\n        opacity: 1;\n        transform: none;\n}\n}\n\n/* Simple CSS3 Fade-in Animation */\n@-webkit-keyframes fadeIn-data-v-172b28a4 {\nfrom { opacity:0;\n}\nto { opacity:1;\n}\n}\n@keyframes fadeIn-data-v-172b28a4 {\nfrom { opacity:0;\n}\nto { opacity:1;\n}\n}\n.fadeIn[data-v-172b28a4] {\n    opacity:0;\n    -webkit-animation:fadeIn-data-v-172b28a4 ease-in 1;\n    animation:fadeIn-data-v-172b28a4 ease-in 1;\n\n    -webkit-animation-fill-mode:forwards;\n    animation-fill-mode:forwards;\n\n    -webkit-animation-duration:1s;\n    animation-duration:1s;\n}\n.fadeIn.first[data-v-172b28a4] {\n    -webkit-animation-delay: 0.4s;\n    animation-delay: 0.4s;\n}\n.fadeIn.second[data-v-172b28a4] {\n    -webkit-animation-delay: 0.6s;\n    animation-delay: 0.6s;\n}\n.fadeIn.third[data-v-172b28a4] {\n    -webkit-animation-delay: 0.8s;\n    animation-delay: 0.8s;\n}\n.fadeIn.fourth[data-v-172b28a4] {\n    -webkit-animation-delay: 1s;\n    animation-delay: 1s;\n}\n\n/* Simple CSS3 Fade-in Animation */\n.underlineHover[data-v-172b28a4]:after {\n    display: block;\n    left: 0;\n    bottom: -10px;\n    width: 0;\n    height: 2px;\n    background-color: #56baed;\n    content: \"\";\n    transition: width 0.2s;\n}\n.underlineHover[data-v-172b28a4]:hover {\n    color: #0d0d0d;\n}\n.underlineHover[data-v-172b28a4]:hover:after{\n    width: 100%;\n}\n\n\n\n/* OTHERS */\n*[data-v-172b28a4]:focus {\n    outline: none;\n}\n#icon[data-v-172b28a4] {\n    width:60%;\n}\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-ebdd9bf2] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-ebdd9bf2] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh3[data-v-ebdd9bf2]{\n    color: #56baed;\n}\ndiv[data-v-ebdd9bf2] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-ebdd9bf2] {\n    color: white;\n    background: #56baed;\n}\n.rcorners2[data-v-ebdd9bf2] {\n    border: 2px solid lightgray;\n    padding: 20px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -43807,6 +44254,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_style_index_0_id_ebdd9bf2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_style_index_0_id_ebdd9bf2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_style_index_0_id_ebdd9bf2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=style&index=0&id=11e733ca&scoped=true&lang=css&":
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=style&index=0&id=11e733ca&scoped=true&lang=css& ***!
@@ -44753,6 +45230,47 @@ component.options.__file = "resources/js/components/login.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/monthlyLoadFactor.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/components/monthlyLoadFactor.vue ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true& */ "./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true&");
+/* harmony import */ var _monthlyLoadFactor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./monthlyLoadFactor.vue?vue&type=script&lang=js& */ "./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js&");
+/* harmony import */ var _monthlyLoadFactor_vue_vue_type_style_index_0_id_ebdd9bf2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& */ "./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _monthlyLoadFactor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "ebdd9bf2",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/monthlyLoadFactor.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/navbar.vue":
 /*!********************************************!*\
   !*** ./resources/js/components/navbar.vue ***!
@@ -45307,6 +45825,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./monthlyLoadFactor.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/navbar.vue?vue&type=script&lang=js&":
 /*!*********************************************************************!*\
   !*** ./resources/js/components/navbar.vue?vue&type=script&lang=js& ***!
@@ -45567,6 +46101,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_login_vue_vue_type_style_index_0_id_172b28a4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./login.vue?vue&type=style&index=0&id=172b28a4&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/login.vue?vue&type=style&index=0&id=172b28a4&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& ***!
+  \****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_style_index_0_id_ebdd9bf2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=style&index=0&id=ebdd9bf2&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -45850,6 +46397,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_login_vue_vue_type_template_id_172b28a4_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_login_vue_vue_type_template_id_172b28a4_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./login.vue?vue&type=template&id=172b28a4&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/login.vue?vue&type=template&id=172b28a4&scoped=true&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true& ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_monthlyLoadFactor_vue_vue_type_template_id_ebdd9bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true&");
 
 
 /***/ }),
@@ -47048,7 +47612,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex" }, [
+  return _c("div", { staticClass: "d-flex", attrs: { id: "component" } }, [
     _c(
       "div",
       { staticClass: "col" },
@@ -47169,33 +47733,6 @@ var render = function() {
           ])
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "PO" } }, [_vm._v("Numéro de PO : ")]),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.PONumber,
-                  expression: "PONumber"
-                }
-              ],
-              attrs: { type: "text", id: "PO" },
-              domProps: { value: _vm.PONumber },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.PONumber = $event.target.value
-                }
-              }
-            })
-          ])
-        ]),
-        _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _c("input", {
@@ -47217,51 +47754,22 @@ var render = function() {
         _vm.show === 1 && _vm.allEvents["PP"] !== null
           ? [
               _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col" }, [
-                  _c("p", [
-                    _vm._v(
-                      "\n                        Plant Operating Time : " +
-                        _vm._s(_vm.allEvents["POInfo"][0].plantOperatingTime) +
-                        " mn "
-                    ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        Planned Production Time : " +
-                        _vm._s(
-                          _vm.allEvents["POInfo"][0].plannedProductionTime
-                        ) +
-                        " mn "
-                    ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        Load factor : " +
-                        _vm._s(_vm.allEvents["POInfo"][0].loadFactor) +
-                        " % "
-                    ),
-                    _c("br")
-                  ])
-                ]),
+                _vm._m(0),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
                   _c("p", [
-                    _vm._v(
-                      "\n                        Volume packed : " +
-                        _vm._s(_vm.allEvents["POInfo"][0].volumePacked) +
-                        " L "
-                    ),
+                    _vm._v("\n                        Volume packed :"),
+                    _vm._v(" L "),
                     _c("br"),
                     _vm._v(
                       "\n                        Nber of Production Order : " +
-                        _vm._s(_vm.allEvents["POInfo"][0].nbProductionOrder) +
+                        _vm._s(_vm.allEvents["SITE"].length) +
                         " "
                     ),
                     _c("br"),
                     _vm._v(
                       "\n                        Nber of items Produced : " +
-                        _vm._s(
-                          _vm.allEvents["POInfo"][0].nbItemProductionOrder
-                        ) +
-                        " "
+                        _vm._s(_vm.qtyProduced)
                     ),
                     _c("br")
                   ])
@@ -47270,7 +47778,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(0),
+                  _vm._m(1),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
@@ -47362,7 +47870,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(1),
+                  _vm._m(2),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
@@ -47546,7 +48054,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(2),
+                  _vm._m(3),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
@@ -47742,7 +48250,70 @@ var render = function() {
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
-        _vm.show === 1 ? [_vm._m(3)] : _vm._e(),
+        _vm.show === 1
+          ? [
+              _c("div", { attrs: { id: "squareZone" } }, [
+                _vm._m(4),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _c("h5", [_vm._v("Plant Operating Time Overview")]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row rect", attrs: { id: "rect1" } }, [
+                  _c("p", { staticClass: "blueBack" }, [
+                    _vm._v(
+                      "\n                        Planned Production Time (PPT)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "greenBack" }, [
+                    _vm._v(
+                      "\n                        Planned Downtime (PD)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(
+                          (_vm.plannedProductionTime / _vm.plannedDowntimes) *
+                            100
+                        ) +
+                        "%\n                    "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row rect", attrs: { id: "rect2" } }, [
+                  _c("p", { staticClass: "blueBack" }, [
+                    _vm._v(
+                      "\n                        Operating Time (OT)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "redBack" }, [
+                    _vm._v(
+                      "\n                        Unplanned Downtime (UD)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(
+                          (_vm.operatingTime / _vm.unplannedDowntimes) * 100
+                        ) +
+                        "%\n                    "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(5),
+                _vm._v(" "),
+                _vm._m(6)
+              ])
+            ]
+          : _vm._e(),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
@@ -47807,6 +48378,24 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col" }, [
+      _c("p", [
+        _vm._v("\n                        Plant Operating Time :"),
+        _vm._v(" mn "),
+        _c("br"),
+        _vm._v("\n                        Planned Production Time : "),
+        _vm._v("mn "),
+        _c("br"),
+        _vm._v("\n                        Load factor :"),
+        _vm._v(" % "),
+        _c("br")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
         _c("th", { attrs: { scope: "col" } }, [
@@ -47849,88 +48438,58 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { attrs: { id: "squareZone" } }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col" }, [
-          _c("canvas", { attrs: { id: "can", width: "200", height: "200" } }),
-          _vm._v(" "),
-          _c("h5", [_vm._v("Form Volume Split")])
-        ]),
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col" }, [
+        _c("canvas", { attrs: { id: "can", width: "200", height: "200" } }),
         _vm._v(" "),
-        _c("div", { staticClass: "col" }, [
-          _c("canvas", { attrs: { id: "can2", width: "200", height: "200" } }),
-          _vm._v(" "),
-          _c("h5", [_vm._v("Pack Size Split")])
-        ])
+        _c("h5", [_vm._v("Form Volume Split")])
       ]),
       _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("h5", [_vm._v("Plant Operating Time Overview")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row rect", attrs: { id: "rect1" } }, [
-        _c("p", { staticClass: "blueBack" }, [
-          _vm._v(
-            "\n                        Planned Production Time (PPT)\n                    "
-          )
-        ]),
+      _c("div", { staticClass: "col" }, [
+        _c("canvas", { attrs: { id: "can2", width: "200", height: "200" } }),
         _vm._v(" "),
-        _c("p", { staticClass: "greenBack" }, [
-          _vm._v(
-            "\n                        Planned Downtime (PD)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", [_vm._v("\n                        ..%\n                    ")])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row rect", attrs: { id: "rect2" } }, [
-        _c("p", { staticClass: "blueBack" }, [
-          _vm._v(
-            "\n                        Operating Time (OT)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", { staticClass: "redBack" }, [
-          _vm._v(
-            "\n                        Unplanned Downtime (UD)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", [_vm._v("\n                        ..%\n                    ")])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
-        _c("p", { staticClass: "blueBack" }, [
-          _vm._v(
-            "\n                        Net Operating Time (NOT)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", { staticClass: "redBack" }, [
-          _vm._v(
-            "\n                        Speed Losses (SL)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", [_vm._v("\n                        ..%\n                    ")])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
-        _c("p", { staticClass: "blueBack" }, [
-          _vm._v(
-            "\n                        Valuable Operating Time (VOT)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", { staticClass: "redBack" }, [
-          _vm._v(
-            "\n                        Quality Losses (QL)\n                    "
-          )
-        ]),
-        _vm._v(" "),
-        _c("p", [_vm._v("\n                        ..%\n                    ")])
+        _c("h5", [_vm._v("Pack Size Split")])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
+      _c("p", { staticClass: "blueBack" }, [
+        _vm._v(
+          "\n                        Net Operating Time (NOT)\n                    "
+        )
+      ]),
+      _vm._v(" "),
+      _c("p", { staticClass: "redBack" }, [
+        _vm._v(
+          "\n                        Speed Losses (SL)\n                    "
+        )
+      ]),
+      _vm._v(" "),
+      _c("p", [_vm._v("\n                        ..%\n                    ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
+      _c("p", { staticClass: "blueBack" }, [
+        _vm._v(
+          "\n                        Valuable Operating Time (VOT)\n                    "
+        )
+      ]),
+      _vm._v(" "),
+      _c("p", { staticClass: "redBack" }, [
+        _vm._v(
+          "\n                        Quality Losses (QL)\n                    "
+        )
+      ]),
+      _vm._v(" "),
+      _c("p", [_vm._v("\n                        ..%\n                    ")])
     ])
   }
 ]
@@ -47961,246 +48520,238 @@ var render = function() {
     [
       _vm.displayNumber === 0
         ? [
-            _c("div", { attrs: { align: "center" } }, [
-              _c(
-                "div",
-                {
-                  staticClass: "col productionName rcorners2",
-                  attrs: { align: "center" }
-                },
-                [_vm._v("\n                Performance\n            ")]
-              ),
-              _vm._v(" "),
-              _c("form", [
-                _c("div", { staticClass: "form-group row blockInput" }, [
-                  _c(
-                    "label",
-                    {
-                      staticClass: "col-sm-2 col-form-label rcorners1",
-                      attrs: { for: "startingPO" }
-                    },
-                    [_vm._v("Heure de début de PO")]
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-10" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.startPO,
-                          expression: "startPO"
-                        }
-                      ],
-                      staticClass: "form-control-plaintext rcorners2",
-                      attrs: {
-                        type: "time",
-                        id: "startingPO",
-                        min: "00:00",
-                        max: "24:00",
-                        required: ""
-                      },
-                      domProps: { value: _vm.startPO },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.startPO = $event.target.value
-                        }
-                      }
-                    })
-                  ])
-                ]),
+            _c(
+              "div",
+              { attrs: { align: "center" } },
+              [
+                _c(
+                  "div",
+                  {
+                    staticClass: "col productionName rcorners2",
+                    attrs: { align: "center" }
+                  },
+                  [_vm._v("\n                Performance\n            ")]
+                ),
                 _vm._v(" "),
-                _c("div", { staticClass: "form-group row blockInput" }, [
-                  _c(
-                    "label",
-                    {
-                      staticClass: "col-sm-2 rcorners1",
-                      attrs: { for: "endingPO" }
-                    },
-                    [_vm._v("Heure de fin de PO")]
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-10" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.endPO,
-                          expression: "endPO"
-                        }
-                      ],
-                      staticClass: "form-control-plaintext rcorners2",
-                      attrs: {
-                        type: "time",
-                        id: "endingPO",
-                        min: "00:00",
-                        max: "24:00",
-                        required: ""
+                _c("form", [
+                  _c("div", { staticClass: "form-group row blockInput" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "col-sm-2 col-form-label rcorners1",
+                        attrs: { for: "startingPO" }
                       },
-                      domProps: { value: _vm.endPO },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.endPO = $event.target.value
-                        }
-                      }
-                    })
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group row blockInput" }, [
-                  _c(
-                    "label",
-                    {
-                      staticClass: "col-sm-2 rcorners1",
-                      attrs: { for: "finalQuantityProduced" }
-                    },
-                    [_vm._v("Quantité finale produite")]
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-10" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.finalQuantityProduced,
-                          expression: "finalQuantityProduced"
-                        }
-                      ],
-                      staticClass: "form-control-plaintext rcorners2",
-                      attrs: { type: "number", id: "finalQuantityProduced" },
-                      domProps: { value: _vm.finalQuantityProduced },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.finalQuantityProduced = $event.target.value
-                        }
-                      }
-                    })
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "rcorners2", attrs: { align: "center" } },
-                [
-                  _c("div", { attrs: { align: "left" } }, [
-                    _vm._v(
-                      "\n\n\n                    TOTAL PO OPERATING TIME (min): " +
-                        _vm._s(
-                          _vm.endPO.toString().split(":")[0] * 60 +
-                            _vm.endPO.toString().split(":")[1] -
-                            (_vm.startPO.toString().split(":")[0] * 60 +
-                              _vm.startPO.toString().split(":")[1])
-                        ) +
-                        "\n                    "
+                      [_vm._v("Heure de début de PO")]
                     ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                    TOTAL PO NET OPERATING TIME (min): " +
-                        _vm._s(
-                          _vm.endPO.toString().split(":")[0] * 60 +
-                            _vm.endPO.toString().split(":")[1] -
-                            (_vm.startPO.toString().split(":")[0] * 60 +
-                              _vm.startPO.toString().split(":")[1]) -
-                            _vm.total_dowtimes
-                        ) +
-                        "\n                    "
-                    ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                    TOTAL PO PERFORMANCE (%) : " +
-                        _vm._s(
-                          ((_vm.endPO.toString().split(":")[0] * 60 +
-                            _vm.endPO.toString().split(":")[1] -
-                            (_vm.startPO.toString().split(":")[0] * 60 +
-                              _vm.startPO.toString().split(":")[1]) -
-                            _vm.total_dowtimes) /
-                            (_vm.endPO.toString().split(":")[0] * 60 +
-                              _vm.endPO.toString().split(":")[1] -
-                              (_vm.startPO.toString().split(":")[0] * 60 +
-                                _vm.startPO.toString().split(":")[1]))) *
-                            100
-                        ) +
-                        "\n                "
-                    )
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm-10" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.startPO,
+                            expression: "startPO"
+                          }
+                        ],
+                        staticClass: "form-control-plaintext rcorners2",
+                        attrs: {
+                          type: "time",
+                          id: "startingPO",
+                          min: "00:00",
+                          max: "24:00",
+                          required: ""
+                        },
+                        domProps: { value: _vm.startPO },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.startPO = $event.target.value
+                          }
+                        }
+                      })
+                    ])
                   ]),
                   _vm._v(" "),
-                  _c("br"),
+                  _c("div", { staticClass: "form-group row blockInput" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "col-sm-2 rcorners1",
+                        attrs: { for: "endingPO" }
+                      },
+                      [_vm._v("Heure de fin de PO")]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm-10" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.endPO,
+                            expression: "endPO"
+                          }
+                        ],
+                        staticClass: "form-control-plaintext rcorners2",
+                        attrs: {
+                          type: "time",
+                          id: "endingPO",
+                          min: "00:00",
+                          max: "24:00",
+                          required: ""
+                        },
+                        domProps: { value: _vm.endPO },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.endPO = $event.target.value
+                          }
+                        }
+                      })
+                    ])
+                  ]),
                   _vm._v(" "),
-                  _vm.speedLoss.length <= 0
-                    ? [
-                        _c("h4", [
-                          _vm._v("Aucune perte de performance enregistrée")
-                        ])
-                      ]
-                    : [
-                        _c("table", { staticClass: "table" }, [
-                          _vm._m(0),
-                          _vm._v(" "),
-                          _c(
-                            "tbody",
-                            [
-                              _vm._l(_vm.speedLoss, function(event) {
-                                return [
-                                  _c("tr", [
-                                    _c("th", { attrs: { scope: "row" } }, [
-                                      _vm._v(_vm._s(event.reason))
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("td", [_vm._v(_vm._s(event.comment))])
-                                  ])
-                                ]
-                              })
-                            ],
-                            2
-                          )
-                        ])
-                      ]
-                ],
-                2
-              ),
-              _vm._v(" "),
-              _c("div", { attrs: { align: "right" } }, [
-                _c(
-                  "button",
-                  {
-                    staticClass:
-                      "btn btn-primary border-danger align-items-right btn-danger",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        $event.preventDefault()
-                        return _vm.backPage()
-                      }
-                    }
-                  },
-                  [_vm._v("\n                    Annuler\n                ")]
-                )
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass:
-                    "d-flex flex-row justify-content-between align-items-center bg-white"
-                },
-                [
+                  _c("div", { staticClass: "form-group row blockInput" }, [
+                    _vm._m(0),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm-10" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.finalQuantityProduced,
+                            expression: "finalQuantityProduced"
+                          }
+                        ],
+                        staticClass: "form-control-plaintext rcorners2",
+                        attrs: { type: "number", id: "finalQuantityProduced" },
+                        domProps: { value: _vm.finalQuantityProduced },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.finalQuantityProduced = $event.target.value
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
                   _c(
                     "button",
                     {
                       staticClass:
-                        "btn btn-primary d-flex align-items-center btn-danger",
+                        "btn btn-primary d-flex align-items-center btn-info",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          return _vm.validateCalculation()
+                        }
+                      }
+                    },
+                    [_vm._v("\n                    Valider\n                ")]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _vm.valider === 1
+                  ? [
+                      _c(
+                        "div",
+                        {
+                          staticClass: "rcorners2",
+                          attrs: { align: "center" }
+                        },
+                        [
+                          _c("div", { attrs: { align: "left" } }, [
+                            _vm._v(
+                              "\n\n                        TOTAL PO PRODUCTION TIME (min): " +
+                                _vm._s(_vm.totalProductionTime) +
+                                "\n                        "
+                            ),
+                            _c("br"),
+                            _vm._v(
+                              "\n                        TOTAL PO OPERATING TIME (min): " +
+                                _vm._s(_vm.totalOperatingTime) +
+                                "\n                        "
+                            ),
+                            _c("br"),
+                            _vm._v(
+                              "\n                        DIFFERENCE (min): " +
+                                _vm._s(
+                                  _vm.totalProductionTime -
+                                    _vm.totalOperatingTime
+                                ) +
+                                "\n                        "
+                            ),
+                            _c("br"),
+                            _vm._v(
+                              "\n\n                        TOTAL PO PERFORMANCE (%) : " +
+                                _vm._s(_vm.performance * 100) +
+                                "\n                    "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("br"),
+                          _vm._v(" "),
+                          _vm.speedLoss.length <= 0
+                            ? [
+                                _c("h4", [
+                                  _vm._v(
+                                    "Aucune perte de performance enregistrée"
+                                  )
+                                ])
+                              ]
+                            : [
+                                _c("table", { staticClass: "table" }, [
+                                  _vm._m(1),
+                                  _vm._v(" "),
+                                  _c(
+                                    "tbody",
+                                    [
+                                      _vm._l(_vm.speedLoss, function(event) {
+                                        return [
+                                          _c("tr", [
+                                            _c(
+                                              "th",
+                                              { attrs: { scope: "row" } },
+                                              [_vm._v(_vm._s(event.reason))]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("td", [
+                                              _vm._v(_vm._s(event.comment))
+                                            ])
+                                          ])
+                                        ]
+                                      })
+                                    ],
+                                    2
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      )
+                    ]
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { attrs: { align: "right" } }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass:
+                        "btn btn-primary border-danger align-items-right btn-danger",
                       attrs: { type: "button" },
                       on: {
                         click: function($event) {
@@ -48209,47 +48760,85 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n                    Retour\n                ")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass:
-                        "btn btn-primary d-flex align-items-center btn-warning",
-                      attrs: { id: "addReasonButton", type: "button" },
-                      on: {
-                        click: function($event) {
-                          $event.preventDefault()
-                          return _vm.addSpeedLoss()
-                        }
-                      }
-                    },
-                    [
-                      _vm._v(
-                        "\n                    Justification perte de performance\n                "
+                    [_vm._v("\n                    Annuler\n                ")]
+                  )
+                ]),
+                _vm._v(" "),
+                _vm.valider === 1
+                  ? [
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "d-flex flex-row justify-content-between align-items-center bg-white"
+                        },
+                        [
+                          _c(
+                            "button",
+                            {
+                              staticClass:
+                                "btn btn-primary d-flex align-items-center btn-danger",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.backPage()
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                        Retour\n                    "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass:
+                                "btn btn-primary d-flex align-items-center btn-warning",
+                              attrs: { id: "addReasonButton", type: "button" },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.addSpeedLoss()
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                        Justification perte de performance\n                    "
+                              )
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass:
+                                "btn btn-primary border-success align-items-center btn-success",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.validateInformations()
+                                }
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                        OK\n                    "
+                              )
+                            ]
+                          )
+                        ]
                       )
                     ]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass:
-                        "btn btn-primary border-success align-items-center btn-success",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          $event.preventDefault()
-                          return _vm.validateInformations()
-                        }
-                      }
-                    },
-                    [_vm._v("\n                    OK\n                ")]
-                  )
-                ]
-              )
-            ])
+                  : _vm._e()
+              ],
+              2
+            )
           ]
         : _vm._e(),
       _vm._v(" "),
@@ -48273,11 +48862,11 @@ var render = function() {
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
-              _vm._m(1),
+              _vm._m(2),
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
-              _vm._m(2),
+              _vm._m(3),
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
@@ -48344,7 +48933,7 @@ var render = function() {
                   attrs: { align: "center" }
                 },
                 [
-                  _vm._m(3),
+                  _vm._m(4),
                   _vm._v(" "),
                   _c("tbody", [
                     _c("tr", [
@@ -48606,24 +49195,23 @@ var render = function() {
             _vm._v(" "),
             _c("span", [
               _vm._v(
-                "\n             TOTAL PO OPERATING TIME (min):  " +
+                "\n\n            TOTAL PO PRODUCTION TIME (min): " +
+                  _vm._s(_vm.totalProductionTime) +
+                  "\n            "
+              ),
+              _c("br"),
+              _vm._v(
+                "\n            TOTAL PO OPERATING TIME (min): " +
                   _vm._s(_vm.totalOperatingTime) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
-                "\n            TOTAL PO NET OPERATING TIME (min): " +
-                  _vm._s(_vm.totalNetOperatingTime) +
+                "\n            DIFFERENCE (min): " +
+                  _vm._s(_vm.totalProductionTime - _vm.totalOperatingTime) +
                   "\n            "
               ),
-              _c("br"),
-              _vm._v(
-                "\n            TOTAL PO PERFORMANCE (%) : " +
-                  _vm._s(
-                    (100 * _vm.totalNetOperatingTime) / _vm.totalOperatingTime
-                  ) +
-                  "\n        "
-              )
+              _c("br")
             ]),
             _vm._v(" "),
             _c("br"),
@@ -48634,7 +49222,7 @@ var render = function() {
               ? [_c("h5", [_vm._v("Aucune perte de performance enregistrée")])]
               : [
                   _c("table", { staticClass: "table" }, [
-                    _vm._m(4),
+                    _vm._m(5),
                     _vm._v(" "),
                     _c(
                       "tbody",
@@ -48658,21 +49246,13 @@ var render = function() {
             _vm._v(" "),
             _c("h5", [_vm._v("Qualité")]),
             _vm._v(" "),
-            _c("span", [
-              _vm._v(
-                "\n             TOTAL PO QUALITY(min):  " +
-                  _vm._s(_vm.totalPOQuality) +
-                  "\n        "
-              )
-            ]),
-            _vm._v(" "),
             _c("br"),
             _vm._v(" "),
             _c(
               "table",
               { staticClass: "table table-hover", attrs: { align: "center" } },
               [
-                _vm._m(5),
+                _vm._m(6),
                 _vm._v(" "),
                 _c("tbody", [
                   _c("tr", [
@@ -48759,19 +49339,25 @@ var render = function() {
             _c("span", [
               _vm._v(
                 "\n\n             Disponibilité (%) :  " +
-                  _vm._s(_vm.availability) +
+                  _vm._s(_vm.availability * 100) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
                 "\n             Performance (%) :  " +
-                  _vm._s(_vm.availability) +
+                  _vm._s(_vm.performance * 100) +
+                  "\n            "
+              ),
+              _c("br"),
+              _vm._v(
+                "\n             Qualité (%) :  " +
+                  _vm._s(_vm.quality * 100) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
                 "\n             OLE (%) :  " +
-                  _vm._s(_vm.availability) +
+                  _vm._s(_vm.OLE * 100) +
                   "\n\n        "
               )
             ]),
@@ -48825,6 +49411,23 @@ var render = function() {
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "label",
+      {
+        staticClass: "col-sm-2 rcorners1",
+        attrs: { for: "finalQuantityProduced" }
+      },
+      [
+        _vm._v("Quantité finale produite "),
+        _c("br"),
+        _vm._v("(en\n                        nombre de caisse) ")
+      ]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -49130,6 +49733,460 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true&":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/monthlyLoadFactor.vue?vue&type=template&id=ebdd9bf2&scoped=true& ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c("div", { staticClass: "d-flex" }, [
+        _c("div", { staticClass: "col" }, [
+          _c("div", { staticClass: "d-flex" }, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(site.name) +
+                            "\n                            "
+                        )
+                      ])
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "d-flex" }, [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v("Ligne de production : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "d-flex" }, [
+            _c("form", [
+              _c("label", { attrs: { for: "PO" } }, [
+                _vm._v("Numéro de PO : ")
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.PONumber,
+                    expression: "PONumber"
+                  }
+                ],
+                attrs: { type: "text", id: "PO" },
+                domProps: { value: _vm.PONumber },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.PONumber = $event.target.value
+                  }
+                }
+              })
+            ])
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button", value: "Charger" },
+            on: {
+              click: function($event) {
+                return _vm.load()
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col" }, [
+          _c("h3", [
+            _vm._v(
+              "\n                Monthly Load Factor –\n                One year overview\n\n\n            "
+            )
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("div", { staticClass: "d-flex" }, [
+            _c("label", { attrs: { for: "startingPO" } }, [_vm._v("De")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.beginningDate,
+                  expression: "beginningDate"
+                }
+              ],
+              staticClass: " ",
+              attrs: { type: "date", id: "startingPO", required: "" },
+              domProps: { value: _vm.beginningDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.beginningDate = $event.target.value
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "endingPO" } }, [_vm._v("A")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.endingDate,
+                  expression: "endingDate"
+                }
+              ],
+              attrs: { type: "date", id: "endingPO", required: "" },
+              domProps: { value: _vm.endingDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.endingDate = $event.target.value
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("br")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
+      _vm.show === 1 ? [_vm._m(0)] : _vm._e()
+    ],
+    2
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "table-info-data" }, [
+      _c("table", { staticClass: "table" }, [
+        _c("thead", [
+          _c("tr", [
+            _c("th", { attrs: { scope: "col" } }),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Jan")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Feb")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Mar")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Apr")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("May")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Jun")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Jul")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Aug")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Sep")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Oct")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Nov")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("Dec")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("tbody", [
+          _c("tr", [
+            _c("th", { attrs: { scope: "row" } }, [
+              _vm._v("Plant Operating Time")
+            ]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", { attrs: { scope: "row" } }, [
+              _vm._v("Line Operating Time "),
+              _c("br"),
+              _vm._v(" Planned Downtime")
+            ]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", { attrs: { scope: "row" } }, [_vm._v("Nb Production")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", { attrs: { scope: "row" } }, [
+              _vm._v("Planned Maintenance "),
+              _c("br"),
+              _vm._v(" Capital Project "),
+              _c("br"),
+              _vm._v(" Breaks, Meal")
+            ]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", { attrs: { scope: "row" } }, [_vm._v("Load Factor")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("0")])
+          ])
+        ])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=template&id=11e733ca&scoped=true&":
 /*!******************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=template&id=11e733ca&scoped=true& ***!
@@ -49202,6 +50259,10 @@ var render = function() {
             _vm._v(" "),
             _c("option", { attrs: { value: "downtimesReport" } }, [
               _vm._v("\n                    Page 2\n                ")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "monthlyLoadFactor" } }, [
+              _vm._v("\n                    Page 3\n                ")
             ])
           ]
         ),
@@ -49490,182 +50551,6 @@ var render = function() {
                     ],
                     2
                   )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("div", { staticClass: "d-flex" }, [
-                _c("form", [
-                  _c("label", { attrs: { for: "product" } }, [
-                    _vm._v("Produit : ")
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "select",
-                    {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.product,
-                          expression: "product"
-                        }
-                      ],
-                      staticClass: "form-select",
-                      attrs: { name: "product", id: "product" },
-                      on: {
-                        change: function($event) {
-                          var $$selectedVal = Array.prototype.filter
-                            .call($event.target.options, function(o) {
-                              return o.selected
-                            })
-                            .map(function(o) {
-                              var val = "_value" in o ? o._value : o.value
-                              return val
-                            })
-                          _vm.product = $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        }
-                      }
-                    },
-                    [
-                      _vm._l(_vm.machines[2], function(product) {
-                        return [
-                          _c("option", { domProps: { value: product.name } }, [
-                            _vm._v(
-                              "\n                                    " +
-                                _vm._s(product.name) +
-                                "\n                                "
-                            )
-                          ])
-                        ]
-                      })
-                    ],
-                    2
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "d-flex" }, [
-                _c("form", [
-                  _c("label", { attrs: { for: "formulationType" } }, [
-                    _vm._v("Type de Formulation : ")
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "select",
-                    {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.formulationType,
-                          expression: "formulationType"
-                        }
-                      ],
-                      staticClass: "form-select",
-                      attrs: { name: "formulationType", id: "formulationType" },
-                      on: {
-                        change: function($event) {
-                          var $$selectedVal = Array.prototype.filter
-                            .call($event.target.options, function(o) {
-                              return o.selected
-                            })
-                            .map(function(o) {
-                              var val = "_value" in o ? o._value : o.value
-                              return val
-                            })
-                          _vm.formulationType = $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        }
-                      }
-                    },
-                    [
-                      _vm._l(_vm.machines[3], function(formulation) {
-                        return [
-                          _c(
-                            "option",
-                            { domProps: { value: formulation.formulation } },
-                            [
-                              _vm._v(
-                                "\n                                    " +
-                                  _vm._s(formulation.formulation) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        ]
-                      })
-                    ],
-                    2
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "d-flex" }, [
-                _c("form", [
-                  _c("label", { attrs: { for: "oleReporting" } }, [
-                    _vm._v("OLE Reporting : ")
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-10" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.reporting,
-                          expression: "reporting"
-                        }
-                      ],
-                      staticClass: "form-control-plaintext rcorners2",
-                      attrs: { type: "text", id: "oleReporting" },
-                      domProps: { value: _vm.reporting },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.reporting = $event.target.value
-                        }
-                      }
-                    })
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "d-flex" }, [
-                _c("form", [
-                  _c("label", { attrs: { for: "oleReporting" } }, [
-                    _vm._v("OLE Tool : ")
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-sm-10" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.tool,
-                          expression: "tool"
-                        }
-                      ],
-                      staticClass: "form-control-plaintext rcorners2",
-                      attrs: { type: "text", id: "oleTool" },
-                      domProps: { value: _vm.tool },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.tool = $event.target.value
-                        }
-                      }
-                    })
-                  ])
                 ])
               ]),
               _vm._v(" "),

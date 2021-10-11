@@ -244,11 +244,14 @@
                 }
 
 
-                if (sessionStorage.getItem("dcodes") === null) {
-                    sessionStorage.dcodes = dcodesTab;
+
+
+                if (sessionStorage.getItem("GMID") === null) {
+                    sessionStorage.GMID = dcodesTab;
                 } else {
-                    sessionStorage.setItem("dcodes", dcodesTab);
+                    sessionStorage.setItem("GMID", dcodesTab);
                 }
+
 
 
                 var POs = document.getElementsByClassName('PO');

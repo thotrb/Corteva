@@ -1,5 +1,7 @@
 <template>
     <div class="container">
+
+        <!--{{assignation}}-->
         <!--{{events1}}-->
         <div class="row">
             <template v-for="productionline in productionlines">
@@ -228,10 +230,11 @@
                     };
 
                     await this.$store.dispatch('checkAssignation', assignation);
+                    await this.resolveAfter05Second();
 
-
-                    console.log(assignation);
-                    await this.$store.dispatch('storeAssignation', assignation);
+                    if(this.assignation[i] === 0){
+                        await this.$store.dispatch('storeAssignation', assignation);
+                    }
 
 
                 }
@@ -246,6 +249,7 @@
                 'events2',
                 'productionlineID',
                 'worksiteID',
+                'assignation',
             ])
         }
 

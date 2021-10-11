@@ -108,39 +108,65 @@
                             sessionStorage.setItem("productionName", this.productionlines[indice / this.productionlines.length]);
                         }
 
+                        if (sessionStorage.getItem("GMIDCODE") === null) {
+                            sessionStorage.GMIDCODE = sessionStorage.GMID.split(',')[indice / this.productionlines.length];
+                        } else {
+                            sessionStorage.setItem("GMIDCODE", sessionStorage.GMID.split(',')[indice / this.productionlines.length]);
+                        }
+
                         console.log('events1 : ' + this.productionlines[indice / this.productionlines.length]);
 
-                        var s1 = 0;
-                        for(let i=0; i<this.events1.length; i++){
-                            console.log(this.events1[i]);
+                        var sommePlannedEvents = 0;
+                        var sommeUnplannedEvents = 0;
 
-                            if(this.events1[i].productionline === this.productionlines[indice / this.productionlines.length]){
+
+                        for (let i = 0; i < this.events1.length; i++) {
+                            //console.log(this.events1[i]);
+
+                            if (this.events1[i].productionline === this.productionlines[indice / this.productionlines.length]) {
                                 console.log('events1');
 
                                 console.log(this.events1[i]);
 
-                                s1 += this.events1[i].total_duration;
+                                if (this.events1[i].kind === 0) {
+                                    sommePlannedEvents += this.events1[i].total_duration;
+                                } else {
+                                    sommeUnplannedEvents += this.events1[i].total_duration;
+                                }
+
                             }
                         }
 
-                        for(let i=0; i<this.events2.length; i++){
-                            if(this.events2[i].productionline === this.productionlines[indice / this.productionlines.length]){
-                                s1 += this.events2[i].total_duration;
+                        for (let i = 0; i < this.events2.length; i++) {
+                            if (this.events2[i].productionline === this.productionlines[indice / this.productionlines.length]) {
+
+
+                                if (this.events2[i].kind === 0) {
+                                    sommePlannedEvents += this.events2[i].total_duration;
+                                } else {
+                                    sommeUnplannedEvents += this.events2[i].total_duration;
+                                }
                             }
                         }
 
 
                         //console.log(this.events1);
 
-                        console.log('SOMME : ' + s1);
+                        console.log('UNPLANNED SOMME : ' + sommeUnplannedEvents);
+                        console.log('PLANNED SOMME : ' + sommePlannedEvents);
 
 
-                        if (sessionStorage.getItem("sommeUnplannedEvent") === null) {
-                            sessionStorage.sommeUnplannedEvent = s1;
+                        if (sessionStorage.getItem("sommeUnplannedEvents") === null) {
+                            sessionStorage.sommeUnplannedEvents = sommeUnplannedEvents;
                         } else {
-                            sessionStorage.setItem("sommeUnplannedEvent", s1);
+                            sessionStorage.setItem("sommeUnplannedEvents", sommeUnplannedEvents);
                         }
 
+                        if (sessionStorage.getItem("sommePlannedEvents") === null) {
+                            sessionStorage.sommePlannedEvents = sommePlannedEvents;
+                        } else {
+                            sessionStorage.setItem("sommePlannedEvents", sommePlannedEvents);
+                        }
 
 
                         window.location.href = this.url + 'endPO/' + this.productionlines[indice / this.productionlines.length] + '/endPO';
@@ -176,6 +202,8 @@
                 }
 
             }
+
+            console.log(sessionStorage.getItem("GMID").split(','));
         },
 
 
