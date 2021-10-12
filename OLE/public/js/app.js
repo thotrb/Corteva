@@ -6234,6 +6234,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
@@ -6387,6 +6390,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           cov: 0,
           bnc: 0
         };
+        var totalDowntimeDuration = 0;
         var years = dateTo - dateFrom + 1;
 
         for (var _i = 0, _arr = ['cip', 'cov', 'bnc']; _i < _arr.length; _i++) {
@@ -6416,12 +6420,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _iterator3.f();
           }
 
+          totalDowntimeDuration += totalDuration[type];
           var avgYearlyNb = totalNb[type] / years;
           var avgYearlyDuration = totalDuration[type] / years;
-          var avgDuration = avgYearlyDuration / avgYearlyNb;
-          _this.downtimes[type].general.totalNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
-          _this.downtimes[type].general.totalDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
-          _this.downtimes[type].general.average = (avgDuration ? avgDuration : 0).toFixed(2); //Create charts if they dont exist already
+          var avgEventDuration = avgYearlyDuration / avgYearlyNb;
+          _this.downtimes[type].general.avgYearlyNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
+          _this.downtimes[type].general.avgYearlyDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
+          _this.downtimes[type].general.averageEventDuration = (avgEventDuration ? avgEventDuration : 0).toFixed(2);
+          _this.downtimes[type].general.totalNb = totalNb[type];
+          _this.downtimes[type].general.totalDuration = totalDuration[type]; //Create charts if they dont exist already
 
           if (!_this.chartObjects.cip) _this.createCharts(); //Update chart data
 
@@ -6444,6 +6451,17 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
           _this.chartObjects[type].update();
         }
+
+        for (var _i2 = 0, _arr2 = ['cip', 'cov', 'bnc']; _i2 < _arr2.length; _i2++) {
+          var _type = _arr2[_i2];
+          var downtimePercent = _this.downtimes[_type].general.totalDuration / totalDowntimeDuration * 100;
+          if (downtimePercent) downtimePercent.toFixed(2);
+          _this.downtimes[_type].general.downtimePercentage = downtimePercent; //Insert into good element
+
+          var textToInsert = downtimePercent ? downtimePercent + ' % ' : '-- % ';
+          textToInsert += "of Unplanned Downtime";
+          document.getElementById(_type + '-percent').innerText = textToInsert;
+        }
       });
     },
     resolveAfter: function resolveAfter(milliseconds) {
@@ -6454,8 +6472,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       });
     },
     createCharts: function createCharts() {
-      for (var _i2 = 0, _arr2 = ['cip', 'cov', 'bnc']; _i2 < _arr2.length; _i2++) {
-        var type = _arr2[_i2];
+      for (var _i3 = 0, _arr3 = ['cip', 'cov', 'bnc']; _i3 < _arr3.length; _i3++) {
+        var type = _arr3[_i3];
         var chartName = type + '-chart';
         this.chartObjects[type] = new Chart(chartName, {
           type: 'bar',
@@ -12310,7 +12328,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 300px;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    margin: 0px 10px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 350px;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    height: 300px;\n    margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n    text-align: center;\n    margin: 10px 0px;\n    font-size: 16px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -51793,7 +51811,7 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.totalDuration) +
+                        _vm._s(_vm.downtimes[cat].general.avgYearlyDuration) +
                         " Hours"
                     )
                   ]),
@@ -51801,7 +51819,7 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.totalNb) +
+                        _vm._s(_vm.downtimes[cat].general.avgYearlyNb) +
                         " " +
                         _vm._s(cat.toUpperCase())
                     )
@@ -51816,7 +51834,9 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.average) +
+                        _vm._s(
+                          _vm.downtimes[cat].general.averageEventDuration
+                        ) +
                         " Hours"
                     )
                   ])
@@ -51855,15 +51875,30 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "main-chart-container" }, [
       _c("div", { staticClass: "chart-container" }, [
-        _c("canvas", { staticClass: "chart", attrs: { id: "cip-chart" } })
+        _c("canvas", { staticClass: "chart", attrs: { id: "cip-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "cip-percent" }
+        })
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "chart-container" }, [
-        _c("canvas", { staticClass: "chart", attrs: { id: "cov-chart" } })
+        _c("canvas", { staticClass: "chart", attrs: { id: "cov-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "cov-percent" }
+        })
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "chart-container" }, [
-        _c("canvas", { staticClass: "chart", attrs: { id: "bnc-chart" } })
+        _c("canvas", { staticClass: "chart", attrs: { id: "bnc-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "bnc-percent" }
+        })
       ])
     ])
   }
