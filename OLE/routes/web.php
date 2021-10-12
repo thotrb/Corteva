@@ -35,11 +35,8 @@ Route::get('/packagingLineID', \App\Http\Controllers\FormController::class.'@ind
 
 Route::get('/downtimesReport', \App\Http\Controllers\FormController::class.'@downtimesReport');
 
-<<<<<<< HEAD
 Route::get('/monthlyLoadFactor', \App\Http\Controllers\FormController::class.'@monthlyLoadFactor');
 
-=======
->>>>>>> ecad6dbc0e578f5a90c4ae77397c0ccb44f3a198
 Route::get('/summary', \App\Http\Controllers\FormController::class.'@summary');
 
 Route::get('/summary/{productionName}', \App\Http\Controllers\FormController::class.'@choicePlannedUnplanned');

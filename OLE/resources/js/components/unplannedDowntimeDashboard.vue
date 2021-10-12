@@ -111,10 +111,16 @@
         </div>
 
         <!-- Downtime graphs-->
-        <div class="chart-container">
-            <canvas class="chart" id="cip-chart" width="400" height="400"></canvas>
-            <canvas class="chart" id="cov-chart" width="400" height="400"></canvas>
-            <canvas class="chart" id="bnc-chart" width="400" height="400"></canvas>
+        <div class="main-chart-container">
+            <div class="chart-container">
+                <canvas class="chart" id="cip-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas class="chart" id="cov-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas class="chart" id="bnc-chart"></canvas>
+            </div>
         </div>
     </div>
 </template>                                                                                           
@@ -142,6 +148,11 @@
                     cip: {},
                     cov: {},
                     bnc: {}
+                },
+                chartObjects: {
+                    cip: undefined,
+                    cov: undefined,
+                    bnc: undefined
                 },
                 site: '',
                 productionLine: ''
@@ -235,6 +246,16 @@
                       this.downtimes[type].general.totalNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
                       this.downtimes[type].general.totalDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
                       this.downtimes[type].general.average = (avgDuration ? avgDuration : 0).toFixed(2);
+                      
+                      //Create charts if they dont exist already
+                      if (!this.chartObjects.cip) this.createCharts();
+
+                      //Update chart data
+                      this.chartObjects[type].data.datasets[0].data = [];
+                      for (let month of this.months) {
+                          this.chartObjects[type].data.datasets[0].data.push(this.downtimes[type][month].totalNb);                    
+                      }
+                      this.chartObjects[type].update();
                   }
               });
 
@@ -247,10 +268,30 @@
           },
 
           createCharts: function () {
-              var cipChart = new Chart('cip-chart', {
-                  type: 'bar',
-                  data: {}
-              });
+              for (let type of ['cip', 'cov', 'bnc']) {
+                  const chartName = type + '-chart'
+                  this.chartObjects[type] = new Chart(chartName, {
+                    type: 'bar',
+                    data: {
+                      labels: this.months,
+                      datasets: [{
+                          label: type.toUpperCase(),
+                          data: [],
+                          backgroundColor: 'rgb(112, 184, 232)'
+                      }]
+                    },
+                    options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                          title: {
+                            display: true,
+                            text: this.unplannedDowntimesCategories[type]
+                        }
+                      }
+                    }
+                    });
+              }
           }
 
         },
@@ -262,8 +303,6 @@
             let chartJs = document.createElement('script');
             chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
             document.head.appendChild(chartJs);
-            
-            setTimeout(() => this.createCharts(), 2000);
         },
 
         computed: {
@@ -369,9 +408,16 @@
         text-align: center;
     }
 
-    div.chart-container {
+    div.main-chart-container {
+        margin-top: 20px;
         display: flex;
         justify-content: center;
+        height: 300px;
+    }
+
+    div.chart-container {
+        width: 25% !important;
+        margin: 0px 10px;
     }
         
     thead {
