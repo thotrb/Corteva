@@ -6221,6 +6221,22 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
@@ -6240,6 +6256,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         cip: {},
         cov: {},
         bnc: {}
+      },
+      chartObjects: {
+        cip: undefined,
+        cov: undefined,
+        bnc: undefined
       },
       site: '',
       productionLine: ''
@@ -6369,6 +6390,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           cov: 0,
           bnc: 0
         };
+        var totalDowntimeDuration = 0;
         var years = dateTo - dateFrom + 1;
 
         for (var _i = 0, _arr = ['cip', 'cov', 'bnc']; _i < _arr.length; _i++) {
@@ -6398,25 +6420,91 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _iterator3.f();
           }
 
+          totalDowntimeDuration += totalDuration[type];
           var avgYearlyNb = totalNb[type] / years;
           var avgYearlyDuration = totalDuration[type] / years;
-          var avgDuration = avgYearlyDuration / avgYearlyNb;
-          _this.downtimes[type].general.totalNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
-          _this.downtimes[type].general.totalDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
-          _this.downtimes[type].general.average = (avgDuration ? avgDuration : 0).toFixed(2);
+          var avgEventDuration = avgYearlyDuration / avgYearlyNb;
+          _this.downtimes[type].general.avgYearlyNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
+          _this.downtimes[type].general.avgYearlyDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
+          _this.downtimes[type].general.averageEventDuration = (avgEventDuration ? avgEventDuration : 0).toFixed(2);
+          _this.downtimes[type].general.totalNb = totalNb[type];
+          _this.downtimes[type].general.totalDuration = totalDuration[type]; //Create charts if they dont exist already
+
+          if (!_this.chartObjects.cip) _this.createCharts(); //Update chart data
+
+          _this.chartObjects[type].data.datasets[0].data = [];
+
+          var _iterator4 = _createForOfIteratorHelper(_this.months),
+              _step4;
+
+          try {
+            for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+              var _month = _step4.value;
+
+              _this.chartObjects[type].data.datasets[0].data.push(_this.downtimes[type][_month].totalNb);
+            }
+          } catch (err) {
+            _iterator4.e(err);
+          } finally {
+            _iterator4.f();
+          }
+
+          _this.chartObjects[type].update();
+        }
+
+        for (var _i2 = 0, _arr2 = ['cip', 'cov', 'bnc']; _i2 < _arr2.length; _i2++) {
+          var _type = _arr2[_i2];
+          var downtimePercent = _this.downtimes[_type].general.totalDuration / totalDowntimeDuration * 100;
+          if (downtimePercent) downtimePercent.toFixed(2);
+          _this.downtimes[_type].general.downtimePercentage = downtimePercent; //Insert into good element
+
+          var textToInsert = downtimePercent ? downtimePercent + ' % ' : '-- % ';
+          textToInsert += "of Unplanned Downtime";
+          document.getElementById(_type + '-percent').innerText = textToInsert;
         }
       });
     },
-    resolveAfter: function resolveAfter(miliseconds) {
+    resolveAfter: function resolveAfter(milliseconds) {
       return new Promise(function (resolve) {
         setTimeout(function () {
           return resolve();
-        }, miliseconds);
+        }, milliseconds);
       });
+    },
+    createCharts: function createCharts() {
+      for (var _i3 = 0, _arr3 = ['cip', 'cov', 'bnc']; _i3 < _arr3.length; _i3++) {
+        var type = _arr3[_i3];
+        var chartName = type + '-chart';
+        this.chartObjects[type] = new Chart(chartName, {
+          type: 'bar',
+          data: {
+            labels: this.months,
+            datasets: [{
+              label: type.toUpperCase(),
+              data: [],
+              backgroundColor: 'rgb(112, 184, 232)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: this.unplannedDowntimesCategories[type]
+              }
+            }
+          }
+        });
+      }
     }
   },
   mounted: function mounted() {
-    this.$store.dispatch('fetchSites');
+    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
+
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+    document.head.appendChild(chartJs);
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'unplannedDowntimeEvents']))
 });
@@ -7267,9 +7355,94 @@ vue__WEBPACK_IMPORTED_MODULE_4__.default.use(vuex__WEBPACK_IMPORTED_MODULE_5__.d
 /*!*****************************************!*\
   !*** ./resources/js/store/mutations.js ***!
   \*****************************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/resources/js/store/mutations.js: Unexpected token (70:0)\n\n\u001b[0m \u001b[90m 68 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 69 |\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 70 |\u001b[39m \u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<\u001b[39m \u001b[33mHEAD\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 71 |\u001b[39m     \u001b[33mFECTH_ASSIGNATION\u001b[39m(state\u001b[33m,\u001b[39m assignation){\u001b[0m\n\u001b[0m \u001b[90m 72 |\u001b[39m         \u001b[36mreturn\u001b[39m state\u001b[33m.\u001b[39massignation\u001b[33m.\u001b[39mpush(assignation)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 73 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n    at Parser._raise (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:788:17)\n    at Parser.raiseWithData (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:781:17)\n    at Parser.raise (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.unexpected (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:9929:16)\n    at Parser.parseIdentifierName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12150:18)\n    at Parser.parseIdentifier (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12128:23)\n    at Parser.parseMaybePrivateName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11418:19)\n    at Parser.parsePropertyName (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11942:151)\n    at Parser.parsePropertyDefinition (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11825:22)\n    at Parser.parseObjectLike (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11741:25)\n    at Parser.parseExprAtom (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11265:23)\n    at Parser.parseExprSubscripts (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10914:23)\n    at Parser.parseUpdate (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10894:21)\n    at Parser.parseMaybeUnary (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10872:23)\n    at Parser.parseExprOps (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10733:23)\n    at Parser.parseMaybeConditional (/Users/thomastrubert/Desktop/INSA/ETIC/Corteva/Projet/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10707:23)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+var mutations = {
+  FETCH_USER: function FETCH_USER(state, user) {
+    return state.user = user;
+  },
+  FETCH_EVENTS1: function FETCH_EVENTS1(state, events) {
+    return state.events1 = events;
+  },
+  FETCH_EVENTS2: function FETCH_EVENTS2(state, events) {
+    return state.events2 = events;
+  },
+  FETCH_PO: function FETCH_PO(state, pos) {
+    return state.pos = pos;
+  },
+  FETCH_WORKSITEID: function FETCH_WORKSITEID(state, id) {
+    return state.worksiteID = id;
+  },
+  FETCH_PRODUCTIONLINEID: function FETCH_PRODUCTIONLINEID(state, id) {
+    return state.productionlineID = id;
+  },
+  FETCH_DOWNTIME_REASONS: function FETCH_DOWNTIME_REASONS(state, downtimeReasons) {
+    return state.downtimeReasons = downtimeReasons;
+  },
+  FETCH_DOWNTIME_REASONS_2: function FETCH_DOWNTIME_REASONS_2(state, downtimeReasons_2) {
+    return state.downtimeReasons_2 = downtimeReasons_2;
+  },
+  FETCH_SPEEDLOSSES: function FETCH_SPEEDLOSSES(state, speedLoss) {
+    return state.speedLoss = speedLoss;
+  },
+  FETCH_DOWNTIME_REASONS_MACHINE_ISSUE: function FETCH_DOWNTIME_REASONS_MACHINE_ISSUE(state, machineIssue) {
+    return state.machineIssue = machineIssue;
+  },
+  CREATE_PO: function CREATE_PO(state, POs) {
+    state.PO.unshift(POs);
+  },
+  FETCH_SITES: function FETCH_SITES(state, sites) {
+    return state.sites = sites;
+  },
+  FETCH_MACHINES: function FETCH_MACHINES(state, machines) {
+    return state.machines = machines;
+  },
+  FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
+    return state.allEvents = events;
+  },
+  FECTH_ASSIGNATION: function FECTH_ASSIGNATION(state, assignation) {
+    return state.assignation.push(assignation);
+  },
+  FETCH_NETOP: function FETCH_NETOP(state, data) {
+    return state.netOP = data;
+  },
+  FETCH_UNPLANNED_DOWNTIME_EVENTS: function FETCH_UNPLANNED_DOWNTIME_EVENTS(state, events) {
+    return state.unplannedDowntimeEvents = events;
+  },
+  CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME: function CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent) {
+    state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
+  },
+  CREATE_UNPLANNEDEVENT_CHANGINGFORMAT: function CREATE_UNPLANNEDEVENT_CHANGINGFORMAT(state, unplannedEvent) {
+    state.unplannedEvent_ChangingFormat.unshift(unplannedEvent);
+  },
+  CREATE_UNPLANNEDEVENT_CLIENTCHANGING: function CREATE_UNPLANNEDEVENT_CLIENTCHANGING(state, unplannedEvent) {
+    state.unplannedEvent_ClientChanging.unshift(unplannedEvent);
+  },
+  CREATE_ASSIGNATION: function CREATE_ASSIGNATION(state, assignation) {
+    state.assignation.unshift(assignation);
+  },
+  CREATE_UNPLANNEDEVENT_CIP: function CREATE_UNPLANNEDEVENT_CIP(state, unplannedEvent) {
+    state.unplannedEvent_CIP.unshift(unplannedEvent);
+  },
+  CREATE_PLANNEDEVENT: function CREATE_PLANNEDEVENT(state, plannedEvent) {
+    state.plannedEvent.unshift(plannedEvent);
+  },
+  CREATE_SPEEDLOSS: function CREATE_SPEEDLOSS(state, speedLoss) {
+    state.speedLoss.unshift(speedLoss);
+  },
+  STOP_PO: function STOP_PO(state, PO) {
+    state.PO.unshift(PO);
+  },
+  RETREIVETOKEN: function RETREIVETOKEN(state, token) {
+    state.token = token;
+  }
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (mutations);
 
 /***/ }),
 
@@ -12155,7 +12328,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin-top: 20px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    flex-direction: column;\n    width: 25%;\n    min-width: 350px;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n    height: 91px;\n    margin-left: auto;\n    visibility: hidden;\n}\ndiv.production-window > div[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.production-window > div.title span[data-v-5f72b0a5] {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 10px;\n}\ndiv.production-window > div.interval-selection > select[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window > div.interval-selection > *[data-v-5f72b0a5] {\n    font-size: 17px;\n}\ndiv.site-pl-selection[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    margin-left: 30px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 350px;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    height: 300px;\n    margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n    text-align: center;\n    margin: 10px 0px;\n    font-size: 16px;\n}\nthead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -51638,7 +51811,7 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.totalDuration) +
+                        _vm._s(_vm.downtimes[cat].general.avgYearlyDuration) +
                         " Hours"
                     )
                   ]),
@@ -51646,7 +51819,7 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.totalNb) +
+                        _vm._s(_vm.downtimes[cat].general.avgYearlyNb) +
                         " " +
                         _vm._s(cat.toUpperCase())
                     )
@@ -51661,7 +51834,9 @@ var render = function() {
                   _c("span", [
                     _vm._v(
                       " " +
-                        _vm._s(_vm.downtimes[cat].general.average) +
+                        _vm._s(
+                          _vm.downtimes[cat].general.averageEventDuration
+                        ) +
                         " Hours"
                     )
                   ])
@@ -51672,7 +51847,9 @@ var render = function() {
         ],
         2
       )
-    ])
+    ]),
+    _vm._v(" "),
+    _vm._m(2)
   ])
 }
 var staticRenderFns = [
@@ -51690,6 +51867,39 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "d-flex title" }, [
       _c("span", [_vm._v("Production Window")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "main-chart-container" }, [
+      _c("div", { staticClass: "chart-container" }, [
+        _c("canvas", { staticClass: "chart", attrs: { id: "cip-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "cip-percent" }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "chart-container" }, [
+        _c("canvas", { staticClass: "chart", attrs: { id: "cov-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "cov-percent" }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "chart-container" }, [
+        _c("canvas", { staticClass: "chart", attrs: { id: "bnc-chart" } }),
+        _vm._v(" "),
+        _c("p", {
+          staticClass: "downtime-percent",
+          attrs: { id: "bnc-percent" }
+        })
+      ])
     ])
   }
 ]

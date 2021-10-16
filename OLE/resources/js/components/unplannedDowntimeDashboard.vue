@@ -98,15 +98,31 @@
                     <div :key="cat" class="d-flex ya-info-row">
                         <div class="d-flex">
                             <span style="font-weight: bold">{{"Yearly " + cat.toUpperCase()}}</span>
-                            <span>&emsp;{{downtimes[cat].general.totalDuration}} Hours</span>
-                            <span>&emsp;{{downtimes[cat].general.totalNb}} {{cat.toUpperCase()}}</span>
+                            <span>&emsp;{{downtimes[cat].general.avgYearlyDuration}} Hours</span>
+                            <span>&emsp;{{downtimes[cat].general.avgYearlyNb}} {{cat.toUpperCase()}}</span>
                         </div>
                         <div class="d-flex">
                             <span style="font-weight: bold">Average</span>
-                            <span>&emsp;{{downtimes[cat].general.average}} Hours</span>
+                            <span>&emsp;{{downtimes[cat].general.averageEventDuration}} Hours</span>
                         </div>
                     </div>
                 </template>
+            </div>
+        </div>
+
+        <!-- Downtime graphs-->
+        <div class="main-chart-container">
+            <div class="chart-container">
+                <canvas class="chart" id="cip-chart"></canvas>
+                <p class="downtime-percent" id="cip-percent"></p>
+            </div>
+            <div class="chart-container">
+                <canvas class="chart" id="cov-chart"></canvas>
+                <p class="downtime-percent" id="cov-percent"></p>
+            </div>
+            <div class="chart-container">
+                <canvas class="chart" id="bnc-chart"></canvas>
+                <p class="downtime-percent" id="bnc-percent"></p>
             </div>
         </div>
     </div>
@@ -135,6 +151,11 @@
                     cip: {},
                     cov: {},
                     bnc: {}
+                },
+                chartObjects: {
+                    cip: undefined,
+                    cov: undefined,
+                    bnc: undefined
                 },
                 site: '',
                 productionLine: ''
@@ -210,8 +231,10 @@
                       cov: 0, 
                       bnc: 0
                   };
+                  let totalDowntimeDuration = 0;
                   const years = dateTo - dateFrom + 1;
 
+               
                   for (let type of ['cip', 'cov', 'bnc']) {
                       for (let event of this.unplannedDowntimeEvents[0][type.toUpperCase()]) {
                           const monthCreated = this.getMonth(event.created_at);
@@ -222,26 +245,82 @@
                           totalDuration[type] += event.total_duration;
                           totalNb[type]++;
                       }
-                      const avgYearlyNb = totalNb[type]/years;
-                      const avgYearlyDuration = totalDuration[type]/years;
-                      const avgDuration = avgYearlyDuration / avgYearlyNb;
-                      this.downtimes[type].general.totalNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
-                      this.downtimes[type].general.totalDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
-                      this.downtimes[type].general.average = (avgDuration ? avgDuration : 0).toFixed(2);
+                      totalDowntimeDuration += totalDuration[type];
+                      const avgYearlyNb = totalNb[type] / years;
+                      const avgYearlyDuration = totalDuration[type] / years;
+                      const avgEventDuration = avgYearlyDuration / avgYearlyNb;
+                      this.downtimes[type].general.avgYearlyNb = (avgYearlyNb ? avgYearlyNb : 0).toFixed(2);
+                      this.downtimes[type].general.avgYearlyDuration = (avgYearlyDuration ? avgYearlyDuration : 0).toFixed(2);
+                      this.downtimes[type].general.averageEventDuration = (avgEventDuration ? avgEventDuration : 0).toFixed(2);
+                      this.downtimes[type].general.totalNb = totalNb[type];
+                      this.downtimes[type].general.totalDuration = totalDuration[type];
+                      
+                      //Create charts if they dont exist already
+                      if (!this.chartObjects.cip) this.createCharts();
+
+                      //Update chart data
+                      this.chartObjects[type].data.datasets[0].data = [];
+                      for (let month of this.months) {
+                          this.chartObjects[type].data.datasets[0].data.push(this.downtimes[type][month].totalNb);                    
+                      }
+                      this.chartObjects[type].update();
                   }
+
+                  for (let type of ['cip', 'cov', 'bnc'])  {
+                      let downtimePercent = (this.downtimes[type].general.totalDuration / totalDowntimeDuration) * 100;
+                      if (downtimePercent) downtimePercent.toFixed(2);
+                      this.downtimes[type].general.downtimePercentage = downtimePercent;
+                      //Insert into good element
+                      let textToInsert = downtimePercent ? downtimePercent + ' % ' : '-- % ';
+                      textToInsert += "of Unplanned Downtime";
+                      document.getElementById(type + '-percent').innerText = textToInsert;
+                  } 
               });
 
           },
 
-          resolveAfter: function (miliseconds) {
+          resolveAfter: function (milliseconds) {
                 return new Promise(resolve => {
-                    setTimeout(() => resolve(), miliseconds);
+                    setTimeout(() => resolve(), milliseconds);
                 });
-            },
+          },
+
+          createCharts: function () {
+              for (let type of ['cip', 'cov', 'bnc']) {
+                  const chartName = type + '-chart'
+                  this.chartObjects[type] = new Chart(chartName, {
+                    type: 'bar',
+                    data: {
+                      labels: this.months,
+                      datasets: [{
+                          label: type.toUpperCase(),
+                          data: [],
+                          backgroundColor: 'rgb(112, 184, 232)'
+                      }]
+                    },
+                    options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                          title: {
+                            display: true,
+                            text: this.unplannedDowntimesCategories[type]
+                        }
+                      }
+                    }
+                    });
+              }
+          }
+
         },
 
         mounted() {
             this.$store.dispatch('fetchSites');
+
+            //Load chart.js into vue component
+            let chartJs = document.createElement('script');
+            chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+            document.head.appendChild(chartJs);
         },
 
         computed: {
@@ -345,6 +424,25 @@
 
     div.container-table td.table-data > tr {
         text-align: center;
+    }
+
+    div.main-chart-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        height: 350px;
+    }
+
+    div.chart-container {
+        width: 25% !important;
+        height: 300px;
+        margin: 0px 10px;
+    }
+
+    p.downtime-percent {
+        text-align: center;
+        margin: 10px 0px;
+        font-size: 16px;
     }
         
     thead {
