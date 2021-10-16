@@ -686,7 +686,7 @@ class FormController extends Controller
     //getEvents for the unplanned dashboard page
     public function getEventsUD($dateFrom, $dateTo) {
 
-       
+
 
     }
 
