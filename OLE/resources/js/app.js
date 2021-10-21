@@ -60,6 +60,7 @@ Vue.component('endPO_Declaration', require('./components/endPO_Declaration.vue')
 
 Vue.component('unplannedDowntimeDashboard', require('./components/unplannedDowntimeDashboard.vue').default);
 
+Vue.component('unplannedDowntimeShutdowns', require('./components/unplannedDowntimeShutdowns.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

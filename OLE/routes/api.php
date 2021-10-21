@@ -35,6 +35,8 @@ Route::get('events/{PO}/{productionLine}', FormController::class.'@getEvents');
 
 Route::get('unplannedDowntimeEvents/{productionLine}/{startYear}/{endYear}', FormController::class.'@getUnplannedDowntimeEvents');
 
+Route::get('unplannedDowntimeMachineShutdownTypes/{productionLine}/{startYear}/{endYear}', FormController::class.'@getUnplannedDowntimeMachineShutdownTypes');
+
 Route::get('summary/{productionName}/{downTimeType}', FormController::class.'@getDowntimeReasons');
 
 Route::get('{productionName}/{downtimeType}/unplannedDowntime', FormController::class.'@get_unplannedDowntime_2');

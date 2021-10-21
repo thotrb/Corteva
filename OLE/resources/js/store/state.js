@@ -22,7 +22,8 @@ let state = {
     worksiteID: -1,
     productionlineID: -1,
     token: localStorage.getItem('access_token'),
-    unplannedDowntimeEvents: []
+    unplannedDowntimeEvents: [],
+    unplannedDowntimeMachineShutdownTypes: []
 };
 
 export default state

@@ -66,6 +66,18 @@ let actions = {
             }).catch(err => console.log(err));
     },
 
+    fetchMachineShutdownTypes({commit}, parameters) {
+        const productionLine = parameters[0];
+        const startYear = parameters[1];
+        const endYear = parameters[2];
+
+        axios.get(`/api/unplannedDowntimeMachineShutdownTypes/${productionLine}/${startYear}/${endYear}`)
+            .then(res => {
+                commit('FETCH_UNPLANNED_DOWNTIME_MACHINE_SHUTDOWN_TYPES', res.data);
+            }).catch(err => console.log(err));
+
+    },
+
     fetchAllEvents({commit}, parameters) {
 
         var site = parameters[0];
