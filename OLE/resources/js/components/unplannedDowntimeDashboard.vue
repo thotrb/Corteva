@@ -60,7 +60,7 @@
         <div class="d-flex table-ya-container">
             <!-- Downtime table -->
             <div class="d-flex container-table">
-     
+
                 <div class="table">
                     <thead>
                         <tr>
@@ -78,12 +78,12 @@
                                     <tr class="table-sub-row">&emsp;Duration</tr>
                                     <tr class="table-sub-row">&emsp;Number</tr>
                                 </th>
-                                
+
                                 <template v-for="month of months">
                                     <td class="table-data" :key="month">
                                         <tr style="visibility: hidden;">-----</tr>
                                         <tr class="table-sub-row">{{downtimes[cat][month].totalDuration}}</tr>
-                                        <tr class="table-sub-row">{{downtimes[cat][month].totalNb}}</tr>                
+                                        <tr class="table-sub-row">{{downtimes[cat][month].totalNb}}</tr>
                                     </td>
                                 </template>
                             </tr>
@@ -126,7 +126,7 @@
             </div>
         </div>
     </div>
-</template>                                                                                           
+</template>
 
 <script>
     import {mapGetters} from "vuex";
@@ -144,7 +144,7 @@
                 startYear: 2000,
                 unplannedDowntimesCategories: {
                     cip: 'Cleaning in Place (CIP)',
-                    cov: 'Change Over (COV)', 
+                    cov: 'Change Over (COV)',
                     bnc: 'Batch Number Change (BNC)'
                 },
                 downtimes: {
@@ -211,7 +211,7 @@
               const dateFrom = document.getElementById('select-year-from').value;
               const dateTo = document.getElementById('select-year-to').value;
               const params = [selectedPL, dateFrom, dateTo];
-        
+
               this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
                   let events = this.$store.getters['unplannedDowntimeEvents']
                   console.log(events);
@@ -222,19 +222,19 @@
                   //A new downtime object is created to delete previous data
                   this.createDowntimeObject();
                   let totalDuration = {
-                      cip: 0, 
-                      cov: 0, 
+                      cip: 0,
+                      cov: 0,
                       bnc: 0
                   };
                   let totalNb = {
-                      cip: 0, 
-                      cov: 0, 
+                      cip: 0,
+                      cov: 0,
                       bnc: 0
                   };
                   let totalDowntimeDuration = 0;
                   const years = dateTo - dateFrom + 1;
 
-               
+
                   for (let type of ['cip', 'cov', 'bnc']) {
                       for (let event of this.unplannedDowntimeEvents[0][type.toUpperCase()]) {
                           const monthCreated = this.getMonth(event.created_at);
@@ -254,14 +254,14 @@
                       this.downtimes[type].general.averageEventDuration = (avgEventDuration ? avgEventDuration : 0).toFixed(2);
                       this.downtimes[type].general.totalNb = totalNb[type];
                       this.downtimes[type].general.totalDuration = totalDuration[type];
-                      
+
                       //Create charts if they dont exist already
                       if (!this.chartObjects.cip) this.createCharts();
 
                       //Update chart data
                       this.chartObjects[type].data.datasets[0].data = [];
                       for (let month of this.months) {
-                          this.chartObjects[type].data.datasets[0].data.push(this.downtimes[type][month].totalNb);                    
+                          this.chartObjects[type].data.datasets[0].data.push(this.downtimes[type][month].totalNb);
                       }
                       this.chartObjects[type].update();
                   }
@@ -274,7 +274,7 @@
                       let textToInsert = downtimePercent ? downtimePercent + ' % ' : '-- % ';
                       textToInsert += "of Unplanned Downtime";
                       document.getElementById(type + '-percent').innerText = textToInsert;
-                  } 
+                  }
               });
 
           },
@@ -444,7 +444,7 @@
         margin: 10px 0px;
         font-size: 16px;
     }
-        
+
     thead {
         color: white;
         background: #56baed;

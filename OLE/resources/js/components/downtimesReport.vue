@@ -1,15 +1,10 @@
-
 <template>
     <div class="d-flex" id="component">
 
-        <!--{{ allEvents['SITE']}}-->
-
-        <!--{{allEvents['CP']}}-->
+        <!--
 
 
-        <!--{{allEvents}}-->
-
-
+                -->
         <div class="col">
 
             <div class="d-flex">
@@ -56,6 +51,7 @@
 
             <template v-if="show===1 && allEvents['PP'] !== null">
 
+
                 <div class="row">
 
                     <div class="col">
@@ -69,9 +65,9 @@
                     <div class="col">
 
                         <p>
-                            Volume packed :<!-- {{ allEvents['POInfo'][0].volumePacked}} --> L <br/>
+                            Volume packed : {{littersProduced}} L <br/>
                             Nber of Production Order : {{ allEvents['SITE'].length}} <br/>
-                            Nber of items Produced : {{ qtyProduced }}<br/>
+                            Nber of items Produced : {{ qtyProduced }} Bottles<br/>
 
                         </p>
 
@@ -297,20 +293,15 @@
                     </table>
                 </div>
             </template>
-            <template v-if="allEvents['PP']===null">
-                <h4>
-                    Numéro de PO inconnu pour cette ligne de production
-                </h4>
-            </template>
 
 
         </div>
 
         <div class="col">
-            <p>
+            <h1>
                 Fenetre de production
 
-            </p>
+            </h1>
             <br/>
             <div class="d-flex">
                 <label class="" for="startingPO">De</label>
@@ -354,7 +345,8 @@
                             Planned Downtime (PD)
                         </p>
                         <p>
-                            {{plannedProductionTime / plannedDowntimes * 100}}%
+
+                            {{(plannedDowntimes / plannedProductionTime * 100).toFixed(2)}}%
                         </p>
                     </div>
 
@@ -367,7 +359,8 @@
                             Unplanned Downtime (UD)
                         </p>
                         <p>
-                            {{operatingTime / unplannedDowntimes * 100}}%
+
+                            {{(unplannedDowntimes / operatingTime * 100).toFixed(2)}}%
                         </p>
                     </div>
 
@@ -379,7 +372,7 @@
                             Speed Losses (SL)
                         </p>
                         <p>
-                            ..%
+                            {{(performance* 100).toFixed(2)}}%
                         </p>
                     </div>
 
@@ -391,7 +384,7 @@
                             Quality Losses (QL)
                         </p>
                         <p>
-                            ..%
+                            {{(quality* 100).toFixed(2)}}%
                         </p>
                     </div>
 
@@ -477,18 +470,22 @@
 
 
                 productsName: [],
-                quantityArray :[],
-                formatArray : [],
+                quantityArray: [],
+                formatArray: [],
+                quantityPerArray: [],
+                formulationArray: [],
+
+                littersProduced: 0,
 
                 plannedDowntimes: 0,
                 unplannedDowntimes: 0,
                 plannedProductionTime: 0,
                 operatingTime: 0,
                 netOperatingTime: 0,
-                performance:0,
-                availability:0,
-                quality:0,
-                OLE:0,
+                performance: 0,
+                availability: 0,
+                quality: 0,
+                OLE: 0,
             }
         },
 
@@ -510,7 +507,7 @@
                     tab.push(this.beginningDate);
                     tab.push(this.endingDate);
 
-                    this.$store.dispatch('fecthAllEvents', tab);
+                    this.$store.dispatch('fetchAllEvents', tab);
                     await this.resolveAfter15Second();
                     this.show = 1;
                     await this.resolveAfter15Second();
@@ -532,14 +529,36 @@
 
             },
 
-            loadArray : function (){
+            loadArray: function () {
                 for (let i = 0; i < this.allEvents['SITE'].length; i++) {
                     this.quantityArray[i] = 0;
-                    this.formatArray[i] = '';
+                    this.quantityPerArray[i] = 0;
                 }
+
                 for (let i = 0; i < this.allEvents['SITE'].length; i++) {
 
-                    this.qtyProduced += this.allEvents['SITE'][i].qtyProduced;
+                    let nbBottles = this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase;
+                    this.qtyProduced += nbBottles * 1;
+
+                    if(!this.formulationArray.includes(this.allEvents['SITE'][i].formulationType)){
+                        this.formulationArray.push(this.allEvents['SITE'][i].formulationType);
+                    }
+
+                    let indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][i].formulationType);
+
+                    this.quantityPerArray[indexFormulation] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
+                        * this.allEvents['SITE'][i].size;
+
+
+                    if(!this.formatArray.includes(this.allEvents['SITE'][i].size)){
+                        this.formatArray.push(this.allEvents['SITE'][i].size);
+                    }
+
+                    let indexSize = this.formatArray.indexOf(this.allEvents['SITE'][i].size);
+                    this.quantityArray[indexSize] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
+                        * this.allEvents['SITE'][i].size;
+
+
 
                     if (!this.productsName.includes(this.allEvents['SITE'][i].product)) {
                         this.productsName.push(this.allEvents['SITE'][i].product);
@@ -547,13 +566,19 @@
 
                     let index = this.productsName.indexOf(this.allEvents['SITE'][i].product);
 
-                    this.quantityArray[index] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase;
-                    this.formatArray[index] =  this.allEvents['SITE'][i].size;
+                    this.quantityArray[index] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
+                        * this.allEvents['SITE'][i].size;
+
+                    this.littersProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
+                        * this.allEvents['SITE'][i].size;
+                    this.formatArray[index] = this.allEvents['SITE'][i].size;
                 }
 
                 console.log(this.productsName);
                 console.log(this.quantityArray);
                 console.log(this.formatArray);
+                console.log(this.quantityPerArray);
+                console.log(this.formulationArray);
 
 
             },
@@ -566,7 +591,7 @@
                 });
             },
 
-            loadProductionTime : function(){
+            loadProductionTime: function () {
 
                 var sommePlannedEvents = 0;
                 var sommeUnplannedEvents = 0;
@@ -575,35 +600,44 @@
                 var sommeRejection = 0;
 
                 var fillerCounter = 0;
-                var caperCounter =0;
+                var caperCounter = 0;
                 var labelerCounter = 0;
                 var wieghtBoxCounter = 0;
 
                 this.netOperatingTime = 0;
-
-
-
-                for (let i = 0; i < this.allEvents['EVENTS'].length; i++) {
-
-                        let PO = this.allEvents['EVENTS'][i];
-                        sommeQtyProduced += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1;
-                        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1+ PO.labelerRejection * 1+ PO.weightBoxRejection * 1;
-                        fillerCounter += PO.fillerCounter * 1;
-                        caperCounter  += PO.caperCounter * 1;
-                        labelerCounter += PO.labelerCounter * 1;
-                        wieghtBoxCounter  += PO.weightBoxCounter * 1;
-                        this.netOperatingTime  += (this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1) / this.allEvents['EVENTS'][i].idealRate * 1;
-                        if (this.allEvents['EVENTS'][i].kind === 0) {
-                            sommePlannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
-                        } else {
-                            sommeUnplannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
-                        }
-                 }
-
                 var sommeWorkingTime = 0;
-                for (let j = 0; j < this.allEvents['SITE'].length; j++) {
-                    sommeWorkingTime += this.allEvents['SITE'][j].workingDuration * 1;
+
+
+                for (let i = 0; i < this.allEvents['SITE'].length; i++) {
+
+                    sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+
+
+                    let PO = this.allEvents['SITE'][i];
+                    sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+                    sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+                    fillerCounter += PO.fillerCounter * 1;
+                    caperCounter += PO.caperCounter * 1;
+                    labelerCounter += PO.labelerCounter * 1;
+                    wieghtBoxCounter += PO.weightBoxCounter * 1;
+                    this.netOperatingTime += (this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1) / this.allEvents['SITE'][i].idealRate * 1;
+                    for (let j = 0; j < this.allEvents['EVENTS'].length; j++) {
+
+                        if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+                            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+
+
+                        }
+
+                    }
+
+                    for (let k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+                        if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+                            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+                        }
+                    }
                 }
+
 
                 this.plannedDowntimes = sommePlannedEvents;
                 this.unplannedDowntimes = sommeUnplannedEvents;
@@ -612,33 +646,36 @@
                 this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
                 this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
 
-                this.availability= this.operatingTime / this.plannedProductionTime * 100;
-
+                this.availability = this.operatingTime / this.plannedProductionTime;
                 this.performance = this.netOperatingTime / this.operatingTime;
 
-                if(sommeRejection===0 && fillerCounter === 0 && caperCounter === 0
-                    && labelerCounter === 0 && wieghtBoxCounter ===0){
-                    this.quality = 100;
-                }else{
-                    var s =  (fillerCounter-sommeQtyProduced) +  (caperCounter-sommeQtyProduced)
-                    +  (labelerCounter-sommeQtyProduced) +  (wieghtBoxCounter-sommeQtyProduced);
-                    this.quality = (sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s) * 100;
+                console.log('net OP TIME : ');
+                console.log(this.netOperatingTime);
+                console.log(' OP TIME : ');
+                console.log(this.operatingTime);
+
+                if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0
+                    && labelerCounter === 0 && wieghtBoxCounter === 0) {
+                    this.quality = 1;
+                } else {
+                    var s = (fillerCounter - sommeQtyProduced) + (caperCounter - sommeQtyProduced)
+                        + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+                    this.quality = (sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s);
 
                 }
 
 
-
-                if(this.operatingTime ===0){
+                if (this.operatingTime === 0) {
                     this.availability = 0;
 
                 }
 
-                if(this.netOperatingTime ===0){
+                if (this.netOperatingTime === 0) {
                     this.performance = 0;
                     this.unplannedDowntimes = 1;
                 }
 
-                if(this.plannedProductionTime ===0){
+                if (this.plannedProductionTime === 0) {
                     this.plannedDowntimes = 1;
                 }
 
@@ -655,17 +692,157 @@
                 console.log('Operating Time : ' + this.operatingTime);
 
 
-
-
-
-
-            },
+            }
+            ,
 
             pieCharts: function () {
 
-/**
+                let obj;
                 var data = [];
-                for(let i=0; i<this.productsName.length; i++){
+                for(let j= 0; j<this.formulationArray.length; j++){
+                    obj = {
+                        name: this.formulationArray[j],
+                        nbr: this.quantityPerArray[j]
+                    };
+                    data.push(obj);
+                }
+                console.log('DATA');
+
+                console.log(data);
+
+
+                const randomHexColorCode = () => {
+                    return "#" + Math.random().toString(16).slice(2, 8)
+                };
+
+                var canvas = document.getElementById("can");
+                var ctx = canvas.getContext("2d");
+                canvas.width = 400;
+                canvas.height = 300;
+                let total = data.reduce( (ttl, house) => {
+                    return ttl + house.nbr
+                }, 0);
+                let startAngle = 0;
+                let radius = 100;
+                let cx = canvas.width/2;
+                let cy = canvas.height/2;
+
+                for(let j= 0; j<data.length; j++){
+
+                    let item = data[j];
+                    //set the styles before beginPath
+                    ctx.fillStyle = randomHexColorCode();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#333';
+                    ctx.beginPath();
+                    //console.log(total, house.troops, house.troops/total);
+                    // draw the pie wedges
+                    let endAngle = ((item.nbr / total) * Math.PI * 2) + startAngle;
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+                    ctx.lineTo(cx, cy);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.closePath();
+
+                    // add the labels
+                    ctx.beginPath();
+                    ctx.font = '20px Helvetica, Calibri';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = 'rebeccapurple';
+                    // midpoint between the two angles
+                    // 1.5 * radius is the length of the Hypotenuse
+                    let theta = (startAngle + endAngle) / 2;
+                    let deltaY = Math.sin(theta) * 1.5 * radius;
+                    let deltaX = Math.cos(theta) * 1.5 * radius;
+                    /***
+                     SOH  - sin(angle) = opposite / hypotenuse
+                     = opposite / 1px
+                     CAH  - cos(angle) = adjacent / hypotenuse
+                     = adjacent / 1px
+                     TOA
+
+                     ***/
+                    var txt = item.name + '\n';
+                    ctx.fillText(txt, deltaX+cx, deltaY+cy);
+                    ctx.closePath();
+
+                    startAngle = endAngle;
+                }
+
+                data = [];
+                for(let j= 0; j<this.formatArray.length; j++){
+                    obj = {
+                        name: this.formatArray[j],
+                        nbr: this.quantityArray[j],
+                    };
+                    data.push(obj);
+                }
+                console.log('DATA');
+
+                console.log(data);
+
+
+
+                canvas = document.getElementById("can2");
+                ctx = canvas.getContext("2d");
+                canvas.width = 400;
+                canvas.height = 300;
+                total = data.reduce( (ttl, house) => {
+                    return ttl + house.nbr
+                }, 0);
+                startAngle = 0;
+                radius = 100;
+                cx = canvas.width/2;
+                cy = canvas.height/2;
+
+                for(let j= 0; j<data.length; j++){
+
+                    let item = data[j];
+                    //set the styles before beginPath
+                    ctx.fillStyle = randomHexColorCode();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#333';
+                    ctx.beginPath();
+                    //console.log(total, house.troops, house.troops/total);
+                    // draw the pie wedges
+                    let endAngle = ((item.nbr / total) * Math.PI * 2) + startAngle;
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+                    ctx.lineTo(cx, cy);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.closePath();
+
+                    // add the labels
+                    ctx.beginPath();
+                    ctx.font = '20px Helvetica, Calibri';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = 'rebeccapurple';
+                    // midpoint between the two angles
+                    // 1.5 * radius is the length of the Hypotenuse
+                    let theta = (startAngle + endAngle) / 2;
+                    let deltaY = Math.sin(theta) * 1.5 * radius;
+                    let deltaX = Math.cos(theta) * 1.5 * radius;
+                    /***
+                     SOH  - sin(angle) = opposite / hypotenuse
+                     = opposite / 1px
+                     CAH  - cos(angle) = adjacent / hypotenuse
+                     = adjacent / 1px
+                     TOA
+
+                     ***/
+                    txt = item.name + '\n';
+                    txt = txt + ' L';
+                    ctx.fillText(txt, deltaX+cx, deltaY+cy);
+                    ctx.closePath();
+
+                    startAngle = endAngle;
+                }
+
+                /**
+                 var data = [];
+                 for(let i=0; i<this.productsName.length; i++){
                     let item = {
                       y:  this.quantityArray[i],
                         label: this.productsName[i]
@@ -675,7 +852,7 @@
 
 
 
-                var chart = new CanvasJS.Chart("can", {
+                 var chart = new CanvasJS.Chart("can", {
                     animationEnabled: true,
                     title: {
                         text: "Desktop Search Engine Market Share - 2016"
@@ -689,12 +866,12 @@
                     }]
                 });
 
-                chart.render();
-**/
+                 chart.render();
+                 **/
 
-
-                var data = [];
-                for(let i=0; i<this.productsName.length; i++){
+/**
+                data = [];
+                for (let i = 0; i < this.productsName.length; i++) {
                     data.push(this.quantityArray[i]);
                 }
                 var canvas = document.getElementById("can");
@@ -721,7 +898,6 @@
                 }
 
 
-
                 canvas = document.getElementById("can2");
                 ctx = canvas.getContext("2d");
                 lastend = 0;
@@ -743,9 +919,10 @@
                     ctx.fill();
                     lastend += Math.PI * 2 * (data[i] / myTotal);
                 }
+**/
 
-
-            },
+            }
+            ,
 
             resolveAfter05Second: function () {
                 return new Promise(resolve => {
@@ -753,7 +930,8 @@
                         resolve('resolved');
                     }, 500);
                 });
-            },
+            }
+            ,
 
             circle: function () {
 
@@ -761,9 +939,9 @@
                 var context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.availability >= 70 && this.availability  < 95) {
+                if (this.availability >= 0.70 && this.availability < 0.95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.availability  >= 95) {
+                } else if (this.availability >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -771,16 +949,17 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.availability, 70, 90);
+                let ava = this.availability * 100;
+                context.fillText(ava.toFixed(2), 70, 90);
 
 
                 canvas = document.getElementById("Performance");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.performance  >= 70 && this.performance  < 95) {
+                if (this.performance >= 0.70 && this.performance < 0.95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.performance  >= 95) {
+                } else if (this.performance >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -788,15 +967,16 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.performance , 70, 90);
+                let perf = this.performance * 100;
+                context.fillText(perf.toFixed(2), 70, 90);
 
                 canvas = document.getElementById("Quality");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.quality  >= 70 && this.quality < 95) {
+                if (this.quality >= 0.7 && this.quality < 0.95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.quality >= 95) {
+                } else if (this.quality >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
                 context.arc(80, 80, 62, 0, 2 * Math.PI);
@@ -804,13 +984,14 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.quality, 70, 90);
+                let qua = this.quality * 100;
+                context.fillText(qua.toFixed(2), 70, 90);
 
                 canvas = document.getElementById("OLE");
                 context = canvas.getContext("2d");
                 context.lineWidth = "2";
                 context.fillStyle = "#FF0000";
-                if (this.OLE >= 70 && this.OLE < 95) {
+                if (this.OLE >= 0.70 && this.OLE < 0.95) {
                     context.fillStyle = "#FF8700";
                 } else if (this.OLE >= 95) {
                     context.fillStyle = "#71FA23";
@@ -820,12 +1001,15 @@
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
-                context.fillText(this.OLE, 70, 90);
+                let o = this.OLE * 100;
+                context.fillText(o.toFixed(2), 70, 90);
 
 
-            },
+            }
+            ,
 
-        },
+        }
+        ,
 
 
         mounted() {

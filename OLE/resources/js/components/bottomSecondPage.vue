@@ -191,6 +191,9 @@
         },
 
         mounted() {
+            console.log("POS : ");
+
+            console.log(sessionStorage.getItem("pos").split(','));
 
             if (this.PO.length > 0 && this.PO[0] !== "") {
                 for (let i = 0; i < this.PO.length; i++) {
@@ -202,6 +205,8 @@
                 }
 
             }
+
+
 
             console.log(sessionStorage.getItem("GMID").split(','));
         },

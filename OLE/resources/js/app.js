@@ -60,6 +60,10 @@ Vue.component('endPO_Declaration', require('./components/endPO_Declaration.vue')
 
 Vue.component('unplannedDowntimeDashboard', require('./components/unplannedDowntimeDashboard.vue').default);
 
+Vue.component('productionDashboard', require('./components/productionDashboard.vue').default);
+
+Vue.component('overallLineEffectivness', require('./components/overallLineEffectivness').default);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

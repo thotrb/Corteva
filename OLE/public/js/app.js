@@ -2474,6 +2474,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    console.log("POS : ");
+    console.log(sessionStorage.getItem("pos").split(','));
+
     if (this.PO.length > 0 && this.PO[0] !== "") {
       for (var i = 0; i < this.PO.length; i++) {
         var tab = [];
@@ -3183,13 +3186,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "downtimesReport",
@@ -3210,6 +3206,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       productsName: [],
       quantityArray: [],
       formatArray: [],
+      quantityPerArray: [],
+      formulationArray: [],
+      littersProduced: 0,
       plannedDowntimes: 0,
       unplannedDowntimes: 0,
       plannedProductionTime: 0,
@@ -3247,7 +3246,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(this.productionline);
                 tab.push(this.beginningDate);
                 tab.push(this.endingDate);
-                this.$store.dispatch('fecthAllEvents', tab);
+                this.$store.dispatch('fetchAllEvents', tab);
                 _context.next = 11;
                 return this.resolveAfter15Second();
 
@@ -3284,24 +3283,42 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     loadArray: function loadArray() {
       for (var i = 0; i < this.allEvents['SITE'].length; i++) {
         this.quantityArray[i] = 0;
-        this.formatArray[i] = '';
+        this.quantityPerArray[i] = 0;
       }
 
       for (var _i = 0; _i < this.allEvents['SITE'].length; _i++) {
-        this.qtyProduced += this.allEvents['SITE'][_i].qtyProduced;
+        var nbBottles = this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase;
+        this.qtyProduced += nbBottles * 1;
+
+        if (!this.formulationArray.includes(this.allEvents['SITE'][_i].formulationType)) {
+          this.formulationArray.push(this.allEvents['SITE'][_i].formulationType);
+        }
+
+        var indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][_i].formulationType);
+        this.quantityPerArray[indexFormulation] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * this.allEvents['SITE'][_i].size;
+
+        if (!this.formatArray.includes(this.allEvents['SITE'][_i].size)) {
+          this.formatArray.push(this.allEvents['SITE'][_i].size);
+        }
+
+        var indexSize = this.formatArray.indexOf(this.allEvents['SITE'][_i].size);
+        this.quantityArray[indexSize] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * this.allEvents['SITE'][_i].size;
 
         if (!this.productsName.includes(this.allEvents['SITE'][_i].product)) {
           this.productsName.push(this.allEvents['SITE'][_i].product);
         }
 
         var index = this.productsName.indexOf(this.allEvents['SITE'][_i].product);
-        this.quantityArray[index] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase;
+        this.quantityArray[index] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * this.allEvents['SITE'][_i].size;
+        this.littersProduced += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * this.allEvents['SITE'][_i].size;
         this.formatArray[index] = this.allEvents['SITE'][_i].size;
       }
 
       console.log(this.productsName);
       console.log(this.quantityArray);
       console.log(this.formatArray);
+      console.log(this.quantityPerArray);
+      console.log(this.formulationArray);
     },
     resolveAfter15Second: function resolveAfter15Second() {
       return new Promise(function (resolve) {
@@ -3320,42 +3337,48 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var labelerCounter = 0;
       var wieghtBoxCounter = 0;
       this.netOperatingTime = 0;
+      var sommeWorkingTime = 0;
 
-      for (var i = 0; i < this.allEvents['EVENTS'].length; i++) {
-        var PO = this.allEvents['EVENTS'][i];
-        sommeQtyProduced += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1;
+      for (var i = 0; i < this.allEvents['SITE'].length; i++) {
+        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+        var PO = this.allEvents['SITE'][i];
+        sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
         sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
         fillerCounter += PO.fillerCounter * 1;
         caperCounter += PO.caperCounter * 1;
         labelerCounter += PO.labelerCounter * 1;
         wieghtBoxCounter += PO.weightBoxCounter * 1;
-        this.netOperatingTime += this.allEvents['EVENTS'][i].qtyProduced * this.allEvents['EVENTS'][i].bottlesPerCase * 1 / this.allEvents['EVENTS'][i].idealRate * 1;
+        this.netOperatingTime += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1 / this.allEvents['SITE'][i].idealRate * 1;
 
-        if (this.allEvents['EVENTS'][i].kind === 0) {
-          sommePlannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
-        } else {
-          sommeUnplannedEvents += this.allEvents['EVENTS'][i].total_duration * 1;
+        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+          }
         }
-      }
 
-      var sommeWorkingTime = 0;
-
-      for (var j = 0; j < this.allEvents['SITE'].length; j++) {
-        sommeWorkingTime += this.allEvents['SITE'][j].workingDuration * 1;
+        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+          }
+        }
       }
 
       this.plannedDowntimes = sommePlannedEvents;
       this.unplannedDowntimes = sommeUnplannedEvents;
       this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
       this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
-      this.availability = this.operatingTime / this.plannedProductionTime * 100;
+      this.availability = this.operatingTime / this.plannedProductionTime;
       this.performance = this.netOperatingTime / this.operatingTime;
+      console.log('net OP TIME : ');
+      console.log(this.netOperatingTime);
+      console.log(' OP TIME : ');
+      console.log(this.operatingTime);
 
       if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0 && labelerCounter === 0 && wieghtBoxCounter === 0) {
-        this.quality = 100;
+        this.quality = 1;
       } else {
         var s = fillerCounter - sommeQtyProduced + (caperCounter - sommeQtyProduced) + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
-        this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s) * 100;
+        this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s);
       }
 
       if (this.operatingTime === 0) {
@@ -3382,85 +3405,221 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log('Operating Time : ' + this.operatingTime);
     },
     pieCharts: function pieCharts() {
-      /**
-                      var data = [];
-                      for(let i=0; i<this.productsName.length; i++){
-                          let item = {
-                            y:  this.quantityArray[i],
-                              label: this.productsName[i]
-                          };
-                          data.push(item);
-                      }
-      
-      
-      
-                      var chart = new CanvasJS.Chart("can", {
-                          animationEnabled: true,
-                          title: {
-                              text: "Desktop Search Engine Market Share - 2016"
-                          },
-                          data: [{
-                              type: "pie",
-                              startAngle: 240,
-                              yValueFormatString: "##0.00\"%\"",
-                              indexLabel: "{label} {y}",
-                              dataPoints: data,
-                          }]
-                      });
-      
-                      chart.render();
-      **/
+      var obj;
       var data = [];
 
-      for (var _i2 = 0; _i2 < this.productsName.length; _i2++) {
-        data.push(this.quantityArray[_i2]);
+      for (var j = 0; j < this.formulationArray.length; j++) {
+        obj = {
+          name: this.formulationArray[j],
+          nbr: this.quantityPerArray[j]
+        };
+        data.push(obj);
       }
+
+      console.log('DATA');
+      console.log(data);
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
 
       var canvas = document.getElementById("can");
       var ctx = canvas.getContext("2d");
-      var lastend = 0;
-      var myTotal = 0; // Automatically calculated so don't touch
+      canvas.width = 400;
+      canvas.height = 300;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 100;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
 
-      var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
+      for (var _j = 0; _j < data.length; _j++) {
+        var item = data[_j]; //set the styles before beginPath
 
-      for (var e = 0; e < data.length; e++) {
-        myTotal += data[e];
-      }
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
 
-      for (var i = 0; i < data.length; i++) {
-        ctx.fillStyle = myColor[i];
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, canvas.height / 2); // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-
-        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + Math.PI * 2 * (data[i] / myTotal), false);
-        ctx.lineTo(canvas.width / 2, canvas.height / 2);
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
         ctx.fill();
-        lastend += Math.PI * 2 * (data[i] / myTotal);
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '20px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        /***
+         SOH  - sin(angle) = opposite / hypotenuse
+         = opposite / 1px
+         CAH  - cos(angle) = adjacent / hypotenuse
+         = adjacent / 1px
+         TOA
+          ***/
+
+        var txt = item.name + '\n';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
       }
 
+      data = [];
+
+      for (var _j2 = 0; _j2 < this.formatArray.length; _j2++) {
+        obj = {
+          name: this.formatArray[_j2],
+          nbr: this.quantityArray[_j2]
+        };
+        data.push(obj);
+      }
+
+      console.log('DATA');
+      console.log(data);
       canvas = document.getElementById("can2");
       ctx = canvas.getContext("2d");
-      lastend = 0;
-      data = [60, 60, 20, 50]; // If you add more data values make sure you add more colors
+      canvas.width = 400;
+      canvas.height = 300;
+      total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      startAngle = 0;
+      radius = 100;
+      cx = canvas.width / 2;
+      cy = canvas.height / 2;
 
-      myTotal = 0; // Automatically calculated so don't touch
+      for (var _j3 = 0; _j3 < data.length; _j3++) {
+        var _item = data[_j3]; //set the styles before beginPath
 
-      myColor = ['pink', 'green', 'blue', 'purple']; // Colors of each slice
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
 
-      for (e = 0; e < data.length; e++) {
-        myTotal += data[e];
-      }
+        var _endAngle = _item.nbr / total * Math.PI * 2 + startAngle;
 
-      for (i = 0; i < data.length; i++) {
-        ctx.fillStyle = myColor[i];
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, canvas.height / 2); // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-
-        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + Math.PI * 2 * (data[i] / myTotal), false);
-        ctx.lineTo(canvas.width / 2, canvas.height / 2);
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, _endAngle, false);
+        ctx.lineTo(cx, cy);
         ctx.fill();
-        lastend += Math.PI * 2 * (data[i] / myTotal);
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '20px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var _theta = (startAngle + _endAngle) / 2;
+
+        var _deltaY = Math.sin(_theta) * 1.5 * radius;
+
+        var _deltaX = Math.cos(_theta) * 1.5 * radius;
+        /***
+         SOH  - sin(angle) = opposite / hypotenuse
+         = opposite / 1px
+         CAH  - cos(angle) = adjacent / hypotenuse
+         = adjacent / 1px
+         TOA
+          ***/
+
+
+        txt = _item.name + '\n';
+        txt = txt + ' L';
+        ctx.fillText(txt, _deltaX + cx, _deltaY + cy);
+        ctx.closePath();
+        startAngle = _endAngle;
       }
+      /**
+       var data = [];
+       for(let i=0; i<this.productsName.length; i++){
+          let item = {
+            y:  this.quantityArray[i],
+              label: this.productsName[i]
+          };
+          data.push(item);
+      }
+          var chart = new CanvasJS.Chart("can", {
+          animationEnabled: true,
+          title: {
+              text: "Desktop Search Engine Market Share - 2016"
+          },
+          data: [{
+              type: "pie",
+              startAngle: 240,
+              yValueFormatString: "##0.00\"%\"",
+              indexLabel: "{label} {y}",
+              dataPoints: data,
+          }]
+      });
+        chart.render();
+       **/
+
+      /**
+                      data = [];
+                      for (let i = 0; i < this.productsName.length; i++) {
+                          data.push(this.quantityArray[i]);
+                      }
+                      var canvas = document.getElementById("can");
+                      var ctx = canvas.getContext("2d");
+                      var lastend = 0;
+      
+      
+                      var myTotal = 0; // Automatically calculated so don't touch
+                      var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
+      
+                      for (var e = 0; e < data.length; e++) {
+                          myTotal += data[e];
+                      }
+      
+                      for (var i = 0; i < data.length; i++) {
+                          ctx.fillStyle = myColor[i];
+                          ctx.beginPath();
+                          ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                          // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
+                          ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
+                          ctx.lineTo(canvas.width / 2, canvas.height / 2);
+                          ctx.fill();
+                          lastend += Math.PI * 2 * (data[i] / myTotal);
+                      }
+      
+      
+                      canvas = document.getElementById("can2");
+                      ctx = canvas.getContext("2d");
+                      lastend = 0;
+                      data = [60, 60, 20, 50]; // If you add more data values make sure you add more colors
+                      myTotal = 0; // Automatically calculated so don't touch
+                      myColor = ['pink', 'green', 'blue', 'purple']; // Colors of each slice
+      
+                      for (e = 0; e < data.length; e++) {
+                          myTotal += data[e];
+                      }
+      
+                      for (i = 0; i < data.length; i++) {
+                          ctx.fillStyle = myColor[i];
+                          ctx.beginPath();
+                          ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                          // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
+                          ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
+                          ctx.lineTo(canvas.width / 2, canvas.height / 2);
+                          ctx.fill();
+                          lastend += Math.PI * 2 * (data[i] / myTotal);
+                      }
+      **/
+
     },
     resolveAfter05Second: function resolveAfter05Second() {
       return new Promise(function (resolve) {
@@ -3475,9 +3634,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.availability >= 70 && this.availability < 95) {
+      if (this.availability >= 0.70 && this.availability < 0.95) {
         context.fillStyle = "#FF8700";
-      } else if (this.availability >= 95) {
+      } else if (this.availability >= 0.95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3486,15 +3645,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.availability, 70, 90);
+      var ava = this.availability * 100;
+      context.fillText(ava.toFixed(2), 70, 90);
       canvas = document.getElementById("Performance");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.performance >= 70 && this.performance < 95) {
+      if (this.performance >= 0.70 && this.performance < 0.95) {
         context.fillStyle = "#FF8700";
-      } else if (this.performance >= 95) {
+      } else if (this.performance >= 0.95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3503,15 +3663,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.performance, 70, 90);
+      var perf = this.performance * 100;
+      context.fillText(perf.toFixed(2), 70, 90);
       canvas = document.getElementById("Quality");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.quality >= 70 && this.quality < 95) {
+      if (this.quality >= 0.7 && this.quality < 0.95) {
         context.fillStyle = "#FF8700";
-      } else if (this.quality >= 95) {
+      } else if (this.quality >= 0.95) {
         context.fillStyle = "#71FA23";
       }
 
@@ -3520,13 +3681,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.quality, 70, 90);
+      var qua = this.quality * 100;
+      context.fillText(qua.toFixed(2), 70, 90);
       canvas = document.getElementById("OLE");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
       context.fillStyle = "#FF0000";
 
-      if (this.OLE >= 70 && this.OLE < 95) {
+      if (this.OLE >= 0.70 && this.OLE < 0.95) {
         context.fillStyle = "#FF8700";
       } else if (this.OLE >= 95) {
         context.fillStyle = "#71FA23";
@@ -3537,7 +3699,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
-      context.fillText(this.OLE, 70, 90);
+      var o = this.OLE * 100;
+      context.fillText(o.toFixed(2), 70, 90);
     }
   },
   mounted: function mounted() {
@@ -4104,7 +4267,7 @@ var today = new Date();
                 time1 = 0;
                 time2 = 0;
 
-                if (splitted2[0] >= splitted1[0]) {
+                if (splitted1[0] <= splitted2[0]) {
                   time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
                   time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
                   this.totalOperatingTime = time2 - time1;
@@ -4120,7 +4283,7 @@ var today = new Date();
 
                 this.totalProductionTime -= this.totalPlannedDowtimes;
                 this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
-                this.availability = this.totalOperatingTime / this.totalProductionTime; //this.$store.dispatch('getNetOPTime', this.parameters);
+                this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2); //this.$store.dispatch('getNetOPTime', this.parameters);
 
                 _context.next = 11;
                 return this.$store.dispatch('getNetOPTime', this.GMID);
@@ -4134,7 +4297,7 @@ var today = new Date();
                 this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
                 this.totalNetOperatingTime = this.finalQuantityProduced * this.netOP.bottlesPerCase / this.netOP.idealRate;
                 console.log('NET OP : ' + this.totalNetOperatingTime);
-                this.performance = this.totalNetOperatingTime / this.totalOperatingTime;
+                this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
                 console.log('Perf : ' + this.performance);
                 this.valider = 1;
 
@@ -4177,20 +4340,20 @@ var today = new Date();
     },
     saveEndPO: function () {
       var _saveEndPO = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var pos, array;
+        var array, array2;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
-                pos = sessionStorage.getItem("pos").split(',');
+                /**
+                var pos = sessionStorage.getItem("pos").split(',');
                 pos.splice(this.indice, 1);
-
-                if (sessionStorage.getItem("pos") === null) {
-                  sessionStorage.pos = pos;
+                 if (sessionStorage.getItem("pos") === null) {
+                    sessionStorage.pos = pos;
                 } else {
-                  sessionStorage.setItem("pos", pos);
-                }
+                    sessionStorage.setItem("pos", pos);
+                }**/
 
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
                 array = [];
@@ -4202,16 +4365,35 @@ var today = new Date();
                 array.push(this.finalQuantityProduced);
                 array.push(this.totalDuration);
                 this.$store.dispatch('stop_PO', array);
-                this.parameters.push(this.username);
-                this.$store.dispatch('fetchUsers', this.parameters);
-                _context2.next = 18;
+                _context2.next = 13;
                 return this.resolveAfter1Second();
 
-              case 18:
-                this.loadTable();
+              case 13:
+                array2 = [];
+                array2.push(this.endPO);
+                array2.push(this.EtiqueteuseCounter);
+                array2.push(this.WieghtBoxCounter);
+                array2.push(this.CaperCounter);
+                array2.push(this.FillerCounter);
+                array2.push(this.EtiqueteuseRejection);
+                array2.push(this.WieghtBoxRejection);
+                array2.push(this.CaperRejection);
+                array2.push(this.FillerRejection);
+                this.$store.dispatch('store_Rejection', array2);
+                _context2.next = 26;
+                return this.resolveAfter1Second();
+
+              case 26:
+                this.parameters.push(this.username);
+                this.$store.dispatch('fetchUsers', this.parameters);
+                _context2.next = 30;
+                return this.resolveAfter1Second();
+
+              case 30:
+                //this.loadTable();
                 window.location.href = this.url + 'teamInfo';
 
-              case 20:
+              case 31:
               case "end":
                 return _context2.stop();
             }
@@ -4278,10 +4460,10 @@ var today = new Date();
                     N = this.nbBottlesFilled;
                     summRejection = this.FillerRejection + this.CaperRejection + this.EtiqueteuseRejection + this.WieghtBoxRejection;
                     summCompteur = this.FillerCounter - this.nbBottlesFilled + (this.CaperCounter - this.nbBottlesFilled) + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
-                    this.quality = N / (N + summRejection + summCompteur);
+                    this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
                   }
 
-                  this.OLE = this.quality * this.availability * this.performance;
+                  this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
 
                   if (sessionStorage.getItem("quality") === null) {
                     sessionStorage.quality = this.quality;
@@ -4846,6 +5028,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbar",
   data: function data() {
@@ -4860,6 +5050,629 @@ __webpack_require__.r(__webpack_exports__);
       window.location.href = this.url + this.selection;
     }
   }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "overallLineEffectivness",
+  data: function data() {
+    return {
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      years: [],
+      year: 0,
+      yearsAfterFrom: [],
+      currentYear: new Date().getFullYear(),
+      startYear: 2015,
+      site: '',
+      productionline: '',
+      show: 0,
+      OLEPerMonth: [],
+      AvailabilityPerMonth: [],
+      PerformancePerMonth: [],
+      QualityPerMonth: [],
+      netOperatingTimePerMonth: [],
+      plannedDowntimesPerMonth: [],
+      unplannedDowntimesPerMonth: [],
+      plannedProductionTimePerMonth: [],
+      operatingTimePerMonth: [],
+      OLEPerMonth2: [],
+      AvailabilityPerMonth2: [],
+      PerformancePerMonth2: [],
+      QualityPerMonth2: [],
+      netOperatingTimePerMonth2: [],
+      plannedDowntimesPerMonth2: [],
+      unplannedDowntimesPerMonth2: [],
+      plannedProductionTimePerMonth2: [],
+      operatingTimePerMonth2: [],
+      moyenneOLE: 0,
+      moyenneQuality: 0,
+      moyennePerformance: 0,
+      moyenneAvailability: 0,
+      moyenneOLE2: 0,
+      moyenneQuality2: 0,
+      moyennePerformance2: 0,
+      moyenneAvailability2: 0
+    };
+  },
+  methods: {
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var firstDayYear, lastDayYear, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(this.productionline !== '' && this.year !== '')) {
+                  _context.next = 25;
+                  break;
+                }
+
+                firstDayYear = this.year + '-01-01';
+                lastDayYear = this.year + '-12-31';
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(firstDayYear);
+                tab.push(lastDayYear);
+                this.$store.dispatch('fetchAllEvents', tab);
+                _context.next = 11;
+                return this.resolveAfter15Second();
+
+              case 11:
+                this.loadProductionTime();
+                firstDayYear = this.year - 1 + '-01-01';
+                lastDayYear = this.year - 1 + '-12-31';
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(firstDayYear);
+                tab.push(lastDayYear);
+                this.$store.dispatch('fetchAllEvents', tab);
+                _context.next = 22;
+                return this.resolveAfter15Second();
+
+              case 22:
+                this.loadProductionTime2();
+                this.show = 1;
+                this.graph2();
+
+              case 25:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    loadProductionTime: function loadProductionTime() {
+      var sommeWorkingTimePerMonth = [];
+      var sommeQtyProducedPerMonth = [];
+      var sommeRejectionPerMonth = [];
+      var fillerCounterPerMonth = [];
+      var caperCounterPerMonth = [];
+      var labelerCounterPerMonth = [];
+      var weightBoxCounterPerMonth = [];
+      var sumPlannedEventsPerMonth = [];
+      var sumUnplannedEventsPerMonth = [];
+
+      for (var i = 0; i < 12; i++) {
+        sommeWorkingTimePerMonth[i] = 0;
+        sommeQtyProducedPerMonth[i] = 0;
+        sommeRejectionPerMonth[i] = 0;
+        fillerCounterPerMonth[i] = 0;
+        caperCounterPerMonth[i] = 0;
+        labelerCounterPerMonth[i] = 0;
+        weightBoxCounterPerMonth[i] = 0;
+        sumPlannedEventsPerMonth[i] = 0;
+        sumUnplannedEventsPerMonth[i] = 0;
+        this.OLEPerMonth[i] = 0;
+        this.AvailabilityPerMonth[i] = 0;
+        this.PerformancePerMonth[i] = 0;
+        this.QualityPerMonth[i] = 0;
+        this.netOperatingTimePerMonth[i] = 0;
+        this.plannedDowntimesPerMonth[i] = 0;
+        this.unplannedDowntimesPerMonth[i] = 0;
+        this.plannedProductionTimePerMonth[i] = 0;
+        this.operatingTimePerMonth[i] = 0;
+      }
+
+      var month = 0;
+
+      for (var _i = 0; _i < this.allEvents['SITE'].length; _i++) {
+        month = this.allEvents['SITE'][_i].created_at.split('-')[1] - 1;
+        sommeWorkingTimePerMonth[month] += this.allEvents['SITE'][_i].workingDuration * 1;
+        var PO = this.allEvents['SITE'][_i];
+        sommeQtyProducedPerMonth[month] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * 1;
+        sommeRejectionPerMonth[month] += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounterPerMonth[month] += PO.fillerCounter * 1;
+        caperCounterPerMonth[month] += PO.caperCounter * 1;
+        labelerCounterPerMonth[month] += PO.labelerCounter * 1;
+        weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
+        this.netOperatingTimePerMonth[month] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * 1 / this.allEvents['SITE'][_i].idealRate * 1;
+
+        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+            sumUnplannedEventsPerMonth[month] += this.allEvents['EVENTS'][j].total_duration * 1;
+          }
+        }
+
+        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+            sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+          }
+        }
+      }
+
+      this.plannedDowntimesPerMonth = sumPlannedEventsPerMonth;
+      this.unplannedDowntimesPerMonth = sumUnplannedEventsPerMonth;
+
+      for (var _i2 = 0; _i2 < this.plannedProductionTimePerMonth.length; _i2++) {
+        this.plannedProductionTimePerMonth[_i2] = sommeWorkingTimePerMonth[_i2] - sumPlannedEventsPerMonth[_i2];
+      }
+
+      for (var _i3 = 0; _i3 < this.operatingTimePerMonth.length; _i3++) {
+        this.operatingTimePerMonth[_i3] = sommeWorkingTimePerMonth[_i3] - sumPlannedEventsPerMonth[_i3] - sumUnplannedEventsPerMonth[_i3];
+      }
+      /**
+       console.log('indice :');
+        console.log(sommeWorkingTimePerMonth);
+       console.log(sumPlannedEventsPerMonth);
+       console.log(sumUnplannedEventsPerMonth);
+       **/
+
+
+      for (var _i4 = 0; _i4 < this.AvailabilityPerMonth.length; _i4++) {
+        if (this.operatingTimePerMonth[_i4] === 0) {
+          this.AvailabilityPerMonth[_i4] = 0;
+        } else {
+          this.AvailabilityPerMonth[_i4] = this.operatingTimePerMonth[_i4] / this.plannedProductionTimePerMonth[_i4];
+        }
+      }
+
+      for (var _i5 = 0; _i5 < this.PerformancePerMonth.length; _i5++) {
+        if (this.netOperatingTimePerMonth[_i5] === 0) {
+          this.PerformancePerMonth[_i5] = 0;
+        } else {
+          this.PerformancePerMonth[_i5] = this.netOperatingTimePerMonth[_i5] / this.operatingTimePerMonth[_i5];
+        }
+      }
+
+      for (var _i6 = 0; _i6 < this.QualityPerMonth.length; _i6++) {
+        if (sommeRejectionPerMonth[_i6] === 0 && fillerCounterPerMonth[_i6] === 0 && caperCounterPerMonth[_i6] === 0 && labelerCounterPerMonth[_i6] === 0 && weightBoxCounterPerMonth[_i6] === 0) {
+          this.QualityPerMonth[_i6] = 1;
+        } else {
+          var s = fillerCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6] + (caperCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]) + (labelerCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]) + (weightBoxCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]);
+          this.QualityPerMonth[_i6] = sommeQtyProducedPerMonth[_i6] / (sommeQtyProducedPerMonth[_i6] + sommeRejectionPerMonth[_i6] + s);
+        }
+      }
+
+      for (var _i7 = 0; _i7 < this.OLEPerMonth.length; _i7++) {
+        this.OLEPerMonth[_i7] = this.AvailabilityPerMonth[_i7] * this.PerformancePerMonth[_i7] * this.QualityPerMonth[_i7];
+      }
+
+      console.log(sommeQtyProducedPerMonth);
+      console.log(this.PerformancePerMonth);
+      console.log(this.QualityPerMonth);
+      console.log(this.AvailabilityPerMonth);
+
+      for (var _i8 = 0; _i8 < this.OLEPerMonth.length; _i8++) {
+        this.moyenneOLE += this.OLEPerMonth[_i8];
+        this.moyenneAvailability += this.AvailabilityPerMonth[_i8];
+        this.moyennePerformance += this.PerformancePerMonth[_i8];
+        this.moyenneQuality += this.QualityPerMonth[_i8];
+      }
+
+      this.moyenneOLE = (this.moyenneOLE / 12).toFixed(2);
+      this.moyenneAvailability = (this.moyenneAvailability / 12).toFixed(2);
+      this.moyennePerformance = (this.moyennePerformance / 12).toFixed(2);
+      this.moyenneQuality = (this.moyenneQuality / 12).toFixed(2);
+    },
+    loadProductionTime2: function loadProductionTime2() {
+      var sommeWorkingTimePerMonth = [];
+      var sommeQtyProducedPerMonth = [];
+      var sommeRejectionPerMonth = [];
+      var fillerCounterPerMonth = [];
+      var caperCounterPerMonth = [];
+      var labelerCounterPerMonth = [];
+      var weightBoxCounterPerMonth = [];
+      var sumPlannedEventsPerMonth = [];
+      var sumUnplannedEventsPerMonth = [];
+
+      for (var i = 0; i < 12; i++) {
+        sommeWorkingTimePerMonth[i] = 0;
+        sommeQtyProducedPerMonth[i] = 0;
+        sommeRejectionPerMonth[i] = 0;
+        fillerCounterPerMonth[i] = 0;
+        caperCounterPerMonth[i] = 0;
+        labelerCounterPerMonth[i] = 0;
+        weightBoxCounterPerMonth[i] = 0;
+        sumPlannedEventsPerMonth[i] = 0;
+        sumUnplannedEventsPerMonth[i] = 0;
+        this.OLEPerMonth2[i] = 0;
+        this.AvailabilityPerMonth2[i] = 0;
+        this.PerformancePerMonth2[i] = 0;
+        this.QualityPerMonth2[i] = 0;
+        this.netOperatingTimePerMonth2[i] = 0;
+        this.plannedDowntimesPerMonth2[i] = 0;
+        this.unplannedDowntimesPerMonth2[i] = 0;
+        this.plannedProductionTimePerMonth2[i] = 0;
+        this.operatingTimePerMonth2[i] = 0;
+      }
+
+      var month = 0;
+
+      for (var _i9 = 0; _i9 < this.allEvents['SITE'].length; _i9++) {
+        month = this.allEvents['SITE'][_i9].created_at.split('-')[1] - 1;
+        sommeWorkingTimePerMonth[month] += this.allEvents['SITE'][_i9].workingDuration * 1;
+        var PO = this.allEvents['SITE'][_i9];
+        sommeQtyProducedPerMonth[month] += this.allEvents['SITE'][_i9].qtyProduced * this.allEvents['SITE'][_i9].bottlesPerCase * 1;
+        sommeRejectionPerMonth[month] += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounterPerMonth[month] += PO.fillerCounter * 1;
+        caperCounterPerMonth[month] += PO.caperCounter * 1;
+        labelerCounterPerMonth[month] += PO.labelerCounter * 1;
+        weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
+        this.netOperatingTimePerMonth2[month] += this.allEvents['SITE'][_i9].qtyProduced * this.allEvents['SITE'][_i9].bottlesPerCase * 1 / this.allEvents['SITE'][_i9].idealRate * 1;
+
+        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+            sumUnplannedEventsPerMonth[month] += this.allEvents['EVENTS'][j].total_duration * 1;
+          }
+        }
+
+        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+            sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+          }
+        }
+      }
+
+      this.plannedDowntimesPerMonth2 = sumPlannedEventsPerMonth;
+      this.unplannedDowntimesPerMonth2 = sumUnplannedEventsPerMonth;
+
+      for (var _i10 = 0; _i10 < this.plannedProductionTimePerMonth2.length; _i10++) {
+        this.plannedProductionTimePerMonth2[_i10] = sommeWorkingTimePerMonth[_i10] - sumPlannedEventsPerMonth[_i10];
+      }
+
+      for (var _i11 = 0; _i11 < this.operatingTimePerMonth2.length; _i11++) {
+        this.operatingTimePerMonth2[_i11] = sommeWorkingTimePerMonth[_i11] - sumPlannedEventsPerMonth[_i11] - sumUnplannedEventsPerMonth[_i11];
+      }
+      /**
+       console.log('indice :');
+        console.log(sommeWorkingTimePerMonth);
+       console.log(sumPlannedEventsPerMonth);
+       console.log(sumUnplannedEventsPerMonth);
+       **/
+
+
+      for (var _i12 = 0; _i12 < this.AvailabilityPerMonth2.length; _i12++) {
+        if (this.operatingTimePerMonth2[_i12] === 0) {
+          this.AvailabilityPerMonth2[_i12] = 0;
+        } else {
+          this.AvailabilityPerMonth2[_i12] = this.operatingTimePerMonth2[_i12] / this.plannedProductionTimePerMonth2[_i12];
+        }
+      }
+
+      for (var _i13 = 0; _i13 < this.PerformancePerMonth2.length; _i13++) {
+        if (this.netOperatingTimePerMonth2[_i13] === 0) {
+          this.PerformancePerMonth2[_i13] = 0;
+        } else {
+          this.PerformancePerMonth2[_i13] = this.netOperatingTimePerMonth2[_i13] / this.operatingTimePerMonth2[_i13];
+        }
+      }
+
+      for (var _i14 = 0; _i14 < this.QualityPerMonth2.length; _i14++) {
+        if (sommeRejectionPerMonth[_i14] === 0 && fillerCounterPerMonth[_i14] === 0 && caperCounterPerMonth[_i14] === 0 && labelerCounterPerMonth[_i14] === 0 && weightBoxCounterPerMonth[_i14] === 0) {
+          this.QualityPerMonth2[_i14] = 1;
+        } else {
+          var s = fillerCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14] + (caperCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]) + (labelerCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]) + (weightBoxCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]);
+          this.QualityPerMonth2[_i14] = sommeQtyProducedPerMonth[_i14] / (sommeQtyProducedPerMonth[_i14] + sommeRejectionPerMonth[_i14] + s);
+        }
+      }
+
+      for (var _i15 = 0; _i15 < this.OLEPerMonth2.length; _i15++) {
+        this.OLEPerMonth2[_i15] = this.AvailabilityPerMonth2[_i15] * this.PerformancePerMonth2[_i15] * this.QualityPerMonth2[_i15];
+      }
+
+      for (var _i16 = 0; _i16 < this.OLEPerMonth2.length; _i16++) {
+        this.moyenneOLE2 += this.OLEPerMonth2[_i16];
+        this.moyenneAvailability2 += this.AvailabilityPerMonth2[_i16];
+        this.moyennePerformance2 += this.PerformancePerMonth2[_i16];
+        this.moyenneQuality2 += this.QualityPerMonth2[_i16];
+      }
+
+      this.moyenneOLE2 = (this.moyenneOLE2 / 12).toFixed(2);
+      this.moyenneAvailability2 = (this.moyenneAvailability2 / 12).toFixed(2);
+      this.moyennePerformance2 = (this.moyennePerformance2 / 12).toFixed(2);
+      this.moyenneQuality2 = (this.moyenneQuality2 / 12).toFixed(2);
+    },
+    graph2: function graph2() {
+      var ctx = document.getElementById("myChart5").getContext('2d');
+      var tab = [];
+      var colors = [];
+      colors.push("#008d93");
+      var ar = [];
+
+      for (var j = 0; j < this.OLEPerMonth.length; j++) {
+        ar.push((this.OLEPerMonth[j] * 100).toFixed(2));
+      }
+
+      var obj = {
+        label: 'Overall Line Effectivness',
+        backgroundColor: colors[0],
+        data: ar
+      };
+      tab.push(obj);
+      console.log('tab');
+      console.log(tab);
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: tab
+        },
+        options: {
+          tooltips: {
+            displayColors: true,
+            callbacks: {
+              mode: 'x'
+            }
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              type: 'linear'
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom'
+          }
+        }
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.$store.dispatch('fetchSites');
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
+    document.head.appendChild(chartJs);
+
+    for (var i = this.startYear; i <= this.currentYear; i++) {
+      this.years.push(i);
+    }
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
 });
 
 /***/ }),
@@ -4882,17 +5695,6 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -5288,6 +6090,770 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "productionDashboard",
+  data: function data() {
+    return {
+      site: '',
+      beginningDate: '',
+      endingDate: '',
+      productionline: '',
+      show: 0,
+      formulations: '',
+      formulationsPerMonth: '',
+      qtyPerFormulation: [],
+      sumPerMonth: [],
+      total: 0,
+      packsizes: [],
+      total2: 0,
+      sumPerMonth2: [],
+      packsizePerMonth: []
+    };
+  },
+  methods: {
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
+                  _context.next = 17;
+                  break;
+                }
+
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(this.beginningDate);
+                tab.push(this.endingDate);
+                this.$store.dispatch('fetchVolumes', tab);
+                _context.next = 11;
+                return this.resolveAfter15Second();
+
+              case 11:
+                this.makeCalculationFormulation();
+                this.pieCharts();
+                this.pieCharts2();
+                this.graph();
+                this.graph2();
+                this.show = 1;
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    graph: function graph() {
+      var ctx = document.getElementById("myChart4").getContext('2d');
+      var tab = [];
+      var colors = [];
+      colors.push("#caf270");
+      colors.push("#45c490");
+      colors.push("#008d93");
+      colors.push("#2e5468");
+
+      for (var i = 0; i < this.formulations.length; i++) {
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var ar = [];
+
+        for (var j = 0; j < mois.length; j++) {
+          ar.push(this.formulationsPerMonth[i][mois[j]]);
+        }
+
+        var obj = {
+          label: this.formulations[i],
+          backgroundColor: colors[i],
+          data: ar
+        };
+        tab.push(obj);
+      }
+
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: tab
+        },
+        options: {
+          tooltips: {
+            displayColors: true,
+            callbacks: {
+              mode: 'x'
+            }
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              type: 'linear'
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom'
+          }
+        }
+      });
+    },
+    pieCharts: function pieCharts() {
+      var data = [];
+
+      for (var j = 0; j < this.formulations.length; j++) {
+        var formulation = this.formulations[j];
+        var sum = 0; //console.log('PER MONTH');
+        //console.log(this.formulationsPerMonth[j]);
+
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        for (var k = 0; k < mois.length; k++) {
+          var m = mois[k];
+          sum += this.formulationsPerMonth[j][m];
+        }
+
+        var obj = {
+          name: formulation,
+          nbr: sum
+        };
+        data.push(obj);
+      }
+
+      console.log('DATA');
+      console.log(data);
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
+
+      var canvas = document.getElementById("formulationSplit");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 800;
+      canvas.height = 600;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 100;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
+
+      for (var _j = 0; _j < data.length; _j++) {
+        var item = data[_j]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '20px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        /***
+         SOH  - sin(angle) = opposite / hypotenuse
+         = opposite / 1px
+         CAH  - cos(angle) = adjacent / hypotenuse
+         = adjacent / 1px
+         TOA
+          ***/
+
+        var txt = item.name + '\n';
+        var pct = item.nbr / this.total * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
+      }
+    },
+    graph2: function graph2() {
+      var ctx = document.getElementById("myChart5").getContext('2d');
+      var tab = [];
+      var colors = [];
+      colors.push("#caf270");
+      colors.push("#45c490");
+      colors.push("#008d93");
+      colors.push("#2e5468");
+
+      for (var i = 0; i < this.packsizes.length; i++) {
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var ar = [];
+
+        for (var j = 0; j < mois.length; j++) {
+          ar.push(this.packsizePerMonth[i][mois[j]]);
+        }
+
+        var obj = {
+          label: this.packsizes[i] + 'L',
+          backgroundColor: colors[i],
+          data: ar
+        };
+        tab.push(obj);
+      }
+
+      console.log('tab');
+      console.log(tab);
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: tab
+        },
+        options: {
+          tooltips: {
+            displayColors: true,
+            callbacks: {
+              mode: 'x'
+            }
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              type: 'linear'
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom'
+          }
+        }
+      });
+    },
+    pieCharts2: function pieCharts2() {
+      var data = [];
+
+      for (var j = 0; j < this.packsizes.length; j++) {
+        var format = this.packsizes[j];
+        var sum = 0; //console.log('PER MONTH');
+        //console.log(this.formulationsPerMonth[j]);
+
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        for (var k = 0; k < mois.length; k++) {
+          var m = mois[k];
+          sum += this.packsizePerMonth[j][m];
+        }
+
+        var obj = {
+          name: format,
+          nbr: sum
+        };
+        data.push(obj);
+      }
+
+      console.log('DATA');
+      console.log(data);
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
+
+      var canvas = document.getElementById("packsizeSplit");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 800;
+      canvas.height = 600;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 100;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
+
+      for (var _j2 = 0; _j2 < data.length; _j2++) {
+        var item = data[_j2]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '20px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        var txt = item.name + 'L \n';
+        var pct = item.nbr / this.total2 * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
+      }
+    },
+    makeCalculationFormulation: function makeCalculationFormulation() {
+      var sommeQtyProduced = 0;
+      this.formulations = [];
+      var qtyPerFormulation = [];
+
+      for (var i = 0; i < this.volumes.length; i++) {
+        sommeQtyProduced += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+
+        if (!this.formulations.includes(this.volumes[i].BULK)) {
+          this.formulations.push(this.volumes[i].BULK);
+          qtyPerFormulation[this.volumes[i].BULK] = this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+        } else {
+          qtyPerFormulation[this.volumes[i].BULK] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+        }
+      }
+
+      var finalValue = [];
+
+      for (var j = 0; j < this.formulations.length; j++) {
+        var tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var tableauFormulationValue = [];
+
+        for (var k = 0; k < tableauFormulation.length; k++) {
+          tableauFormulationValue[tableauFormulation[k]] = 0;
+        }
+
+        for (var _i = 0; _i < this.volumes.length; _i++) {
+          if (this.volumes[_i].BULK === this.formulations[j]) {
+            var month = this.volumes[_i].created_at.split('-')[1];
+
+            console.log('MOIS : ' + month);
+            var correspondingMonth = tableauFormulation[month - 1];
+            tableauFormulationValue[correspondingMonth] += this.volumes[_i].qtyProduced * this.volumes[_i].bottlesPerCase * this.volumes[_i].size * 1;
+          }
+        }
+
+        finalValue.push(tableauFormulationValue);
+      }
+
+      var l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      var tab = [];
+
+      for (var _k = 0; _k < l.length; _k++) {
+        tab[l[_k]] = 0;
+      }
+
+      for (var t = 0; t < finalValue.length; t++) {
+        for (var _k2 = 0; _k2 < l.length; _k2++) {
+          var _month = l[_k2];
+          tab[_month] += finalValue[t][_month];
+          this.total += finalValue[t][_month];
+        }
+      }
+
+      this.sumPerMonth.push(tab);
+      this.formulationsPerMonth = finalValue; //Graph2
+
+      var sommeQtyProduced2 = 0;
+      this.packsizes = [];
+      var qtyPerPacksize = [];
+
+      for (var _i2 = 0; _i2 < this.volumes.length; _i2++) {
+        sommeQtyProduced2 += this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+
+        if (!this.packsizes.includes(this.volumes[_i2].size)) {
+          this.packsizes.push(this.volumes[_i2].size);
+          qtyPerPacksize[this.volumes[_i2].size] = this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+        } else {
+          qtyPerPacksize[this.volumes[_i2].size] += this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+        }
+      }
+
+      var finalValue2 = [];
+
+      for (var _j3 = 0; _j3 < this.packsizes.length; _j3++) {
+        tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var tableauPacksizeValue = [];
+
+        for (var _k3 = 0; _k3 < tableauFormulation.length; _k3++) {
+          tableauPacksizeValue[tableauFormulation[_k3]] = 0;
+        }
+
+        for (var _i3 = 0; _i3 < this.volumes.length; _i3++) {
+          if (this.volumes[_i3].size === this.packsizes[_j3]) {
+            month = this.volumes[_i3].created_at.split('-')[1];
+            correspondingMonth = tableauFormulation[month - 1];
+            tableauPacksizeValue[correspondingMonth] += this.volumes[_i3].qtyProduced * this.volumes[_i3].bottlesPerCase * 1;
+          }
+        }
+
+        finalValue2.push(tableauPacksizeValue);
+      }
+
+      l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      tab = [];
+
+      for (var _k4 = 0; _k4 < l.length; _k4++) {
+        tab[l[_k4]] = 0;
+      }
+
+      for (var _t = 0; _t < finalValue2.length; _t++) {
+        for (var _k5 = 0; _k5 < l.length; _k5++) {
+          var _month2 = l[_k5];
+          tab[_month2] += finalValue2[_t][_month2];
+          this.total2 += finalValue2[_t][_month2];
+        }
+      }
+
+      this.sumPerMonth2.push(tab);
+      this.packsizePerMonth = finalValue2;
+    }
+  },
+  mounted: function mounted() {
+    this.$store.dispatch('fetchSites');
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
+    document.head.appendChild(chartJs);
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'volumes']))
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityDeclaration.vue?vue&type=script&lang=js&":
 /*!*************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityDeclaration.vue?vue&type=script&lang=js& ***!
@@ -5470,12 +7036,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 //
 //
@@ -5690,102 +7264,123 @@ var selectElem = document.getElementById('typeTeam');
     backLogin: function backLogin() {
       window.location.href = this.url + 'menu';
     },
-    nextPage: function nextPage() {
-      //this.addSessionValue("productionA", this.productionA);
-      var DCODES = document.getElementsByClassName('D-Code');
-      var dcodesTab = [];
+    nextPage: function () {
+      var _nextPage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var DCODES, dcodesTab, i, POs, poTab, POElement, _i, po, nbProd, productionlinesTab, _i2, selectCrewLeader, valueCrewLeader, typeTeam, valueTypeTeam;
 
-      for (var i = 0; i < DCODES.length; i++) {
-        dcodesTab.push(DCODES[i].value);
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                //this.addSessionValue("productionA", this.productionA);
+                DCODES = document.getElementsByClassName('D-Code');
+                dcodesTab = [];
+
+                for (i = 0; i < DCODES.length; i++) {
+                  dcodesTab.push(DCODES[i].value);
+                }
+
+                if (sessionStorage.getItem("GMID") === null) {
+                  sessionStorage.GMID = dcodesTab;
+                } else {
+                  sessionStorage.setItem("GMID", dcodesTab);
+                }
+
+                POs = document.getElementsByClassName('PO');
+                poTab = [];
+                POElement = [];
+
+                for (_i = 0; _i < POs.length; _i++) {
+                  poTab.push(POs[_i].value);
+                  po = {
+                    number: POs[_i].value,
+                    GMIDCode: dcodesTab[_i]
+                  };
+                  POElement.push(po);
+                }
+
+                if (sessionStorage.getItem("pos") === null) {
+                  sessionStorage.pos = poTab;
+                } else {
+                  sessionStorage.setItem("pos", poTab);
+                }
+
+                nbProd = document.getElementsByClassName('production').length;
+
+                if (sessionStorage.getItem("nbProductionlines") === null) {
+                  sessionStorage.nbProductionlines = nbProd;
+                } else {
+                  sessionStorage.setItem("nbProductionlines", nbProd);
+                }
+
+                productionlinesTab = [];
+
+                for (_i2 = 0; _i2 < this.user[3].length; _i2++) {
+                  if (this.user[3][_i2].worksiteID === this.user[0][0].worksiteID) {
+                    productionlinesTab.push(this.user[3][_i2].productionline_name);
+                  }
+                }
+
+                if (sessionStorage.getItem("prodlines") === null) {
+                  sessionStorage.prodlines = productionlinesTab;
+                } else {
+                  sessionStorage.setItem("prodlines", productionlinesTab);
+                }
+
+                selectCrewLeader = document.getElementById('crewLeader');
+                valueCrewLeader = selectCrewLeader.options[selectCrewLeader.selectedIndex].value;
+
+                if (sessionStorage.getItem("crewLeader") === null) {
+                  sessionStorage.crewLeader = valueCrewLeader;
+                } else {
+                  sessionStorage.setItem("crewLeader", valueCrewLeader);
+                }
+
+                typeTeam = document.getElementById('typeTeam');
+                valueTypeTeam = typeTeam.options[typeTeam.selectedIndex].value;
+
+                if (sessionStorage.getItem("typeTeam") === null) {
+                  sessionStorage.typeTeam = valueTypeTeam;
+                } else {
+                  sessionStorage.setItem("typeTeam", valueTypeTeam);
+                }
+
+                if (sessionStorage.getItem("workingEnd") === null) {
+                  sessionStorage.workingEnd = document.getElementById('workingEnd').value;
+                } else {
+                  sessionStorage.setItem("workingEnd", document.getElementById('workingEnd').value);
+                }
+
+                if (sessionStorage.getItem("workingDebut") === null) {
+                  sessionStorage.workingDebut = document.getElementById('workingDebut').value;
+                } else {
+                  sessionStorage.setItem("workingDebut", document.getElementById('workingDebut').value);
+                }
+
+                if (sessionStorage.getItem("site") === null) {
+                  sessionStorage.site = document.getElementById('site').value;
+                } else {
+                  sessionStorage.setItem("site", document.getElementById('site').value);
+                }
+
+                window.location.href = this.url + 'summary';
+
+              case 24:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function nextPage() {
+        return _nextPage.apply(this, arguments);
       }
 
-      if (sessionStorage.getItem("GMID") === null) {
-        sessionStorage.GMID = dcodesTab;
-      } else {
-        sessionStorage.setItem("GMID", dcodesTab);
-      }
-
-      var POs = document.getElementsByClassName('PO');
-      var poTab = [];
-      var POElement = [];
-
-      for (var _i = 0; _i < POs.length; _i++) {
-        poTab.push(POs[_i].value);
-        var po = {
-          number: POs[_i].value
-        };
-        POElement.push(po);
-      }
-
-      if (sessionStorage.getItem("pos") === null) {
-        sessionStorage.pos = poTab;
-      } else {
-        sessionStorage.setItem("pos", poTab);
-      }
-
-      var nbProd = document.getElementsByClassName('production').length;
-
-      if (sessionStorage.getItem("nbProductionlines") === null) {
-        sessionStorage.nbProductionlines = nbProd;
-      } else {
-        sessionStorage.setItem("nbProductionlines", nbProd);
-      }
-
-      var productionlinesTab = [];
-
-      for (var _i2 = 0; _i2 < this.user[3].length; _i2++) {
-        if (this.user[3][_i2].worksiteID === this.user[0][0].worksiteID) {
-          productionlinesTab.push(this.user[3][_i2].productionline_name);
-        }
-      }
-
-      if (sessionStorage.getItem("prodlines") === null) {
-        sessionStorage.prodlines = productionlinesTab;
-      } else {
-        sessionStorage.setItem("prodlines", productionlinesTab);
-      }
-
-      var selectCrewLeader = document.getElementById('crewLeader');
-      var valueCrewLeader = selectCrewLeader.options[selectCrewLeader.selectedIndex].value;
-
-      if (sessionStorage.getItem("crewLeader") === null) {
-        sessionStorage.crewLeader = valueCrewLeader;
-      } else {
-        sessionStorage.setItem("crewLeader", valueCrewLeader);
-      }
-
-      var typeTeam = document.getElementById('typeTeam');
-      var valueTypeTeam = typeTeam.options[typeTeam.selectedIndex].value;
-
-      if (sessionStorage.getItem("typeTeam") === null) {
-        sessionStorage.typeTeam = valueTypeTeam;
-      } else {
-        sessionStorage.setItem("typeTeam", valueTypeTeam);
-      }
-
-      if (sessionStorage.getItem("workingEnd") === null) {
-        sessionStorage.workingEnd = document.getElementById('workingEnd').value;
-      } else {
-        sessionStorage.setItem("workingEnd", document.getElementById('workingEnd').value);
-      }
-
-      if (sessionStorage.getItem("workingDebut") === null) {
-        sessionStorage.workingDebut = document.getElementById('workingDebut').value;
-      } else {
-        sessionStorage.setItem("workingDebut", document.getElementById('workingDebut').value);
-      }
-
-      if (sessionStorage.getItem("site") === null) {
-        sessionStorage.site = document.getElementById('site').value;
-      } else {
-        sessionStorage.setItem("site", document.getElementById('site').value);
-      } //this.$store.dispatch('create_PO', POElement);
-
-
-      window.location.href = this.url + 'summary';
-    }
+      return nextPage;
+    }()
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['user']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['user']))
 });
 
 /***/ }),
@@ -5948,6 +7543,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       productionlines: sessionStorage.getItem("prodlines").split(','),
       username: sessionStorage.getItem("username"),
       PO: sessionStorage.getItem("pos").split(','),
+      GMID: sessionStorage.getItem("GMID").split(','),
       //productionA :  sessionStorage.getItem("productionA"),
       //productionB :  sessionStorage.getItem("productionB"),
       crewLeader: sessionStorage.getItem("crewLeader"),
@@ -5966,6 +7562,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       window.location.href = this.url + 'summary/' + productionline;
     },
     resolveAfter05Second: function resolveAfter05Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1000);
+      });
+    },
+    resolveAfter15Second: function resolveAfter15Second() {
       return new Promise(function (resolve) {
         setTimeout(function () {
           resolve('resolved');
@@ -5998,31 +7601,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var i, tab, assignation;
+      var POElement, i, tab, assignation, po, element;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              console.log("POS : ");
+              console.log(sessionStorage.getItem("pos").split(','));
+              _context.next = 4;
               return _this.$store.dispatch('getWorksiteID', sessionStorage.getItem("site"));
 
-            case 2:
-              _context.next = 4;
+            case 4:
+              _context.next = 6;
               return _this.resolveAfter05Second();
 
-            case 4:
+            case 6:
+              POElement = [];
               console.log(_this.PO);
 
               if (!(_this.PO.length > 0 && _this.PO[0] !== "")) {
-                _context.next = 29;
+                _context.next = 39;
                 break;
               }
 
               i = 0;
 
-            case 7:
+            case 10:
               if (!(i < _this.PO.length)) {
-                _context.next = 29;
+                _context.next = 38;
                 break;
               }
 
@@ -6030,18 +7636,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               tab.push(i + 1);
               tab.push(_this.PO[i]);
               tab.push(_this.productionlines[i]);
-              _context.next = 14;
+              _context.next = 17;
               return _this.$store.dispatch('fetchEvents', tab);
 
-            case 14:
-              _context.next = 16;
+            case 17:
+              _context.next = 19;
               return _this.$store.dispatch('getProductionlineID', _this.productionlines[i]);
 
-            case 16:
-              _context.next = 18;
-              return _this.resolveAfter05Second();
+            case 19:
+              _context.next = 21;
+              return _this.resolveAfter15Second();
 
-            case 18:
+            case 21:
               assignation = {
                 username: _this.username,
                 productionline: _this.productionlineID[0].id,
@@ -6049,28 +7655,50 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 shift: sessionStorage.getItem("typeTeam"),
                 worksite: _this.worksiteID[0].id
               };
-              _context.next = 21;
+              _context.next = 24;
               return _this.$store.dispatch('checkAssignation', assignation);
 
-            case 21:
-              _context.next = 23;
+            case 24:
+              _context.next = 26;
               return _this.resolveAfter05Second();
 
-            case 23:
+            case 26:
               if (!(_this.assignation[i] === 0)) {
-                _context.next = 26;
+                _context.next = 29;
                 break;
               }
 
-              _context.next = 26;
+              _context.next = 29;
               return _this.$store.dispatch('storeAssignation', assignation);
 
-            case 26:
+            case 29:
+              po = _this.PO[i];
+              _context.next = 32;
+              return _this.$store.dispatch('checkPO', po);
+
+            case 32:
+              _context.next = 34;
+              return _this.resolveAfter05Second();
+
+            case 34:
+              if (_this.checkPO === 0) {
+                element = {
+                  number: po,
+                  GMIDCode: _this.GMID[i],
+                  productionline_name: _this.productionlines[i]
+                };
+                POElement.push(element);
+              }
+
+            case 35:
               i++;
-              _context.next = 7;
+              _context.next = 10;
               break;
 
-            case 29:
+            case 38:
+              _this.$store.dispatch('create_PO', POElement);
+
+            case 39:
             case "end":
               return _context.stop();
           }
@@ -6078,7 +7706,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, _callee);
     }))();
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['events1', 'events2', 'productionlineID', 'worksiteID', 'assignation']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['events1', 'events2', 'productionlineID', 'worksiteID', 'assignation', 'checkPO']))
 });
 
 /***/ }),
@@ -6929,6 +8557,8 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('ClientChanging_Declaration',
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('plannedDowntime_Declaration', __webpack_require__(/*! ./components/plannedDowntime_Declaration.vue */ "./resources/js/components/plannedDowntime_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('endPO_Declaration', __webpack_require__(/*! ./components/endPO_Declaration.vue */ "./resources/js/components/endPO_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeDashboard', __webpack_require__(/*! ./components/unplannedDowntimeDashboard.vue */ "./resources/js/components/unplannedDowntimeDashboard.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('productionDashboard', __webpack_require__(/*! ./components/productionDashboard.vue */ "./resources/js/components/productionDashboard.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('overallLineEffectivness', __webpack_require__(/*! ./components/overallLineEffectivness */ "./resources/js/components/overallLineEffectivness.vue").default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -7064,8 +8694,20 @@ var actions = {
       console.log(err);
     });
   },
-  fetchEvents: function fetchEvents(_ref6, parameters) {
+  fetchVolumes: function fetchVolumes(_ref6, parameters) {
     var commit = _ref6.commit;
+    var site = parameters[0];
+    var productionLine = parameters[1];
+    var beginningDate = parameters[2];
+    var endingDate = parameters[3];
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/allVolumes/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate)).then(function (res) {
+      commit('FETCH_ALL_VOLUMES', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  fetchEvents: function fetchEvents(_ref7, parameters) {
+    var commit = _ref7.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/events/".concat(parameters[1], "/").concat(parameters[2])).then(function (res) {
       //console.log(res.data);
       if (parameters[0] === 1) {
@@ -7077,8 +8719,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchPO: function fetchPO(_ref7, parameters) {
-    var commit = _ref7.commit;
+  fetchPO: function fetchPO(_ref8, parameters) {
+    var commit = _ref8.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/pos/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       //console.log(res.data);
       commit('FETCH_PO', res.data);
@@ -7086,16 +8728,16 @@ var actions = {
       console.log(err);
     });
   },
-  fetchSpeedLosses: function fetchSpeedLosses(_ref8, parameters) {
-    var commit = _ref8.commit;
+  fetchSpeedLosses: function fetchSpeedLosses(_ref9, parameters) {
+    var commit = _ref9.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/speedLosses/".concat(parameters[1], "/").concat(parameters[0])).then(function (res) {
       commit('FETCH_SPEEDLOSSES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchDowntimeReason: function fetchDowntimeReason(_ref9, parameters) {
-    var commit = _ref9.commit;
+  fetchDowntimeReason: function fetchDowntimeReason(_ref10, parameters) {
+    var commit = _ref10.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS', res.data);
@@ -7103,8 +8745,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref10, parameters) {
-    var commit = _ref10.commit;
+  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref11, parameters) {
+    var commit = _ref11.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
       console.log('Je passe ici');
       console.log(res.data);
@@ -7113,8 +8755,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref11, machineName) {
-    var commit = _ref11.commit;
+  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref12, machineName) {
+    var commit = _ref12.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_MACHINE_ISSUE', res.data);
@@ -7122,40 +8764,48 @@ var actions = {
       console.log(err);
     });
   },
-  getWorksiteID: function getWorksiteID(_ref12, worksite) {
-    var commit = _ref12.commit;
+  getWorksiteID: function getWorksiteID(_ref13, worksite) {
+    var commit = _ref13.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/worksiteID/".concat(worksite)).then(function (res) {
       commit('FETCH_WORKSITEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getProductionlineID: function getProductionlineID(_ref13, productionline) {
-    var commit = _ref13.commit;
+  getProductionlineID: function getProductionlineID(_ref14, productionline) {
+    var commit = _ref14.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/productionlineID/".concat(productionline)).then(function (res) {
       commit('FETCH_PRODUCTIONLINEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkAssignation: function checkAssignation(_ref14, assignation) {
-    var commit = _ref14.commit;
+  checkAssignation: function checkAssignation(_ref15, assignation) {
+    var commit = _ref15.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
       commit('FECTH_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getNetOPTime: function getNetOPTime(_ref15, GMID) {
-    var commit = _ref15.commit;
+  checkPO: function checkPO(_ref16, po) {
+    var commit = _ref16.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/po/".concat(po)).then(function (res) {
+      commit('FECTH_CHECKPO', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  getNetOPTime: function getNetOPTime(_ref17, GMID) {
+    var commit = _ref17.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/netOP/".concat(GMID)).then(function (res) {
       commit('FETCH_NETOP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref16, potab) {
-    var commit = _ref16.commit;
+  create_PO: function create_PO(_ref18, potab) {
+    var commit = _ref18.commit;
 
     for (var i = 0; i < potab.length; i++) {
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/PO", potab[i]).then(function (res) {
@@ -7165,56 +8815,56 @@ var actions = {
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref17, assignation) {
-    var commit = _ref17.commit;
+  storeAssignation: function storeAssignation(_ref19, assignation) {
+    var commit = _ref19.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref18, event) {
-    var commit = _ref18.commit;
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref20, event) {
+    var commit = _ref20.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref19, event) {
-    var commit = _ref19.commit;
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref21, event) {
+    var commit = _ref21.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref20, event) {
-    var commit = _ref20.commit;
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref22, event) {
+    var commit = _ref22.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref21, event) {
-    var commit = _ref21.commit;
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref23, event) {
+    var commit = _ref23.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref22, event) {
-    var commit = _ref22.commit;
+  create_plannedEvent: function create_plannedEvent(_ref24, event) {
+    var commit = _ref24.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref23, array) {
-    var commit = _ref23.commit;
+  stop_PO: function stop_PO(_ref25, array) {
+    var commit = _ref25.commit;
     var PO = array[0];
     var availability = array[1];
     var performance = array[2];
@@ -7228,8 +8878,25 @@ var actions = {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref24, event) {
-    var commit = _ref24.commit;
+  store_Rejection: function store_Rejection(_ref26, array) {
+    var commit = _ref26.commit;
+    var PO = array[0];
+    var etiqCounter = array[1];
+    var weigCounter = array[2];
+    var caperCounter = array[3];
+    var fillCounter = array[4];
+    var etiqRejection = array[5];
+    var weigRejection = array[6];
+    var caperRejection = array[7];
+    var fillerRejection = array[8];
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/storeRejection/".concat(PO, "/").concat(etiqCounter, "/").concat(weigCounter, "/").concat(caperCounter, "/").concat(fillCounter, "/").concat(etiqRejection, "/").concat(weigRejection, "/").concat(caperRejection, "/").concat(fillerRejection)).then(function (res) {
+      commit('STORE_REJECTION', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  create_SpeedLoss: function create_SpeedLoss(_ref27, event) {
+    var commit = _ref27.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
@@ -7285,6 +8952,12 @@ var getters = {
   },
   speedLoss: function speedLoss(state) {
     return state.speedLoss;
+  },
+  volumes: function volumes(state) {
+    return state.volumes;
+  },
+  checkPO: function checkPO(state) {
+    return state.checkPO;
   },
   assignation: function assignation(state) {
     return state.assignation;
@@ -7405,8 +9078,14 @@ var mutations = {
   FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
     return state.allEvents = events;
   },
+  FETCH_ALL_VOLUMES: function FETCH_ALL_VOLUMES(state, volumes) {
+    return state.volumes = volumes;
+  },
   FECTH_ASSIGNATION: function FECTH_ASSIGNATION(state, assignation) {
     return state.assignation.push(assignation);
+  },
+  FECTH_CHECKPO: function FECTH_CHECKPO(state, checkPO) {
+    return state.checkPO = checkPO;
   },
   FETCH_NETOP: function FETCH_NETOP(state, data) {
     return state.netOP = data;
@@ -7437,6 +9116,9 @@ var mutations = {
   },
   STOP_PO: function STOP_PO(state, PO) {
     state.PO.unshift(PO);
+  },
+  STORE_REJECTION: function STORE_REJECTION(state, REJECTION) {
+    state.REJECTION.unshift(REJECTION);
   },
   RETREIVETOKEN: function RETREIVETOKEN(state, token) {
     state.token = token;
@@ -7477,10 +9159,13 @@ var state = {
   netOP: [],
   machines: [],
   allEvents: [],
+  volumes: [],
   worksiteID: -1,
   productionlineID: -1,
   token: localStorage.getItem('access_token'),
-  unplannedDowntimeEvents: []
+  unplannedDowntimeEvents: [],
+  checkPO: [],
+  REJECTION: []
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
 
@@ -12167,6 +13852,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.nv[data-v-11e733ca] {\n    backgrou
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-a4f0ea4a] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-a4f0ea4a] {\n    color: red;\n}\ndiv[data-v-a4f0ea4a] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-a4f0ea4a] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\nh5[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-a4f0ea4a] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.wrapper[data-v-a4f0ea4a] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-a4f0ea4a] {\n    background: #fff;\n    height: 400px;\n}\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css&":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css& ***!
@@ -12209,6 +13918,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-3f839173] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-3f839173] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-3f839173] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-3f839173] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-3f839173] {\n    color: white;\n    margin-top: 20px;\n}\n#addReasonButton[data-v-3f839173] {\n    color: black;\n}\ninput[data-v-3f839173] {\n    width: 40%;\n}\n#comments[data-v-3f839173] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.table-info-data[data-v-3f839173] {\n    overflow:scroll; max-height: 300px;\n}\n\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-09ddfa60] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-09ddfa60] {\n    color: red;\n}\ndiv[data-v-09ddfa60] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-09ddfa60] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-09ddfa60] {\n    margin-left: 60px;\n}\nh5[data-v-09ddfa60] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-09ddfa60] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.wrapper[data-v-09ddfa60]{\n    width:60%;\n    display:block;\n    overflow:hidden;\n    margin:0 auto;\n    padding: 60px 50px;\n    background:#fff;\n    border-radius:4px;\n}\ncanvas[data-v-09ddfa60]{\n    background:#fff;\n    height:400px;\n}\n\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -12304,7 +14037,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.rcorners1[data-v-b01d2fc6] {\n    border-radius: 25px;\n    background: lightblue;\n    padding-top: 20px;\n    padding-left: 20px;\n    padding-right: 20px;\n    padding-bottom: 10px;\n}\n.rcorners2[data-v-b01d2fc6] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.table-info-data[data-v-b01d2fc6] {\n    overflow:scroll; max-height: 300px;\n}\nthead[data-v-b01d2fc6] {\n    color:white;\n    background: #56baed;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.rcorners1[data-v-b01d2fc6] {\n    border-radius: 25px;\n    background: lightblue;\n    padding-top: 20px;\n    padding-left: 20px;\n    padding-right: 20px;\n    padding-bottom: 10px;\n}\n.rcorners2[data-v-b01d2fc6] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.table-info-data[data-v-b01d2fc6] {\n    overflow: scroll;\n    max-height: 300px;\n}\nthead[data-v-b01d2fc6] {\n    color: white;\n    background: #56baed;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -44465,6 +46198,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_style_index_0_id_a4f0ea4a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_style_index_0_id_a4f0ea4a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_style_index_0_id_a4f0ea4a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css&":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css& ***!
@@ -44522,6 +46285,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_style_index_0_id_3f839173_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_style_index_0_id_09ddfa60_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_style_index_0_id_09ddfa60_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_style_index_0_id_09ddfa60_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
 
 /***/ }),
 
@@ -45463,6 +47256,47 @@ component.options.__file = "resources/js/components/navbar.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/overallLineEffectivness.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/overallLineEffectivness.vue ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& */ "./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&");
+/* harmony import */ var _overallLineEffectivness_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./overallLineEffectivness.vue?vue&type=script&lang=js& */ "./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js&");
+/* harmony import */ var _overallLineEffectivness_vue_vue_type_style_index_0_id_a4f0ea4a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& */ "./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _overallLineEffectivness_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "a4f0ea4a",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/overallLineEffectivness.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/packagingLineID.vue":
 /*!*****************************************************!*\
   !*** ./resources/js/components/packagingLineID.vue ***!
@@ -45541,6 +47375,47 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 /* hot reload */
 if (false) { var api; }
 component.options.__file = "resources/js/components/plannedDowntime_Declaration.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/productionDashboard.vue":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/productionDashboard.vue ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true& */ "./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true&");
+/* harmony import */ var _productionDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./productionDashboard.vue?vue&type=script&lang=js& */ "./resources/js/components/productionDashboard.vue?vue&type=script&lang=js&");
+/* harmony import */ var _productionDashboard_vue_vue_type_style_index_0_id_09ddfa60_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& */ "./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _productionDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "09ddfa60",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/productionDashboard.vue"
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
@@ -46008,6 +47883,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./overallLineEffectivness.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/packagingLineID.vue?vue&type=script&lang=js&":
 /*!******************************************************************************!*\
   !*** ./resources/js/components/packagingLineID.vue?vue&type=script&lang=js& ***!
@@ -46037,6 +47928,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./plannedDowntime_Declaration.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/plannedDowntime_Declaration.vue?vue&type=script&lang=js&");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
+/***/ "./resources/js/components/productionDashboard.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/productionDashboard.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./productionDashboard.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
 
 /***/ }),
 
@@ -46282,6 +48189,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&":
+/*!**********************************************************************************************************************!*\
+  !*** ./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_style_index_0_id_a4f0ea4a_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css&":
 /*!**************************************************************************************************************!*\
   !*** ./resources/js/components/packagingLineID.vue?vue&type=style&index=0&id=bac3c612&scoped=true&lang=css& ***!
@@ -46304,6 +48224,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_style_index_0_id_3f839173_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./plannedDowntime_Declaration.vue?vue&type=style&index=0&id=3f839173&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/plannedDowntime_Declaration.vue?vue&type=style&index=0&id=3f839173&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_style_index_0_id_09ddfa60_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=style&index=0&id=09ddfa60&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -46586,6 +48519,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_overallLineEffectivness_vue_vue_type_template_id_a4f0ea4a_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/packagingLineID.vue?vue&type=template&id=bac3c612&scoped=true&":
 /*!************************************************************************************************!*\
   !*** ./resources/js/components/packagingLineID.vue?vue&type=template&id=bac3c612&scoped=true& ***!
@@ -46616,6 +48566,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_template_id_3f839173_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_plannedDowntime_Declaration_vue_vue_type_template_id_3f839173_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./plannedDowntime_Declaration.vue?vue&type=template&id=3f839173&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/plannedDowntime_Declaration.vue?vue&type=template&id=3f839173&scoped=true&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true&":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true& ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_productionDashboard_vue_vue_type_template_id_09ddfa60_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true&");
 
 
 /***/ }),
@@ -47909,8 +49876,11 @@ var render = function() {
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
                   _c("p", [
-                    _vm._v("\n                        Volume packed :"),
-                    _vm._v(" L "),
+                    _vm._v(
+                      "\n                        Volume packed : " +
+                        _vm._s(_vm.littersProduced) +
+                        " L "
+                    ),
                     _c("br"),
                     _vm._v(
                       "\n                        Nber of Production Order : " +
@@ -47920,7 +49890,8 @@ var render = function() {
                     _c("br"),
                     _vm._v(
                       "\n                        Nber of items Produced : " +
-                        _vm._s(_vm.qtyProduced)
+                        _vm._s(_vm.qtyProduced) +
+                        " Bottles"
                     ),
                     _c("br")
                   ])
@@ -48327,16 +50298,6 @@ var render = function() {
                 ])
               ])
             ]
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.allEvents["PP"] === null
-          ? [
-              _c("h4", [
-                _vm._v(
-                  "\n                Numéro de PO inconnu pour cette ligne de production\n            "
-                )
-              ])
-            ]
           : _vm._e()
       ],
       2
@@ -48346,7 +50307,7 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("p", [_vm._v("\n            Fenetre de production\n\n        ")]),
+        _c("h1", [_vm._v("\n            Fenetre de production\n\n        ")]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
@@ -48425,10 +50386,12 @@ var render = function() {
                   _vm._v(" "),
                   _c("p", [
                     _vm._v(
-                      "\n                        " +
+                      "\n\n                        " +
                         _vm._s(
-                          (_vm.plannedProductionTime / _vm.plannedDowntimes) *
+                          (
+                            (_vm.plannedDowntimes / _vm.plannedProductionTime) *
                             100
+                          ).toFixed(2)
                         ) +
                         "%\n                    "
                     )
@@ -48450,18 +50413,61 @@ var render = function() {
                   _vm._v(" "),
                   _c("p", [
                     _vm._v(
-                      "\n                        " +
+                      "\n\n                        " +
                         _vm._s(
-                          (_vm.operatingTime / _vm.unplannedDowntimes) * 100
+                          (
+                            (_vm.unplannedDowntimes / _vm.operatingTime) *
+                            100
+                          ).toFixed(2)
                         ) +
                         "%\n                    "
                     )
                   ])
                 ]),
                 _vm._v(" "),
-                _vm._m(5),
+                _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
+                  _c("p", { staticClass: "blueBack" }, [
+                    _vm._v(
+                      "\n                        Net Operating Time (NOT)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "redBack" }, [
+                    _vm._v(
+                      "\n                        Speed Losses (SL)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s((_vm.performance * 100).toFixed(2)) +
+                        "%\n                    "
+                    )
+                  ])
+                ]),
                 _vm._v(" "),
-                _vm._m(6)
+                _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
+                  _c("p", { staticClass: "blueBack" }, [
+                    _vm._v(
+                      "\n                        Valuable Operating Time (VOT)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "redBack" }, [
+                    _vm._v(
+                      "\n                        Quality Losses (QL)\n                    "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("p", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s((_vm.quality * 100).toFixed(2)) +
+                        "%\n                    "
+                    )
+                  ])
+                ])
               ])
             ]
           : _vm._e(),
@@ -48601,46 +50607,6 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("h5", [_vm._v("Pack Size Split")])
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
-      _c("p", { staticClass: "blueBack" }, [
-        _vm._v(
-          "\n                        Net Operating Time (NOT)\n                    "
-        )
-      ]),
-      _vm._v(" "),
-      _c("p", { staticClass: "redBack" }, [
-        _vm._v(
-          "\n                        Speed Losses (SL)\n                    "
-        )
-      ]),
-      _vm._v(" "),
-      _c("p", [_vm._v("\n                        ..%\n                    ")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
-      _c("p", { staticClass: "blueBack" }, [
-        _vm._v(
-          "\n                        Valuable Operating Time (VOT)\n                    "
-        )
-      ]),
-      _vm._v(" "),
-      _c("p", { staticClass: "redBack" }, [
-        _vm._v(
-          "\n                        Quality Losses (QL)\n                    "
-        )
-      ]),
-      _vm._v(" "),
-      _c("p", [_vm._v("\n                        ..%\n                    ")])
     ])
   }
 ]
@@ -50405,15 +52371,31 @@ var render = function() {
           },
           [
             _c("option", { attrs: { value: "packagingLineID" } }, [
-              _vm._v("\n                    Page 1\n                ")
+              _vm._v(
+                "\n                    Packaging line ID\n                "
+              )
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "downtimesReport" } }, [
-              _vm._v("\n                    Page 2\n                ")
+              _vm._v("\n                    Downtimes report\n                ")
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "monthlyLoadFactor" } }, [
-              _vm._v("\n                    Page 3\n                ")
+              _vm._v(
+                "\n                    Monthly load factor\n                "
+              )
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "productionDashboard" } }, [
+              _vm._v(
+                "\n                    Production dashboard\n                "
+              )
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "overallLineEffectivness" } }, [
+              _vm._v(
+                "\n                    Overall Line Effectivness\n                "
+              )
             ])
           ]
         ),
@@ -50442,6 +52424,442 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&":
+/*!***********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& ***!
+  \***********************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { staticClass: "d-flex" }, [
+      _c("div", { staticClass: "col" }, [
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.site,
+                    expression: "site"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "site", id: "site" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[0], function(site) {
+                  return [
+                    _c("option", { domProps: { value: site.name } }, [
+                      _vm._v(
+                        "\n                                    " +
+                          _vm._s(site.name) +
+                          "\n                                "
+                      )
+                    ])
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "productionline" } }, [
+              _vm._v("Ligne de production : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.productionline,
+                    expression: "productionline"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "productionline", id: "productionline" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.productionline = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[1], function(productionline) {
+                  return [
+                    productionline.name === _vm.site
+                      ? [
+                          _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: productionline.productionline_name
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                                        " +
+                                  _vm._s(productionline.productionline_name) +
+                                  "\n                                    "
+                              )
+                            ]
+                          )
+                        ]
+                      : _vm._e()
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "btn btn-outline-info",
+          attrs: { type: "button", value: "Charger" },
+          on: {
+            click: function($event) {
+              return _vm.load()
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br")
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col" }, [
+        _c("h1", [
+          _vm._v(
+            "\n                    Fenetre de production\n\n                "
+          )
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("label", { attrs: { for: "startYear" } }, [_vm._v("Year")]),
+          _vm._v(" "),
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.year,
+                  expression: "year"
+                }
+              ],
+              attrs: { id: "startYear" },
+              on: {
+                change: function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.year = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                }
+              }
+            },
+            [
+              _vm._l(_vm.years, function(year) {
+                return [
+                  _c("option", { key: year, domProps: { value: year } }, [
+                    _vm._v(_vm._s(year))
+                  ])
+                ]
+              })
+            ],
+            2
+          )
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { attrs: { align: "center" } },
+      [
+        _vm.show === 1
+          ? [
+              _c("h1", [
+                _vm._v(
+                  "\n                    Overall Line Effectivness\n                "
+                )
+              ])
+            ]
+          : _vm._e(),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _vm._m(0),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "col" },
+            [
+              _vm.show === 1
+                ? [
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(1),
+                      _vm._v(" "),
+                      _c("tbody", [
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Availability")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.moyenneAvailability * 100) + " % "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyenneAvailability * 100) + " %")
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Performance")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyennePerformance * 100) + " %")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyennePerformance * 100) + " %")
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Quality")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyenneQuality * 100) + " % ")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyenneQuality * 100) + " % ")
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("OLE")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyenneOLE * 100) + " % ")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.moyenneOLE * 100) + " % ")
+                          ])
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("br"),
+                    _vm._v(" "),
+                    _c("h3", [
+                      _vm._v(
+                        "\n                            Trend versus previous year\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("br"),
+                    _vm._v(" "),
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(2),
+                      _vm._v(" "),
+                      _c("tbody", [
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Availability")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  (_vm.moyenneAvailability -
+                                    _vm.moyenneAvailability2) *
+                                  100
+                                ).toFixed(2)
+                              ) + " % "
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Performance")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  (_vm.moyennePerformance -
+                                    _vm.moyennePerformance2) *
+                                  100
+                                ).toFixed(2)
+                              ) + " % "
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("Quality")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  (_vm.moyenneQuality - _vm.moyenneQuality2) *
+                                  100
+                                ).toFixed(2)
+                              ) + " %"
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v("OLE")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  (_vm.moyenneOLE - _vm.moyenneOLE2) *
+                                  100
+                                ).toFixed(2)
+                              ) + " % "
+                            )
+                          ])
+                        ])
+                      ])
+                    ])
+                  ]
+                : _vm._e()
+            ],
+            2
+          )
+        ])
+      ],
+      2
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-8" }, [
+      _c("div", { staticClass: "wrapper" }, [
+        _c("canvas", { attrs: { id: "myChart5" } })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Peak Season")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("All Year")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } })
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=template&id=bac3c612&scoped=true&":
 /*!***************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/packagingLineID.vue?vue&type=template&id=bac3c612&scoped=true& ***!
@@ -50458,7 +52876,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row" }, [
+  return _c("div", { staticClass: "d-flex" }, [
     _c("br"),
     _vm._v(" "),
     _c(
@@ -50503,9 +52921,9 @@ var render = function() {
                   return [
                     _c("option", { domProps: { value: site.name } }, [
                       _vm._v(
-                        "\n                                " +
+                        "\n                            " +
                           _vm._s(site.name) +
-                          "\n                            "
+                          "\n                        "
                       )
                     ])
                   ]
@@ -50567,9 +52985,9 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                                    " +
+                                "\n                                " +
                                   _vm._s(productionline.productionline_name) +
-                                  "\n                                "
+                                  "\n                            "
                               )
                             ]
                           )
@@ -50623,16 +53041,14 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("h1", [_vm._v("\n                Packaging Line ID\n            ")]),
+        _c("h1", [_vm._v("\n            Packaging Line ID\n        ")]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _vm.show === 1
           ? [
               _c("h2", [
-                _vm._v(
-                  "\n                    Liste des machines\n                "
-                )
+                _vm._v("\n                Liste des machines\n            ")
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
@@ -50668,9 +53084,7 @@ var render = function() {
               _c("br"),
               _vm._v(" "),
               _c("h2", [
-                _vm._v(
-                  "\n                    Liste des formats\n                "
-                )
+                _vm._v("\n                Liste des formats\n            ")
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
@@ -50980,6 +53394,647 @@ var staticRenderFns = [
       _c("div", { staticClass: "col-sm-10" }, [
         _c("textarea", { attrs: { id: "comments" } })
       ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true&":
+/*!*******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/productionDashboard.vue?vue&type=template&id=09ddfa60&scoped=true& ***!
+  \*******************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "d-flex" }, [
+    _c("br"),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "col" },
+      [
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.site,
+                    expression: "site"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "site", id: "site" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[0], function(site) {
+                  return [
+                    _c("option", { domProps: { value: site.name } }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(site.name) +
+                          "\n                        "
+                      )
+                    ])
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("form", [
+            _c("label", { attrs: { for: "productionline" } }, [
+              _vm._v("Ligne de production : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.productionline,
+                    expression: "productionline"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "productionline", id: "productionline" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.productionline = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[1], function(productionline) {
+                  return [
+                    productionline.name === _vm.site
+                      ? [
+                          _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: productionline.productionline_name
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                                " +
+                                  _vm._s(productionline.productionline_name) +
+                                  "\n                            "
+                              )
+                            ]
+                          )
+                        ]
+                      : _vm._e()
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "btn btn-outline-info",
+          attrs: { type: "button", value: "Charger" },
+          on: {
+            click: function($event) {
+              return _vm.load()
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm.show === 1
+          ? [
+              _c("h1", [
+                _vm._v(
+                  "\n                Répartition des formulations\n            "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "table-info-data" }, [
+                _c("table", { staticClass: "table" }, [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    [
+                      _vm._l(_vm.formulations, function(formulation, index) {
+                        return _c("tr", { key: index }, [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(_vm._s(formulation))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["January"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.formulationsPerMonth[index]["February"]
+                              )
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["March"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["April"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["May"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["June"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["July"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["August"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.formulationsPerMonth[index]["September"]
+                              )
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.formulationsPerMonth[index]["October"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.formulationsPerMonth[index]["November"]
+                              )
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.formulationsPerMonth[index]["December"]
+                              )
+                            )
+                          ])
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "row" } }),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["January"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["February"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["March"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["April"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["May"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["June"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["July"]))]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["August"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["September"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["October"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["November"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth[0]["December"]))
+                        ])
+                      ])
+                    ],
+                    2
+                  )
+                ])
+              ])
+            ]
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm._m(1),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm.show === 1
+          ? [
+              _c("h1", [
+                _vm._v(
+                  "\n                Répartition des tailles de packs\n            "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "table-info-data" }, [
+                _c("table", { staticClass: "table" }, [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    [
+                      _vm._l(_vm.packsizes, function(packsize, index) {
+                        return _c("tr", { key: index }, [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(_vm._s(packsize) + "L")
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["January"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["February"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["March"]))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["April"]))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["May"]))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["June"]))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["July"]))
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["August"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["September"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["October"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["November"])
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm.packsizePerMonth[index]["December"])
+                            )
+                          ])
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "row" } }),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["January"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["February"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["March"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["April"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["May"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["June"]))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["July"]))]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["August"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["September"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["October"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["November"]))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["December"]))
+                        ])
+                      ])
+                    ],
+                    2
+                  )
+                ])
+              ])
+            ]
+          : _vm._e(),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm._m(3),
+        _vm._v(" "),
+        _c("br")
+      ],
+      2
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "col" },
+      [
+        _c("h1", [_vm._v("\n            Fenetre de production\n\n        ")]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("label", { attrs: { for: "startingPO" } }, [_vm._v("De")]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.beginningDate,
+                expression: "beginningDate"
+              }
+            ],
+            staticClass: " ",
+            attrs: { type: "date", id: "startingPO", required: "" },
+            domProps: { value: _vm.beginningDate },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.beginningDate = $event.target.value
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("label", { attrs: { for: "endingPO" } }, [_vm._v("A")]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.endingDate,
+                expression: "endingDate"
+              }
+            ],
+            attrs: { type: "date", id: "endingPO", required: "" },
+            domProps: { value: _vm.endingDate },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.endingDate = $event.target.value
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _vm.show === 1
+          ? [
+              _c("h1", [
+                _vm._v(
+                  "\n                Répartition des formulations (%)\n            "
+                )
+              ])
+            ]
+          : _vm._e(),
+        _vm._v(" "),
+        _c("canvas", {
+          attrs: { id: "formulationSplit", width: "200", height: "200" }
+        }),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("canvas", {
+          attrs: { id: "packsizeSplit", width: "200", height: "200" }
+        })
+      ],
+      2
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jan")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Feb")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mar")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Apr")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("May")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jun")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jul")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Aug")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Sep")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Oct")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nov")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Dec")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "wrapper" }, [
+      _c("canvas", { attrs: { id: "myChart4" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jan")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Feb")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mar")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Apr")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("May")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jun")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jul")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Aug")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Sep")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Oct")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nov")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Dec")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "wrapper" }, [
+      _c("canvas", { attrs: { id: "myChart5" } })
     ])
   }
 ]
@@ -51379,9 +54434,9 @@ var render = function() {
                 },
                 [
                   _vm._v(
-                    "\n                    " +
+                    "\n                     " +
                       _vm._s(productionline) +
-                      "\n                "
+                      "\n                 "
                   )
                 ]
               ),
@@ -51391,29 +54446,31 @@ var render = function() {
               _c("div", { staticClass: "rcorners2" }, [
                 _c("p", [
                   _vm._v(
-                    "\n                        Site : " + _vm._s(_vm.site) + " "
+                    "\n                         Site : " +
+                      _vm._s(_vm.site) +
+                      " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                        Crew Leader : " +
+                    "\n                         Crew Leader : " +
                       _vm._s(_vm.crewLeader) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                        Type : " +
+                    "\n                         Type : " +
                       _vm._s(_vm.typeTeam) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                        Début : " +
+                    "\n                         Début : " +
                       _vm._s(_vm.workingDebut) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                        Fin : " +
+                    "\n                         Fin : " +
                       _vm._s(_vm.workingEnd) +
                       " "
                   ),

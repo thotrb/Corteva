@@ -67,8 +67,16 @@ let mutations = {
         return state.allEvents = events;
     },
 
+    FETCH_ALL_VOLUMES(state, volumes){
+        return state.volumes = volumes;
+    },
+
     FECTH_ASSIGNATION(state, assignation){
         return state.assignation.push(assignation);
+    },
+
+    FECTH_CHECKPO(state, checkPO){
+        return state.checkPO = checkPO;
     },
 
     FETCH_NETOP(state, data){
@@ -110,6 +118,10 @@ let mutations = {
 
     STOP_PO(state, PO) {
         state.PO.unshift(PO)
+    },
+
+    STORE_REJECTION(state, REJECTION) {
+        state.REJECTION.unshift(REJECTION)
     },
 
     RETREIVETOKEN(state, token) {

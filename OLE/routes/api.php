@@ -49,7 +49,11 @@ Route::get('productionlineID/{productionline}', FormController::class.'@getProdu
 
 Route::get('allevents/{site}/{productionLine}/{beginningDate}/{endingDate}', FormController::class.'@getAllEventsPeriod');
 
+Route::get('allVolumes/{site}/{productionLine}/{beginningDate}/{endingDate}', FormController::class.'@getAllVolumes');
+
 Route::get('assignation/{username}/{po}/{productionline}', FormController::class.'@isAssignationPossible');
+
+Route::get('po/{po}', FormController::class.'@isPOPossible');
 
 Route::get('netOP/{GMID}', FormController::class.'@getNetOP');
 
@@ -57,9 +61,11 @@ Route::post('assignation', FormController::class.'@createAssignement');
 
 Route::post('PO',FormController::class.'@createPO');
 
+Route::post('storeRejection/{PO}/{etiqCounter}/{weigCounter}/{caperCounter}/{fillCounter}/{etiqRejection}/{weigRejection}/{caperRejection}/{fillerRejection}', FormController::class.'@storeRejection');
+
 Route::post('log/{username}/{password}', FormController::class.'@log');
 
-Route::post('stopPO/{PO}/{availability}/{performance}/{quality}/{OLE}/{quantityProduced}/{totalDuration', FormController::class.'@stopPO');
+Route::post('stopPO/{PO}/{availability}/{performance}/{quality}/{OLE}/{quantityProduced}/{totalDuration}', FormController::class.'@stopPO');
 
 Route::post('unplannedEvent/changingFormat', FormController::class.'@saveUnplannedEvent_Changingformat');
 
