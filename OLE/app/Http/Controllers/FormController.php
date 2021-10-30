@@ -23,6 +23,10 @@ class FormController extends Controller
         return view('unplannedDowntimeDashboard');
     }
 
+    public function unplannedDowntimeShutdowns() {
+        return view('unplannedDowntimeShutdowns');
+    }
+
     public function index()
     {
         return view('teamInfo');
@@ -53,13 +57,20 @@ class FormController extends Controller
             ->whereYear('ole_unplanned_event_changing_formats.created_at', '>=', $beginningYear)
             ->whereYear('ole_unplanned_event_changing_formats.created_at', '<=', $endingYear)
             ->get();
+        
+        $machineShutdowns = DB::table('ole_unplanned_event_unplanned_downtimes')
+            ->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $productionLine)
+            ->whereYear('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningYear)
+            ->whereYear('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingYear)
+            ->get();
 
 
 
         $tab = array([
             'CIP' => $CIP,
             'COV' => $COV,
-            'BNC' => $BNC
+            'BNC' => $BNC,
+            'machines' => $machineShutdowns
         ]);
 
         return response()->json($tab);

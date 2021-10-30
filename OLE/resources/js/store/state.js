@@ -26,6 +26,7 @@ let state = {
     unplannedDowntimeEvents: [],
     checkPO : [],
     REJECTION: [],
+    unplannedDowntimeMachineShutdownTypes: []
 };
 
 export default state

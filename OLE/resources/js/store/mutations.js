@@ -87,6 +87,10 @@ let mutations = {
         return state.unplannedDowntimeEvents = events;
     },
 
+    FETCH_UNPLANNED_DOWNTIME_MACHINE_SHUTDOWN_TYPES(state, events) {
+        return state.unplannedDowntimeMachineShutdownTypes = events;
+    },
+
     CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME(state, unplannedEvent){
         state.unplannedEvent_UnplannedDowntime.unshift(unplannedEvent);
     },

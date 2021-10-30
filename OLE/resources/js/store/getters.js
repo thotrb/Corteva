@@ -31,6 +31,11 @@ let getters = {
         return state.unplannedDowntimeEvents;
     },
 
+
+    unplannedDowntimeMachineShutdownTypes: state => {
+        return state.unplannedDowntimeMachineShutdownTypes;
+    },
+
     machines : state => {
         return state.machines;
     },
