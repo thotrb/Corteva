@@ -83,7 +83,7 @@
                                 <template v-for="month of months">
                                     <td class="table-data" :key="month">
                                         <tr style="visibility: hidden;">-----</tr>
-                                        <tr class="table-sub-row">{{downtimes[cat][month].totalDuration}}</tr>
+                                        <tr class="table-sub-row">{{downtimes[cat][month].totalDuration ? downtimes[cat][month].totalDuration.toFixed(2) : undefined}}</tr>
                                         <tr class="table-sub-row">{{downtimes[cat][month].totalNb}}</tr>
                                     </td>
                                 </template>
@@ -246,7 +246,7 @@
                           const monthCreated = this.getMonth(event.created_at);
                           const month = this.months[monthCreated - 1];
 
-                          const eventDurationInHours = event.total_duration / 60;
+                          const eventDurationInHours = (event.total_duration / 60);
                           const eventDurationLabelCoef = Math.floor(event.total_duration/10);
                           const durationIntervalChartLabel = `${10 * eventDurationLabelCoef}-${10 * eventDurationLabelCoef + 9} min`;
 

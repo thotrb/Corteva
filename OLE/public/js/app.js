@@ -56760,7 +56760,13 @@ var render = function() {
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
                               _vm._v(
-                                _vm._s(_vm.downtimes[cat][month].totalDuration)
+                                _vm._s(
+                                  _vm.downtimes[cat][month].totalDuration
+                                    ? _vm.downtimes[cat][
+                                        month
+                                      ].totalDuration.toFixed(2)
+                                    : undefined
+                                )
                               )
                             ]),
                             _vm._v(" "),
