@@ -28,9 +28,6 @@
                     </select>
                 </div>
             </div>
-            
-            <!-- Production window -->
-            <production-window :yearSelectedFunction="chargeData"/>
         </div>
 
 
@@ -42,8 +39,30 @@
                 <div class="chart-container">
                     <canvas class="chart" id="machines-shutdown-chart"></canvas>
                 </div>
-                <div class="table-container">
-
+                <div class="d-flex table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Machine Shutdown</th>
+                                <th scope="col">Total Downtime</th>
+                                <th scope="col">Frequency</th>
+                                <th scope="col">Average Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="downtimeCat of Object.keys(downtimes.machines)">
+                                <tr :key="downtimeCat">
+                                    <td scope="col">{{downtimeCat}}</td>
+                                    <td scope="col">{{downtimes.machines[downtimeCat].totalDuration}}</td>
+                                    <td scope="col">{{downtimes.machines[downtimeCat].totalNb}}</td>
+                                    <td scope="col">{{downtimes.machines[downtimeCat].avgDuration}}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex downtime-percent-container">
+                    <p class="downtime-percent">{{downtimePercentages.machines || '--'}} % of Unplanned Downtime</p>
                 </div>
             </div>
             <div class="machines-shutdown-panel">
@@ -53,8 +72,30 @@
                 <div class="chart-container">
                     <canvas class="chart" id="external-shutdown-chart"></canvas>
                 </div>
-                <div class="table-container">
-
+                <div class="d-flex table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">External Shutdown</th>
+                                <th scope="col">Total Downtime</th>
+                                <th scope="col">Frequency</th>
+                                <th scope="col">Average Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="downtimeCat of Object.keys(downtimes.external)">
+                                <tr :key="downtimeCat">
+                                    <td scope="col">{{downtimeCat}}</td>
+                                    <td scope="col">{{downtimes.external[downtimeCat].totalDuration}}</td>
+                                    <td scope="col">{{downtimes.external[downtimeCat].totalNb}}</td>
+                                    <td scope="col">{{downtimes.external[downtimeCat].avgDuration}}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex downtime-percent-container">
+                    <p class="downtime-percent">{{downtimePercentages.external || '--'}} % of Unplanned Downtime</p>
                 </div>
             </div>
         </div>
@@ -80,6 +121,10 @@
                     external: {},
                     machines: {}
                 },
+                downtimePercentages: {
+                    external: undefined,
+                    machines: undefined
+                },
                 startYear: 2000,
                 currentYear: (new Date()).getFullYear(),
                 site: '',
@@ -97,10 +142,8 @@
             },
             
             productionLineSelected: function() {
-                if (document.getElementById("pl-selection").value) {
-                  document.querySelector('div.production-window').style.visibility = 'visible';
-                  this.chargeData(this.startYear, this.currentYear);
-              } else document.querySelector('div.production-window').style.visibility = 'hidden';
+                if (document.getElementById("pl-selection").value) this.chargeData(this.currentYear + '-01-01', this.currentYear + '-12-31');
+             
             },
 
             createDowntimeObject: function() {
@@ -118,11 +161,7 @@
 
                         //Structure data
                         let allShutdowns = {
-                            external: [
-                                ...this.unplannedDowntimeEvents[0].CIP,
-                                ...this.unplannedDowntimeEvents[0].COV,
-                                ...this.unplannedDowntimeEvents[0].BNC 
-                            ],
+                            external: this.unplannedDowntimeEvents[0].external,
                             machines: this.unplannedDowntimeEvents[0].machines
                         }
                     
@@ -138,13 +177,20 @@
                                     this.downtimes[shtdCat][shtdEvent.type] = {
                                         events: [],
                                         totalDuration: 0,
-                                        totalNb: 0
+                                        totalNb: 0,
+                                        avgDuration: 0
                                     };
                                 }
 
                                 this.downtimes[shtdCat][shtdEvent.type].events.push(shtdEvent);
                                 this.downtimes[shtdCat][shtdEvent.type].totalDuration += shtdEvent.total_duration;
                                 this.downtimes[shtdCat][shtdEvent.type].totalNb++;
+                            }
+
+                            //Calculate average durations
+                            for (let shtdEventType of Object.keys(this.downtimes[shtdCat])) {
+                                const eventTypeAvgDuration = Math.round(this.downtimes[shtdCat][shtdEventType].totalDuration / this.downtimes[shtdCat][shtdEventType].totalNb);
+                                this.downtimes[shtdCat][shtdEventType].avgDuration = eventTypeAvgDuration;
                             }
 
                             //Create charts' datasets
@@ -157,11 +203,28 @@
                             }
                             this.chartObjects[shtdCat].update();
                         }
+
+                        //Calculate unplanned downtime percentages
+                        let categoryTotalDowntime = {
+                            machines: 0,
+                            external: 0,
+                            total: 0
+                        };
+                        for (let shtdCat of ['external', 'machines']) {
+                            for (let event of Object.values(this.downtimes[shtdCat])) {
+                                categoryTotalDowntime[shtdCat] += event.totalDuration;
+                                categoryTotalDowntime.total += event.totalDuration; 
+                            }
+                        }
+                        for (let shtdCat of ['external', 'machines']) {
+                            this.downtimePercentages[shtdCat] = Math.round((categoryTotalDowntime[shtdCat]/categoryTotalDowntime.total)*100)
+                        }
                     });
                 });
             },
 
             createCharts: function() {
+                this.chartObjects.created = true;
                 for (let ch of ['external', 'machines']) {
                     this.chartObjects[ch] = new Chart(ch + '-shutdown-chart', {
                     type: 'bar',
@@ -285,6 +348,44 @@
     div.chart-container {
         padding: 15px;
         height: 300px;
+    }
+
+    div.table-container {
+        justify-content: center;
+        padding: 15px 30px;
+    }
+
+    div.table-container th {
+        text-align: center;
+        border: none;
+    }
+
+    div.table-container th:first-of-type{
+        border-top-left-radius: 7px;
+        border-bottom-left-radius: 7px;
+    }
+
+    div.table-container th:last-of-type{
+        border-top-right-radius: 7px;
+        border-bottom-right-radius: 7px;
+    }
+
+    div.table-container td {
+        text-align: center;
+    }
+
+
+    div.downtime-percent-container {
+        justify-content: center;
+    }
+
+    p.downtime-percent {
+        font-size: 16px;
+    }
+
+    thead {
+        color: white;
+        background: #56baed;
     }
  
 </style>

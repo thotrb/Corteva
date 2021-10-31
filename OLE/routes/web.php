@@ -25,6 +25,10 @@ Route::get('/unplannedDowntimeDashboard', \App\Http\Controllers\FormController::
 
 Route::get('/unplannedDowntimeShutdowns', \App\Http\Controllers\FormController::class.'@unplannedDowntimeShutdowns');
 
+Route::get('/unplannedDowntimeSpeedLosses', \App\Http\Controllers\FormController::class.'@unplannedDowntimeSpeedLosses');
+
+Route::get('/qualityLossesDashboard', \App\Http\Controllers\FormController::class.'@qualityLossesDashboard');
+
 Route::get('/endPO/{productionName}/endPO', \App\Http\Controllers\FormController::class.'@endPO');
 
 Route::get('/{productionName}/plannedDowntime/{downtimeReason}', \App\Http\Controllers\FormController::class.'@plannedDowntime_Event');
