@@ -93,6 +93,21 @@ let actions = {
         })
     },
 
+    fetchVolumes({commit}, parameters) {
+
+        var site = parameters[0];
+        var productionLine = parameters[1];
+        var beginningDate = parameters[2];
+        var endingDate = parameters[3];
+
+        axios.get(`/api/allVolumes/${site}/${productionLine}/${beginningDate}/${endingDate}`)
+            .then(res => {
+                commit('FETCH_ALL_VOLUMES', res.data);
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
 
 
     fetchEvents({commit}, parameters) {
@@ -186,6 +201,16 @@ let actions = {
         axios.get(`/api/assignation/${assignation.username}/${assignation.po}/${assignation.productionline}`)
             .then(res => {
                 commit('FECTH_ASSIGNATION', res.data)
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
+    checkPO({commit}, po) {
+
+        axios.get(`/api/po/${po}`)
+            .then(res => {
+                commit('FECTH_CHECKPO', res.data)
             }).catch(err => {
             console.log(err)
         })
@@ -298,6 +323,29 @@ let actions = {
         })
 
     },
+
+    store_Rejection({commit}, array) {
+
+        var PO = array[0];
+        var etiqCounter =  array[1];
+        var weigCounter =  array[2];
+        var caperCounter =  array[3];
+        var fillCounter =  array[4];
+        var etiqRejection = array[5];
+        var weigRejection = array[6];
+        var caperRejection = array[7];
+        var fillerRejection = array[8];
+
+
+        axios.post(`/api/storeRejection/${PO}/${etiqCounter}/${weigCounter}/${caperCounter}/${fillCounter}/${etiqRejection}/${weigRejection}/${caperRejection}/${fillerRejection}`)
+            .then(res => {
+                commit('STORE_REJECTION', res.data)
+            }).catch(err => {
+            console.log(err)
+        })
+
+    },
+
 
     create_SpeedLoss({commit}, event) {
         axios.post(`/api/speedLoss`, event)

@@ -10,15 +10,23 @@
 
                 <select name="page" id="page" class="" v-model="selection">
                     <option value="packagingLineID">
-                        Page 1
+                        Packaging line ID
                     </option>
 
                     <option value="downtimesReport">
-                        Page 2
+                        Downtimes report
                     </option>
 
                     <option value="monthlyLoadFactor">
-                        Page 3
+                        Monthly load factor
+                    </option>
+
+                    <option value="productionDashboard">
+                        Production dashboard
+                    </option>
+
+                    <option value="overallLineEffectivness">
+                        Overall Line Effectivness
                     </option>
 
 

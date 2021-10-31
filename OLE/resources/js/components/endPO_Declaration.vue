@@ -528,6 +528,7 @@
 
 
 
+
             };
         },
 
@@ -542,7 +543,7 @@
 
                 var time1 = 0;
                 var time2 = 0;
-                if (splitted2[0] >= splitted1[0]) {
+                if (splitted1[0] <= splitted2[0] ) {
 
                     time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
 
@@ -573,7 +574,7 @@
 
                 this.totalProductionTime -= (this.totalPlannedDowtimes);
                 this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
-                this.availability = this.totalOperatingTime / this.totalProductionTime;
+                this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2);
 
 
                 //this.$store.dispatch('getNetOPTime', this.parameters);
@@ -589,7 +590,7 @@
 
                 console.log('NET OP : ' + this.totalNetOperatingTime);
 
-                this.performance = this.totalNetOperatingTime / this.totalOperatingTime;
+                this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
 
                 console.log('Perf : ' + this.performance);
 
@@ -637,6 +638,7 @@
             saveEndPO: async function () {
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
 
+                /**
                 var pos = sessionStorage.getItem("pos").split(',');
                 pos.splice(this.indice, 1);
 
@@ -644,7 +646,7 @@
                     sessionStorage.pos = pos;
                 } else {
                     sessionStorage.setItem("pos", pos);
-                }
+                }**/
 
 
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
@@ -660,9 +662,26 @@
                 array.push(this.totalDuration);
 
 
+
                 this.$store.dispatch('stop_PO', array);
 
+                await this.resolveAfter1Second();
 
+                var array2 = [];
+                array2.push(this.endPO);
+                array2.push(this.EtiqueteuseCounter);
+                array2.push(this.WieghtBoxCounter);
+                array2.push(this.CaperCounter);
+                array2.push(this.FillerCounter);
+                array2.push(this.EtiqueteuseRejection);
+                array2.push(this.WieghtBoxRejection);
+                array2.push(this.CaperRejection);
+                array2.push(this.FillerRejection);
+
+
+                this.$store.dispatch('store_Rejection', array2);
+
+                await this.resolveAfter1Second();
 
 
 
@@ -674,7 +693,8 @@
                 await this.resolveAfter1Second();
 
 
-                this.loadTable();
+                //this.loadTable();
+
 
                 window.location.href = this.url + 'teamInfo';
 
@@ -752,11 +772,11 @@
                         var summCompteur = (this.FillerCounter - this.nbBottlesFilled) + (this.CaperCounter - this.nbBottlesFilled)
                             + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
 
-                        this.quality = N / (N + summRejection + summCompteur);
+                        this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
                     }
 
 
-                    this.OLE = this.quality * this.availability * this.performance;
+                    this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
 
                     if (sessionStorage.getItem("quality") === null) {
                         sessionStorage.quality = this.quality;

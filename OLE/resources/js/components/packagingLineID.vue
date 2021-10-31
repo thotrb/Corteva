@@ -1,22 +1,11 @@
 <template>
-    <div class="row">
-        <!--
+    <div class="d-flex">
 
-        machine : {{machines}}
+
         <br/>
 
-        <h1>
-            production : {{productionline}}
-        </h1>
 
 
-        <h1>
-            index : {{index}}
-        </h1>
-
--->
-
-        <br/>
 
         <div class="col">
 

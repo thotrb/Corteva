@@ -19,10 +19,13 @@ let state = {
     netOP: [],
     machines : [],
     allEvents : [],
+    volumes: [],
     worksiteID: -1,
     productionlineID: -1,
     token: localStorage.getItem('access_token'),
     unplannedDowntimeEvents: [],
+    checkPO : [],
+    REJECTION: [],
     unplannedDowntimeMachineShutdownTypes: []
 };
 

@@ -12,5 +12,5 @@ class ole_pos extends Model
 
     use HasFactory;
     public $timestamps = true;
-    protected $fillable = ['number'];
+    protected $fillable = ['number', 'GMIDCode', 'productionline_name'];
 }

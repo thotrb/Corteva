@@ -232,7 +232,7 @@
                 window.location.href = this.url + 'menu';
             },
 
-            nextPage: function () {
+            nextPage: async function () {
 
                 //this.addSessionValue("productionA", this.productionA);
                 var DCODES = document.getElementsByClassName('D-Code');
@@ -244,14 +244,11 @@
                 }
 
 
-
-
                 if (sessionStorage.getItem("GMID") === null) {
                     sessionStorage.GMID = dcodesTab;
                 } else {
                     sessionStorage.setItem("GMID", dcodesTab);
                 }
-
 
 
                 var POs = document.getElementsByClassName('PO');
@@ -264,6 +261,7 @@
                     poTab.push(POs[i].value);
                     let po = {
                         number: POs[i].value,
+                        GMIDCode: dcodesTab[i],
                     };
 
                     POElement.push(po);
@@ -345,7 +343,9 @@
                 }
 
 
-                //this.$store.dispatch('create_PO', POElement);
+
+
+
 
 
 
@@ -356,7 +356,7 @@
         },
         computed: {
             ...mapGetters([
-                'user'
+                'user',
             ])
         }
     }

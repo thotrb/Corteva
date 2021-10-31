@@ -31,10 +31,11 @@ let getters = {
         return state.unplannedDowntimeEvents;
     },
 
+
     unplannedDowntimeMachineShutdownTypes: state => {
         return state.unplannedDowntimeMachineShutdownTypes;
     },
-    
+
     machines : state => {
         return state.machines;
     },
@@ -54,6 +55,16 @@ let getters = {
     speedLoss: state => {
 
         return state.speedLoss
+    },
+
+    volumes: state => {
+
+        return state.volumes;
+    },
+
+    checkPO: state => {
+
+        return state.checkPO;
     },
 
     assignation: state => {

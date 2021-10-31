@@ -60,6 +60,10 @@ Vue.component('endPO_Declaration', require('./components/endPO_Declaration.vue')
 
 Vue.component('unplannedDowntimeDashboard', require('./components/unplannedDowntimeDashboard.vue').default);
 
+Vue.component('productionDashboard', require('./components/productionDashboard.vue').default);
+
+Vue.component('overallLineEffectivness', require('./components/overallLineEffectivness').default);
+
 Vue.component('unplannedDowntimeShutdowns', require('./components/unplannedDowntimeShutdowns.vue').default);
 
 Vue.component('unplannedDowntimeSpeedLosses', require('./components/unplannedDowntimeSpeedLosses.vue').default);

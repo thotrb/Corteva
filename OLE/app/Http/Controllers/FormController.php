@@ -93,6 +93,75 @@ class FormController extends Controller
         return response()->json($tab);
     }
 
+
+    public function getAllVolumes($site, $productionLine, $beginningDate, $endingDate)
+    {
+        $date1 = explode("-", $beginningDate);
+        $beginningYear = $date1[0];
+        $beginningMonth = $date1[1];
+        $beginningDay = $date1[2];
+
+        $date2 = explode("-", $endingDate);
+        $endingYear = $date2[0];
+        $endingMonth = $date2[1];
+        $endingDay = $date2[2];
+        $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear.'-'.$beginningMonth.'-'.$beginningDay)->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
+
+        $site = DB::table('ole_productionline')
+            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
+            ->join('ole_products', 'ole_pos.GMIDCode', '=', 'ole_products.GMID')
+            ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
+            ->where(function($query) use ($startDate, $endDate, $site, $productionLine) {
+                $query->where('worksite.name', '=', $site)
+                    ->where('ole_productionline.productionline_name', '=', $productionLine)
+                    -> whereBetween(DB::raw('DATE(ole_pos.created_at)'), [$startDate, $endDate]);
+            })
+            ->get();
+
+
+
+/**
+        $formulations = DB::table('ole_productionline')
+            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
+            ->join('ole_products', 'ole_pos.GMID-Code', '=', 'ole_products.GMID')
+            ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
+            ->where(function($query) use ($startDate, $endingDate, $site, $productionLine) {
+                $query->where('worksite.name', '=', $site)
+                    ->where('ole_productionline.productionline_name', '=', $productionLine)
+                    -> whereBetween(DB::raw('DATE(ole_pos.created_at)'), [$startDate, $endingDate]);
+            })
+            //->select(DB::raw('distinct (ole_products.formulationType)'))
+            ->get();
+ * **/
+
+
+
+
+
+
+        if(count($site) > 0){
+
+          $tab = array(
+            "site" => $site,
+            "formulations" => null
+          );
+
+        }else{
+
+            $tab = array(
+                "site" => null,
+                "formulations" => null
+            );
+        }
+
+
+        return response()->json($site);
+
+    }
+
     public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate)
     {
         $site = DB::table('ole_productionline')
@@ -369,11 +438,8 @@ class FormController extends Controller
                 ->get()
                 ->union($changingClients)
                 ->union($CIPBis)
-                ->union($unplanned)
-                ->union($plannedEvents);
-
-
-
+                ->union($unplanned);
+                //->union($plannedEvents);
 
             $tab = array(
 
@@ -393,9 +459,11 @@ class FormController extends Controller
                 'FSM' => $FSM,
                 'SITE' => $site,
                 'EVENTS' => $changingFormats,
-                'SLEVENTS' => $speedLossesEvents
+                'SLEVENTS' => $speedLossesEvents,
+                'PLANNEDEVENTS' => $plannedEvents
 
             );
+
 
 
 
@@ -430,8 +498,70 @@ class FormController extends Controller
 
 
 
+        /**
+         *
+         *  var sommeQtyProduced2 = 0;
+        this.packsizes = [];
+
+        var qtyPerPacksize = [];
+
+        for (let i = 0; i < this.volumes.length; i++) {
+        sommeQtyProduced2 += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * 1;
+        if (!this.packsizes.includes(this.volumes[i].size)) {
+         *
+        this.packsizes.push(this.volumes[i].size);
+         *
+        qtyPerPacksize[this.volumes[i].size] = this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase  * 1;
+        } else {
+        qtyPerPacksize[this.volumes[i].size] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase  * 1;
+        }
+        }
+
+        var finalValue2 = [];
+        for (let j = 0; j < this.formulations.length; j++) {
+        tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var tableauPacksizeValue = [];
+        for (let k = 0; k < tableauFormulation.length; k++) {
+        tableauPacksizeValue[tableauFormulation[k]] = 0;
+        }
+
+
+        for (let i = 0; i < this.volumes.length; i++) {
+        if (this.volumes[i].size === this.packsizes[j]) {
+        month = this.volumes[i].created_at.split('-')[1];
+
+        correspondingMonth = tableauFormulation[month - 1];
+        tableauPacksizeValue[correspondingMonth] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * 1;
+        }
+        }
+
+        finalValue2.push(tableauPacksizeValue);
+        }
+
+        l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        tab = [];
+        for (let k = 0; k < l.length; k++) {
+        tab[l[k]] = 0;
+        }
+        for(let t=0; t<finalValue2.length; t++)
+        {
+        for (let k = 0; k < l.length; k++) {
+        let month = l[k];
+        tab[month] += finalValue2[t][month];
+        this.total2 += finalValue2[t][month];
+        }
+
+        }
+        this.sumPerMonth2.push(tab);
+        this.packsizePerMonth = finalValue2;
+
+
+
+         */
+
 
     }
+
 
     public function getMachines($productionlineID)
     {
@@ -489,10 +619,20 @@ class FormController extends Controller
             ->count();
 
 
-
         return response()->json($assignation);
 
     }
+
+    public function isPOPossible($po)
+    {
+        $pon = DB::table('ole_pos')
+            ->where('ole_pos.number', '=', $po)
+            ->count();
+
+        return response()->json($pon);
+
+    }
+
 
     public function monthlyLoadFactor(){
         return view('monthlyLoadFactor');
@@ -550,8 +690,7 @@ class FormController extends Controller
 
 
         $crewLeaders = DB::table('user')
-            ->join('teamInfo', 'user.assignement', '=', 'teamInfo.id')
-            ->join('worksite', 'teamInfo.worksite', '=', 'worksite.id')
+            ->join('worksite', 'user.assignement', '=', 'worksite.id')
             //->where('worksite.id', '=', $userInfo.worksite)
             ->where('user.status', '=', 1)
             ->select('user.lastname', 'user.firstname', 'worksite.id')
@@ -563,9 +702,10 @@ class FormController extends Controller
             ->get();
 
 
-        $productionLine = DB::table('ole_pos')
-            ->join('ole_assignement_team_pos', 'ole_assignement_team_pos.po', '=', 'ole_pos.number')
-            ->join('ole_productionline', 'ole_productionline.id', '=', 'ole_assignement_team_pos.productionline')
+        $productionLine = DB::table('user')
+            ->join('worksite', 'user.assignement', '=', 'worksite.id')
+            ->join('ole_productionline', 'ole_productionline.worksiteID', '=', 'worksite.id')
+            ->where('user.login', '=', $username)
             ->select('ole_productionline.productionline_name', 'ole_productionline.worksiteID')
             ->get();
 
@@ -611,6 +751,11 @@ class FormController extends Controller
     public function plannedDowntime_Event()
     {
         return view('plannedDowntime_declaration');
+
+    }
+
+    public function productionDashboard(){
+        return view('productionDashboard');
 
     }
 
@@ -710,7 +855,7 @@ class FormController extends Controller
     //getEvents for the unplanned dashboard page
     public function getEventsUD($dateFrom, $dateTo) {
 
-       
+
 
     }
 
@@ -762,6 +907,11 @@ class FormController extends Controller
 
     }
 
+    public function overallLineEffectivness()
+    {
+        return view('overallLineEffectivness');
+    }
+
     public function unplannedDowntime_changingFormat()
     {
         return view('unplannedDowntime_changingFormat');
@@ -780,6 +930,7 @@ class FormController extends Controller
 
     public function createPO(Request $request)
     {
+
 
         $PO = ole_pos::create($request->all());
         printf(response()->json($PO));
@@ -821,6 +972,11 @@ class FormController extends Controller
         $event = ole_planned_events::create($request->all());
         printf(response()->json($event));
         return response()->json($event);
+    }
+
+    public function storeRejection(Request $request)
+    {
+
     }
 
     public function saveSpeedLoss(Request $request)

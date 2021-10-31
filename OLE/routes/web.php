@@ -43,6 +43,10 @@ Route::get('/downtimesReport', \App\Http\Controllers\FormController::class.'@dow
 
 Route::get('/monthlyLoadFactor', \App\Http\Controllers\FormController::class.'@monthlyLoadFactor');
 
+Route::get('/productionDashboard', \App\Http\Controllers\FormController::class.'@productionDashboard');
+
+Route::get('/overallLineEffectivness', \App\Http\Controllers\FormController::class.'@overallLineEffectivness');
+
 Route::get('/summary', \App\Http\Controllers\FormController::class.'@summary');
 
 Route::get('/summary/{productionName}', \App\Http\Controllers\FormController::class.'@choicePlannedUnplanned');

@@ -2,74 +2,74 @@
     <div class="container">
 
         <!--{{assignation}}-->
-        <!--{{events1}}-->
-        <div class="row">
-            <template v-for="productionline in productionlines">
-                <div class="col">
-                    <button
-                        class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info rcorners1"
-                        type="button" @click.prevent="setProductionline(productionline)">
-                        {{productionline}}
-                    </button>
+        <!-- {{events1}}
+         {{events2}}-->
+         <div class="row">
+             <template v-for="productionline in productionlines">
+                 <div class="col">
+                     <button
+                         class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info rcorners1"
+                         type="button" @click.prevent="setProductionline(productionline)">
+                         {{productionline}}
+                     </button>
 
 
-                    <br/>
-                    <div class="rcorners2">
-                        <p>
-                            Site : {{site}} <br/>
-                            Crew Leader : {{crewLeader}} <br/>
-                            Type : {{typeTeam}} <br/>
-                            Début : {{workingDebut}} <br/>
-                            Fin : {{workingEnd}} <br/>
-                        </p>
-                    </div>
+                     <br/>
+                     <div class="rcorners2">
+                         <p>
+                             Site : {{site}} <br/>
+                             Crew Leader : {{crewLeader}} <br/>
+                             Type : {{typeTeam}} <br/>
+                             Début : {{workingDebut}} <br/>
+                             Fin : {{workingEnd}} <br/>
+                         </p>
+                     </div>
 
-                    <br/>
+                     <br/>
 
-                    <div class="rcorners1 table-info-data" align="center" >
-            <!--
-                        <template v-if="events1.length ===0 && events2.length ===0">
+                     <div class="rcorners1 table-info-data" align="center">
+                         <!--
+                                     <template v-if="events1.length ===0 && events2.length ===0">
 
-                            <h4 align="center">AUCUN INCIDENT DECLARE</h4>
+                                         <h4 align="center">AUCUN INCIDENT DECLARE</h4>
 
-                        </template>
-                        -->
-                            <table class="table">
-                                <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Heure de saisie</th>
-                                    <th scope="col">Durée (minutes)</th>
-                                    <th scope="col">Commentaire</th>
+                                     </template>
+                                     -->
+                        <table class="table">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Type</th>
+                                <th scope="col">Heure de saisie</th>
+                                <th scope="col">Durée (minutes)</th>
+                                <th scope="col">Commentaire</th>
 
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <template v-for="event in events1">
-                                    <template v-if="event.productionline === productionline">
-                                        <tr>
-                                            <th scope="row">{{event.type}}</th>
-                                            <td>{{event.updated_at.split(' ')[1]}}</td>
-                                            <td>{{event.total_duration}}</td>
-                                            <td>{{event.comment}}</td>
-                                        </tr>
-                                    </template>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <template v-for="event in events1">
+                                <template v-if="event.productionline === productionline">
+                                    <tr>
+                                        <th scope="row">{{event.type}}</th>
+                                        <td>{{event.updated_at.split(' ')[1]}}</td>
+                                        <td>{{event.total_duration}}</td>
+                                        <td>{{event.comment}}</td>
+                                    </tr>
                                 </template>
+                            </template>
 
-                                <template v-for="event in events2">
-                                    <template v-if="event.productionline === productionline">
-                                        <tr>
-                                            <th scope="row">{{event.type}}</th>
-                                            <td>{{event.updated_at.split(' ')[1]}}</td>
-                                            <td>{{event.total_duration}}</td>
-                                            <td>{{event.comment}}</td>
-                                        </tr>
-                                    </template>
+                            <template v-for="event in events2">
+                                <template v-if="event.productionline === productionline">
+                                    <tr>
+                                        <th scope="row">{{event.type}}</th>
+                                        <td>{{event.updated_at.split(' ')[1]}}</td>
+                                        <td>{{event.total_duration}}</td>
+                                        <td>{{event.comment}}</td>
+                                    </tr>
                                 </template>
-                                </tbody>
+                            </template>
+                            </tbody>
 
-                            </table>
-
+                        </table>
 
 
                         <!--{{event.type}}    {{event.predicted_duration}}   {{event.total_duration}}-->
@@ -135,6 +135,7 @@
                 productionlines: sessionStorage.getItem("prodlines").split(','),
                 username: sessionStorage.getItem("username"),
                 PO: sessionStorage.getItem("pos").split(','),
+                GMID:sessionStorage.getItem("GMID").split(','),
 
                 //productionA :  sessionStorage.getItem("productionA"),
 
@@ -164,6 +165,16 @@
             },
 
             resolveAfter05Second: function () {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve('resolved');
+                    }, 1000);
+                });
+
+
+            },
+
+            resolveAfter15Second: function () {
                 return new Promise(resolve => {
                     setTimeout(() => {
                         resolve('resolved');
@@ -204,9 +215,14 @@
 
         async mounted() {
 
+            console.log("POS : ");
+
+            console.log(sessionStorage.getItem("pos").split(','));
+
             await this.$store.dispatch('getWorksiteID', sessionStorage.getItem("site"));
             await this.resolveAfter05Second();
 
+            var POElement = [];
 
             console.log(this.PO);
             if (this.PO.length > 0 && this.PO[0] !== "") {
@@ -219,7 +235,7 @@
 
 
                     await this.$store.dispatch('getProductionlineID', this.productionlines[i]);
-                    await this.resolveAfter05Second();
+                    await this.resolveAfter15Second();
 
                     var assignation = {
                         username: this.username,
@@ -232,12 +248,29 @@
                     await this.$store.dispatch('checkAssignation', assignation);
                     await this.resolveAfter05Second();
 
-                    if(this.assignation[i] === 0){
+                    if (this.assignation[i] === 0) {
                         await this.$store.dispatch('storeAssignation', assignation);
                     }
 
+                    var po = this.PO[i];
+                    await this.$store.dispatch('checkPO', po);
+                    await this.resolveAfter05Second();
+
+                    if (this.checkPO === 0) {
+                        let element = {
+                            number: po,
+                            GMIDCode: this.GMID[i],
+                            productionline_name: this.productionlines[i],
+
+                        };
+
+                        POElement.push(element);
+
+                    }
 
                 }
+
+                this.$store.dispatch('create_PO', POElement);
 
             }
 
@@ -250,6 +283,7 @@
                 'productionlineID',
                 'worksiteID',
                 'assignation',
+                'checkPO',
             ])
         }
 
@@ -276,11 +310,12 @@
     }
 
     .table-info-data {
-        overflow:scroll; max-height: 300px;
+        overflow: scroll;
+        max-height: 300px;
     }
 
     thead {
-        color:white;
+        color: white;
         background: #56baed;
     }
 </style>

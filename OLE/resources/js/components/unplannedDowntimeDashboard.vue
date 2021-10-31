@@ -79,12 +79,12 @@
                                     <tr class="table-sub-row">&emsp;Duration</tr>
                                     <tr class="table-sub-row">&emsp;Number</tr>
                                 </th>
-                                
+
                                 <template v-for="month of months">
                                     <td class="table-data" :key="month">
                                         <tr style="visibility: hidden;">-----</tr>
-                                        <tr class="table-sub-row">{{(downtimes[cat][month].totalDuration ? downtimes[cat][month].totalDuration.toFixed(2) : 0)}}</tr>
-                                        <tr class="table-sub-row">{{downtimes[cat][month].totalNb || "0"}}</tr>                
+                                        <tr class="table-sub-row">{{downtimes[cat][month].totalDuration}}</tr>
+                                        <tr class="table-sub-row">{{downtimes[cat][month].totalNb}}</tr>
                                     </td>
                                 </template>
                             </tr>
@@ -127,7 +127,7 @@
             </div>
         </div>
     </div>
-</template>                                                                                           
+</template>
 
 <script>
     import {mapGetters} from "vuex";
@@ -142,7 +142,7 @@
                 months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 unplannedDowntimesCategories: {
                     cip: 'Cleaning in Place (CIP)',
-                    cov: 'Change Over (COV)', 
+                    cov: 'Change Over (COV)',
                     bnc: 'Batch Number Change (BNC)'
                 },
                 downtimes: {
@@ -217,15 +217,15 @@
               const dateFrom = currentYear + '-01-01'
               const dateTo = currentYear + '-12-31'
               const params = [selectedPL, dateFrom, dateTo];
-        
+
               this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
                     //Wait for data
               this.resolveAfter(1000).then(() => {
                   //A new downtime object is created to delete previous data
                   this.createDowntimeObject();
                   let totalDuration = {
-                      cip: 0, 
-                      cov: 0, 
+                      cip: 0,
+                      cov: 0,
                       bnc: 0
                   };
                   let totalNb = {
