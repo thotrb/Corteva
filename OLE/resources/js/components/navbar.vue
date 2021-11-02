@@ -36,6 +36,18 @@
                         Overall Line Effectivness
                     </option>
 
+                    <option value="unplannedDowntimeDashboard">
+                        Unplanned Downtime Dashboard
+                    </option>
+
+                    <option value="unplannedDowntimeShutdowns">
+                        Unplanned Downtime Shutdowns
+                    </option>
+
+                    <option value="unplannedDowntimeSpeedLosses">
+                        Unplanned Downtime Speed Losses
+                    </option>
+
 
                 </select>
 

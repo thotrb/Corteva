@@ -56,7 +56,7 @@
                 <br/>
 
                 <div class="d-flex">
-                    <label class="" for="startYear">Year</label>
+                    <label class="" for="startYear">{{$t("year")}}</label>
 
                     <select id="startYear" v-model="year">
                         <template v-for="year of years">
