@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Unplanned Downtime Shutdowns</title>
+    <title>Quality Losses Dashboard</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
@@ -32,7 +32,7 @@
 <div id="app">
 <body>
     <navbar></navbar>
-    <unplanned-downtime-shutdowns></unplanned-downtime-shutdowns>
+    <quality-losses-dashboard></quality-losses-dashboard>
     <script async src="{{mix('js/app.js')}}"></script>
 </body>
 </div>

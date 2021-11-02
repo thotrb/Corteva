@@ -6,18 +6,9 @@
         </div>
         <div class="d-flex interval-selection">
             <span>From</span>
-            <select id="select-year-from" v-on:change="calculateYearsAfterFrom(); yearSelected();">
-                <template v-for="year of years">
-                    <option v-bind:key="year" v-bind:value="year">{{year}}</option>
-                </template>
-            </select>
+            <input type="date" id="select-date-from" v-on:change="dateSelected();"/>
             <span>to</span>
-            <select id="select-year-to" v-on:change="yearSelected();">
-                <template v-for="year of yearsAfterFrom">
-                    <option v-if="year == currentYear" :key="year" selected>{{year}}</option>
-                    <option v-else :key="year">{{year}}</option>
-                </template>
-            </select>
+            <input type="date" id="select-date-to" v-on:change="dateSelected();"/>
         </div>
     </div>
 </template>
@@ -27,12 +18,27 @@ export default {
     name: "productionWindow",
 
     data() {
+        const currentDate = new Date();
+        let year = currentDate.getFullYear().toString();
+        let month = currentDate.getMonth() + 1;
+        if (month < 10) month = '0' + month.toString();
+        else month = month.toString();
+
+        let day = currentDate.getDate();
+        if (day < 10) day = '0' + day.toString();
+        else day = day.toString();
+
+        let finalEndDate = year + '-' + month + '-' + day;
+        let defaultStartDate = year + '-01-01';
+
+
         var data = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             years: [],
             yearsAfterFrom: [],
-            currentYear: (new Date()).getFullYear(),
-            startYear: 2000
+            endDate: finalEndDate,
+            startDate: defaultStartDate,
+            firstDate: '2000-01-01' 
         }
 
         //Populate years array
@@ -49,10 +55,11 @@ export default {
             for (let i = selectedYear; i <= this.currentYear; i++) this.yearsAfterFrom.push(i);
         },
 
-        yearSelected: function () {
-            const dateFrom = document.getElementById('select-year-from').value;
-            const dateTo = document.getElementById('select-year-to').value;
-            this.yearSelectedFunction(dateFrom, dateTo);
+        dateSelected: function () {
+            const dateFrom = document.getElementById('select-date-from').value;
+            document.getElementById("select-date-to").setAttribute("min",dateFrom);
+            const dateTo = document.getElementById('select-date-to').value;
+            if (dateFrom && dateTo) this.yearSelectedFunction(dateFrom, dateTo);
         },
 
         showMenu: function () {
@@ -61,7 +68,12 @@ export default {
     },
 
     mounted() {
-
+        document.getElementById("select-date-from").setAttribute("min",this.firstDate);
+        document.getElementById("select-date-from").setAttribute("max",this.endDate);
+        document.getElementById("select-date-to").setAttribute("min",this.firstDate);
+        document.getElementById("select-date-to").setAttribute("max",this.endDate);
+        document.getElementById("select-date-from").setAttribute("value",this.startDate);
+        document.getElementById("select-date-to").setAttribute("value",this.endDate);
     },
 
     computed: {
@@ -74,14 +86,10 @@ export default {
 <style scoped>
     div.production-window {
         flex-direction: column;
-        width: 25%;
-        min-width: 350px;
         border: solid 1px;
         border-radius: 5px;
         padding: 10px 5px;
         height: 91px;
-        margin-left: auto;
-        visibility: hidden;
     }
 
     div.production-window > div {
@@ -94,8 +102,10 @@ export default {
         margin-bottom: 10px;
     }
 
-    div.production-window > div.interval-selection > select {
+    div.production-window > div.interval-selection > input {
         margin: 0px 10px;
+        width: 35%;
+        font-size: 12px;
     }
 
     div.production-window > div.interval-selection > * {

@@ -8,8 +8,7 @@
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
-            <div class="d-flex site-pl-selection">
-                <div class="d-flex">
+            <div class="site-pl-selection">
                     <label for="site-selection">Site: </label>
                     <select id="site-selection" v-model="site">
                         <option disabled selected value>-- Select --</option>
@@ -17,8 +16,8 @@
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
                         </template>
                     </select>
-                </div>
-                <div class="d-flex">
+                
+               
                     <label for="pl-selection">Production line: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
@@ -30,19 +29,40 @@
                             </template>
                         </template>
                     </select>
+            </div>
+            <!-- Production window -->
+            <div class="d-flex production-window-container">
+                <production-window :yearSelectedFunction="chargeGeneralData"/>
+                <div class="d-flex pw-table-container">
+                    <template v-for="cat of Object.keys(unplannedDowntimesCategories)">
+                        <table class="table" :key="cat">
+                            <thead></thead>
+                            <tbody>
+                                <tr class="t-row">
+                                    <td scope="col">{{unplannedDowntimesCategories[cat]}}</td>
+                                    <td scope="col"></td>
+                                </tr>
+                                <tr class="subrow">
+                                    <td scope="col">&emsp;Duration</td>
+                                    <td scope="col">{{generalData[cat].totalDuration}}</td>
+                                </tr>
+                                <tr class="subrow last-subrow">
+                                    <td scope="col">&emsp;Number</td>
+                                    <td scope="col">{{generalData[cat].totalNb}}</td>
+                                </tr>
+                            
+                            </tbody>
+                        </table>
+                    </template>
                 </div>
             </div>
-
-            <!-- Production window -->
-            <production-window :yearSelectedFunction="chargeUnplannedEventsData"/>
         </div>
 
         <!-- Downtime table, yearly and average information container-->
         <div class="d-flex table-ya-container">
             <!-- Downtime table -->
             <div class="d-flex container-table">
-
-                <div class="table">
+                <table class="table">
                     <thead>
                         <tr>
                             <th scope="col"></th>
@@ -63,19 +83,14 @@
                                 <template v-for="month of months">
                                     <td class="table-data" :key="month">
                                         <tr style="visibility: hidden;">-----</tr>
-<<<<<<< HEAD
-                                        <tr class="table-sub-row">{{downtimes[cat][month].totalDuration}}</tr>
+                                        <tr class="table-sub-row">{{downtimes[cat][month].totalDuration ? downtimes[cat][month].totalDuration.toFixed(2) : undefined}}</tr>
                                         <tr class="table-sub-row">{{downtimes[cat][month].totalNb}}</tr>
-=======
-                                        <tr class="table-sub-row">{{(downtimes[cat][month].totalDuration ? downtimes[cat][month].totalDuration.toFixed(2) : 0)}}</tr>
-                                        <tr class="table-sub-row">{{downtimes[cat][month].totalNb || "0"}}</tr>
->>>>>>> 5fb64a79da0788f13cb10fb31e83c4f523a63195
                                     </td>
                                 </template>
                             </tr>
                         </template>
                     </tbody>
-                </div>
+                </table>
             </div>
 
             <!-- Downtime yearly and average info -->
@@ -84,12 +99,12 @@
                     <div :key="cat" class="d-flex ya-info-row">
                         <div class="d-flex">
                             <span style="font-weight: bold">{{"Yearly " + cat.toUpperCase()}}</span>
-                            <span>&emsp;{{(downtimes[cat].general.avgYearlyDuration ? downtimes[cat].general.avgYearlyDuration.toFixed(2) : 0)}} Hours</span>
-                            <span>&emsp;{{downtimes[cat].general.avgYearlyDuration ? downtimes[cat].general.avgYearlyNb.toFixed(2) : 0}} {{cat.toUpperCase()}}</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyDuration}} Hours</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyNb}} {{cat.toUpperCase()}}</span>
                         </div>
                         <div class="d-flex">
                             <span style="font-weight: bold">Average</span>
-                            <span>&emsp;{{(downtimes[cat].general.averageEventDuration ? downtimes[cat].general.averageEventDuration.toFixed(2) : 0)}} Hours</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyAvg}} Hours</span>
                         </div>
                     </div>
                 </template>
@@ -100,15 +115,15 @@
         <div class="main-chart-container">
             <div class="chart-container">
                 <canvas class="chart" id="cip-chart"></canvas>
-                <p class="downtime-percent" id="cip-percent"></p>
+                <p class="downtime-percent" id="cip-percent">{{downtimes.cip.general.downtimePercentage}} % of Unplanned Downtime</p>
             </div>
             <div class="chart-container">
                 <canvas class="chart" id="cov-chart"></canvas>
-                <p class="downtime-percent" id="cov-percent"></p>
+                <p class="downtime-percent" id="cov-percent">{{downtimes.cov.general.downtimePercentage}} % of Unplanned Downtime</p>
             </div>
             <div class="chart-container">
                 <canvas class="chart" id="bnc-chart"></canvas>
-                <p class="downtime-percent" id="bnc-percent"></p>
+                <p class="downtime-percent" id="bnc-percent">{{downtimes.bnc.general.downtimePercentage}} % of Unplanned Downtime</p>
             </div>
         </div>
     </div>
@@ -125,16 +140,17 @@
 
             var data = {
                 months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                years: [],
-                yearsAfterFrom: [],
-                currentYear: (new Date()).getFullYear(),
-                startYear: 2000,
                 unplannedDowntimesCategories: {
                     cip: 'Cleaning in Place (CIP)',
                     cov: 'Change Over (COV)',
                     bnc: 'Batch Number Change (BNC)'
                 },
                 downtimes: {
+                    cip: {},
+                    cov: {},
+                    bnc: {}
+                },
+                generalData: {
                     cip: {},
                     cov: {},
                     bnc: {}
@@ -155,9 +171,9 @@
                 data.downtimes.cov[month] = {totalNb: undefined, totalDuration: undefined, events: []};
                 data.downtimes.bnc[month] = {totalNb: undefined, totalDuration: undefined, events: []};
             }
-            data.downtimes.cip.general = {totalNb: undefined, totalDuration: undefined, average: undefined};
-            data.downtimes.cov.general = {totalNb: undefined, totalDuration: undefined, average: undefined};
-            data.downtimes.bnc.general = {totalNb: undefined, totalDuration: undefined, average: undefined};
+            data.downtimes.cip.general = {yearlyDuration: undefined, yearlyNb: undefined, yearlyAvg: undefined, downtimePercentage: '--'};
+            data.downtimes.cov.general = {yearlyDuration: undefined, yearlyNb: undefined, yearlyAvg: undefined, downtimePercentage: '--'};
+            data.downtimes.bnc.general = {yearlyDuration: undefined, yearlyNb: undefined, yearlyAvg: undefined, downtimePercentage: '--'};
 
 
             //Populate years array
@@ -177,9 +193,10 @@
 
           productionLineSelected: function () {
               if (document.getElementById("pl-selection").value) {
-                  document.querySelector('div.production-window').style.visibility = 'visible';
-                  this.chargeUnplannedEventsData(this.startYear, this.currentYear);
-              } else document.querySelector('div.production-window').style.visibility = 'hidden';
+                  document.querySelector('div.production-window-container').style.visibility = 'visible';
+                  this.chargeCurrentYearData();
+                  //this.chargeGeneralData();
+              } else document.querySelector('div.production-window-container').style.visibility = 'hidden';
           },
 
           getMonth: function (dateString) {
@@ -194,9 +211,11 @@
               }
           },
 
-          chargeUnplannedEventsData: function (dateFrom, dateTo) {
-              console.log("charge events called - "+dateFrom)
+          chargeCurrentYearData: function () {
               const selectedPL = document.getElementById('pl-selection').value;
+              const currentYear = (new Date()).getFullYear().toString();
+              const dateFrom = currentYear + '-01-01'
+              const dateTo = currentYear + '-12-31'
               const params = [selectedPL, dateFrom, dateTo];
 
               this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
@@ -210,57 +229,90 @@
                       bnc: 0
                   };
                   let totalNb = {
-                      cip: 0,
-                      cov: 0,
-                      bnc: 0
+                      cip: 0, 
+                      cov: 0, 
+                      bnc: 0 
                   };
+                  let labels = {
+                      cip: {}, 
+                      cov: {}, 
+                      bnc: {}  
+                  };
+                  
                   let totalDowntimeDuration = 0;
-                  const years = dateTo - dateFrom + 1;
-
-
+               
                   for (let type of ['cip', 'cov', 'bnc']) {
                       for (let event of this.unplannedDowntimeEvents[0][type.toUpperCase()]) {
                           const monthCreated = this.getMonth(event.created_at);
                           const month = this.months[monthCreated - 1];
-                          const eventDurationInHours = event.total_duration / 60;
+
+                          const eventDurationInHours = (event.total_duration / 60);
+                          const eventDurationLabelCoef = Math.floor(event.total_duration/10);
+                          const durationIntervalChartLabel = `${10 * eventDurationLabelCoef}-${10 * eventDurationLabelCoef + 9} min`;
+
+                          if (!Object.keys(labels[type]).includes(durationIntervalChartLabel)) labels[type][durationIntervalChartLabel] = 1;
+                          else labels[type][durationIntervalChartLabel]++;
+
                           this.downtimes[type][month].events.push(event);
                           this.downtimes[type][month].totalNb++;
                           this.downtimes[type][month].totalDuration += eventDurationInHours;
                           totalDuration[type] += eventDurationInHours;
                           totalNb[type]++;
                       }
-                      totalDowntimeDuration += totalDuration[type];
-                      const avgYearlyNb = totalNb[type] / years;
-                      const avgYearlyDuration = totalDuration[type] / years;
-                      const avgEventDuration = avgYearlyDuration / avgYearlyNb;
-                      //Nb.: Or (||) operator returns last velue when both are falsy
-                      this.downtimes[type].general.avgYearlyNb = (avgYearlyNb || 0);
-                      this.downtimes[type].general.avgYearlyDuration = (avgYearlyDuration || 0);
-                      this.downtimes[type].general.averageEventDuration = (avgEventDuration || 0);
-                      this.downtimes[type].general.totalNb = totalNb[type];
-                      this.downtimes[type].general.totalDuration = totalDuration[type];
 
+                      totalDowntimeDuration += totalDuration[type];
+
+                      //Nb.: Or (||) operator returns last velue when both are falsy
+                      this.downtimes[type].general.yearlyDuration = totalDuration[type].toFixed(2);
+                      this.downtimes[type].general.yearlyNb = totalNb[type].toFixed(2);
+                      this.downtimes[type].general.yearlyAvg = ((totalDuration[type] / totalNb[type]) || 0).toFixed(2);
+                      
                       //Create charts if they dont exist already
                       if (!this.chartObjects.created) this.createCharts();
 
+                      //Sort labels alphabetically
+                      labels[type] = Object.keys(labels[type]).sort().reduce((acc, key) => {
+                          acc[key] = labels[type][key];
+                          return acc;
+                      }, {});
+                      
                       //Update chart data
+                      this.chartObjects[type].data.labels = Object.keys(labels[type]);
                       this.chartObjects[type].data.datasets[0].data = [];
-                      for (let month of this.months) {
-                          this.chartObjects[type].data.datasets[0].data.push(this.downtimes[type][month].totalNb);
+                      for (let label of Object.keys(labels[type])) {
+                          this.chartObjects[type].data.datasets[0].data.push(labels[type][label]);
                       }
                       this.chartObjects[type].update();
                   }
 
                   for (let type of ['cip', 'cov', 'bnc'])  {
-                      let downtimePercent = (this.downtimes[type].general.totalDuration / totalDowntimeDuration) * 100;
-                      if (downtimePercent) downtimePercent.toFixed(2);
-                      this.downtimes[type].general.downtimePercentage = downtimePercent;
-                      //Insert into good element
-                      let textToInsert = downtimePercent ? downtimePercent + ' % ' : '-- % ';
-                      textToInsert += "of Unplanned Downtime";
-                      document.getElementById(type + '-percent').innerText = textToInsert;
+                      let downtimePercent = (totalDuration[type] / totalDowntimeDuration) * 100;
+                      if (downtimePercent) {
+                          downtimePercent = downtimePercent.toFixed(2);
+                          this.downtimes[type].general.downtimePercentage = downtimePercent;
+                      }
+                      
                   }
+                }).then(() => this.chargeGeneralData());
+            });
+          },
 
+          chargeGeneralData: function () {
+            const selectedPL = document.getElementById('pl-selection').value;
+            const dateFrom = document.getElementById('select-date-from').value;
+            const dateTo = document.getElementById('select-date-to').value;
+            const params = [selectedPL, dateFrom, dateTo];
+        
+            this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
+                this.resolveAfter(1000).then(() => {
+                    for (let cat of ['cip', 'cov', 'bnc']) {
+                        this.generalData[cat] = {totalDuration: 0, totalNb: 0};
+                        for (let event of this.unplannedDowntimeEvents[0][cat.toUpperCase()]) {
+                            this.generalData[cat].totalDuration += (event.total_duration / 60);
+                            this.generalData[cat].totalNb ++;
+                        }
+                        this.generalData[cat].totalDuration = this.generalData[cat].totalDuration.toFixed(2);
+                    }
                 });
             });
           },
@@ -277,7 +329,7 @@
                   this.chartObjects[type] = new Chart(chartName, {
                     type: 'bar',
                     data: {
-                      labels: this.months,
+                      labels: [],
                       datasets: [{
                           label: type.toUpperCase(),
                           data: [],
@@ -343,13 +395,10 @@
         flex-direction: row;
         padding: 20px 0px;
         border-bottom: solid 1px;
-    }
-
-    div.site-pl-selection {
-        flex-direction: column;
+        align-items: center;
         justify-content: space-evenly;
-        min-width: 200px;
-    }
+    } 
+
 
     div.site-pl-selection > div{
         align-items: center;
@@ -375,7 +424,11 @@
     div.container-yearly-avg-info {
         flex-direction: column;
         justify-content: space-around;
-        margin-left: 30px;
+        align-items: center;
+        margin: 0px 30px;
+        padding-left: 10px;
+        border: solid 1px;
+        border-radius: 5px;
     }
 
     div.container-yearly-avg-info div.ya-info-row > div {
@@ -406,9 +459,67 @@
         font-size: 16px;
     }
 
-    thead {
+    div.production-window-container {
+        display: flex;
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        margin-top: 10px;
+        width: 800px;
+    }
+
+    tr.subrow > td {
+        padding: 0px !important;
+        border: none;
+        color: gray;
+        font-weight: bold;
+    }
+
+    tr.last-subrow > td {
+        padding: 0px 0px 0.75rem 0px !important;
+    }
+
+    tr.t-row > td {
+        padding: 0.75rem 0px 0px 0px;
+        color: black;
+        font-weight: bold;
+    }
+
+    div.pw-table-container {
+        padding: 0px 10px;
+    }
+        
+    div.table-ya-container thead {
         color: white;
         background: #56baed;
     }
+
+    div.pw-table-container th {
+        border: none;
+    }
+
+    div.pw-table-container table.table {
+        margin: 0px 10px;
+    }
+
+    div.production-window {
+        border: none !important;
+    }
+
+    div.container-table th {
+        border-top: none;
+        border-bottom: none;
+    }
+
+    div.container-table th:first-of-type{
+        border-top-left-radius: 7px;
+        border-bottom-left-radius: 7px;
+    }
+
+    div.container-table th:last-of-type{
+        border-top-right-radius: 7px;
+        border-bottom-right-radius: 7px;
+    }
+    
 
 </style>

@@ -27,6 +27,14 @@ class FormController extends Controller
         return view('unplannedDowntimeShutdowns');
     }
 
+    public function unplannedDowntimeSpeedLosses() {
+        return view('unplannedDowntimeSpeedLosses');
+    }
+
+    public function qualityLossesDashboard() {
+        return view('qualityLossesDashboard');
+    }
+
     public function index()
     {
         return view('teamInfo');
@@ -38,30 +46,38 @@ class FormController extends Controller
     }
 
 
-    public function getUnplannedDowntimeEvents($productionLine, $beginningYear, $endingYear) {
+    public function getUnplannedDowntimeEvents($productionLine, $beginningDate, $endingDate) {
 
         $CIP = DB::table('ole_unplanned_event_cips')
             ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_cips.created_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_cips.created_at', '<=', $endingYear)
+            ->whereDate('ole_unplanned_event_cips.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_cips.created_at', '<=', $endingDate)
             ->get();
 
         $COV = DB::table('ole_unplanned_event_changing_clients')
             ->where('ole_unplanned_event_changing_clients.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_changing_clients.created_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_changing_clients.created_at', '<=', $endingYear)
+            ->whereDate('ole_unplanned_event_changing_clients.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_changing_clients.created_at', '<=', $endingDate)
             ->get();
 
         $BNC = DB::table('ole_unplanned_event_changing_formats')
             ->where('ole_unplanned_event_changing_formats.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_changing_formats.created_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_changing_formats.created_at', '<=', $endingYear)
+            ->whereDate('ole_unplanned_event_changing_formats.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_changing_formats.created_at', '<=', $endingDate)
             ->get();
         
         $machineShutdowns = DB::table('ole_unplanned_event_unplanned_downtimes')
+            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '!=', "Autres")
             ->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $productionLine)
-            ->whereYear('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningYear)
-            ->whereYear('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingYear)
+            ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
+            ->get();
+
+        $externalShutdowns = DB::table('ole_unplanned_event_unplanned_downtimes')
+            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '=', "Autres")
+            ->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $productionLine)
+            ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
             ->get();
 
 
@@ -70,7 +86,8 @@ class FormController extends Controller
             'CIP' => $CIP,
             'COV' => $COV,
             'BNC' => $BNC,
-            'machines' => $machineShutdowns
+            'machines' => $machineShutdowns,
+            'external' => $externalShutdowns
         ]);
 
         return response()->json($tab);
@@ -174,7 +191,13 @@ class FormController extends Controller
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
 
 
-
+            $speedLossesEvents =  DB::table('ole_speed_losses')
+                ->select('ole_speed_losses.duration', 'ole_speed_losses.reason', 'ole_speed_losses.comment', 'ole_pos.id', 'ole_pos.qtyProduced', 'ole_pos.workingDuration', 'ole_products.size', 'ole_products.idealRate')
+                ->whereDate('ole_speed_losses.created_at', '>=', $beginningDate)
+                ->whereDate('ole_speed_losses.created_at', '<=', $endingDate)
+                ->join('ole_pos','ole_pos.number','=','ole_speed_losses.OLE')
+                ->join('ole_products', 'ole_products.GMID', '=', 'ole_pos.GMIDCode')
+                ->get();
 
 
             $BM = DB::table('ole_planned_events')
@@ -436,7 +459,8 @@ class FormController extends Controller
                 'FSM' => $FSM,
                 'SITE' => $site,
                 'EVENTS' => $changingFormats,
-                'PLANNEDEVENTS' => $plannedEvents,
+                'SLEVENTS' => $speedLossesEvents,
+                'PLANNEDEVENTS' => $plannedEvents
 
             );
 
