@@ -10,9 +10,9 @@
 
             <!-- Login Form -->
             <form @submit.prevent="log">
-                <input type="text" id="login" class="fadeIn second" name="login" placeholder="nom d'utilisateur" v-model="username">
-                <input type="password" id="password" class="fadeIn third" name="login" placeholder="mot de passe" v-model="password">
-                <input v-on:click="log()" type="button" class="fadeIn fourth" value="Se Connecter">
+                <input type="text" id="login" class="fadeIn second" name="login" v-bind:placeholder="us" v-model="username">
+                <input type="password" id="password" class="fadeIn third" name="login" v-bind:placeholder="pass" v-model="password">
+                <input v-on:click="log()" type="button" class="fadeIn fourth" v-bind:value="lo">
             </form>
 
 
@@ -29,6 +29,10 @@
                 url : sessionStorage.getItem("url"),
                 username:'',
                 password:'',
+
+                us : this.$t("user"),
+                pass: this.$t("password"),
+                lo: this.$t("connection")
 
             }
         },

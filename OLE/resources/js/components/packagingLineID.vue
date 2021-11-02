@@ -12,7 +12,7 @@
             <div class="d-flex">
 
                 <form>
-                    <label class="" for="site">Site : </label>
+                    <label class="" for="site">{{$t("site")}}  : </label>
                     <select name="site" id="site" class="form-select" v-model="site">
                         <template v-for="site in sites[0]">
                             <option v-bind:value="site.name">
@@ -28,7 +28,7 @@
 
             <div class="d-flex">
                 <form>
-                    <label class="" for="productionline">Ligne de production : </label>
+                    <label class="" for="productionline">{{$t("productionLine")}}  : </label>
                     <select name="productionline" id="productionline" class="form-select" v-model="productionline">
                         <template v-for="productionline in sites[1]">
                             <template v-if="productionline.name === site">
@@ -46,14 +46,14 @@
 
             <br/>
 
-            <input v-on:click="load()" type="button" class="btn btn-outline-info" value="Charger">
+            <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
 
             <template v-if="show === 1">
                 <br/>
 
                 <br/>
 
-                <h2>Diagramme de flux</h2>
+                <h2>{{$t("flowDiagram")}}</h2>
 
                 <br/>
 
@@ -68,14 +68,14 @@
         <div class="col">
 
             <h1>
-                Packaging Line ID
+                {{$t("packagingLineID")}}
             </h1>
 
             <br/>
 
             <template v-if="show === 1">
                 <h2>
-                    Liste des machines
+                    {{$t("machineList")}}
                 </h2>
 
                 <div class="table-info-data">
@@ -83,10 +83,10 @@
                         <thead>
                         <tr>
                             <th scope="col"></th>
-                            <th scope="col">Machine</th>
-                            <th scope="col">Operation</th>
-                            <th scope="col">Fabricant</th>
-                            <th scope="col">Modele</th>
+                            <th scope="col">{{$t("machine")}}</th>
+                            <th scope="col">{{$t("operation")}}</th>
+                            <th scope="col">{{$t("provider")}}</th>
+                            <th scope="col">{{$t("model")}}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -108,7 +108,7 @@
                 <br/>
 
                 <h2>
-                    Liste des formats
+                    {{$t("formatList")}}
                 </h2>
 
 
@@ -116,12 +116,12 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Format</th>
-                            <th scope="col">Forme</th>
-                            <th scope="col">Mat1</th>
-                            <th scope="col">Mat2</th>
-                            <th scope="col">Mat3</th>
-                            <th scope="col">Design rate</th>
+                            <th scope="col">{{$t("format")}}</th>
+                            <th scope="col">{{$t("form")}}</th>
+                            <th scope="col">{{$t("mat1")}}</th>
+                            <th scope="col">{{$t("mat2")}}</th>
+                            <th scope="col">{{$t("mat3")}}</th>
+                            <th scope="col">{{$t("designRate")}}</th>
 
                         </tr>
                         </thead>
@@ -167,6 +167,7 @@
                 username: sessionStorage.getItem("username"),
                 index: -1,
                 show: 0,
+                lo: this.$t("load")
             }
         },
 

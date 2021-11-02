@@ -8,21 +8,28 @@
 
             <div class="d-flex">
 
+                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('fr')">
+                    FR
+                </button>
+                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('en')">
+                    EN
+                </button>
+
                 <select name="page" id="page" class="" v-model="selection">
                     <option value="packagingLineID">
-                        Packaging line ID
+                        {{$t("packagingLineID")}}
                     </option>
 
                     <option value="downtimesReport">
-                        Downtimes report
+                        {{$t("downtimesReport")}}
                     </option>
 
                     <option value="monthlyLoadFactor">
-                        Monthly load factor
+                        {{$t("monthlyLoadFactor")}}
                     </option>
 
                     <option value="productionDashboard">
-                        Production dashboard
+                        {{$t("productionDashboard")}}
                     </option>
 
                     <option value="overallLineEffectivness">
@@ -33,12 +40,14 @@
                 </select>
 
                 <button class="btn btn-outline-success" type="button" v-on:click="nextPage()">
-                    Ouvrir
+                    {{$t("open")}}
                 </button>
 
             </div>
 
         </nav>
+
+
     </div>
 
 </template>
@@ -60,6 +69,11 @@
                 console.log(this.url + this.selection);
                 window.location.href = this.url + this.selection;
             },
+
+            swapLanguage : function(language)
+            {
+                this.$i18n.locale = language;
+            }
         },
     }
 </script>

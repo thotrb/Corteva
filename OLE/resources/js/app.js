@@ -11,7 +11,31 @@ window.Vue = require('vue').default;
 
 import Vue from 'vue';
 import store from './store/index';
+import VueI18n from 'vue-i18n' // Import de vue-i18n
 
+Vue.use(VueI18n); // Utilisation de VueI18n dans Vue
+
+function loadLocaleMessages () {
+    const locales = require.context('../lang', true, /[A-Za-z0-9-_,\s]+\.json$/i)
+    const messages = {}
+    locales.keys().forEach(key => {
+        const matched = key.match(/([A-Za-z0-9-_]+)\./i);
+        if (matched && matched.length > 1) {
+            const locale = matched[1]
+            messages[locale] = locales(key)
+        }
+    });
+    return messages
+}
+
+
+// Création d'une instance i18n exportée pour être utilisée partout dans Vue
+export const i18n = new VueI18n({
+    locale: 'en',
+    fallbackLocale: 'en',
+    messages: loadLocaleMessages(),
+
+});
 
 /**
  * The following block of code may be used to automatically register your
@@ -72,6 +96,7 @@ Vue.component('unplannedDowntimeShutdowns', require('./components/unplannedDownt
  */
 
 const app = new Vue({
+    i18n, // Utilisation de i18n
     el: '#app',
     store
 });

@@ -3,7 +3,7 @@
 
         <form>
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label rcorners1" for="site">Site</label>
+                <label class="col-sm-2 col-form-label rcorners1" for="site">{{$t("site")}}</label>
                 <div class="col-sm-10">
                     <input type="text" id="site" readonly class="form-control-plaintext rcorners2"
                            v-bind:value="user[0][0].name">
@@ -11,7 +11,7 @@
             </div>
 
             <div class="form-group row">
-                <label for="crewLeader" class="col-sm-2 rcorners1">Chef d'équipe</label>
+                <label for="crewLeader" class="col-sm-2 rcorners1">{{$t("crewLeader")}}</label>
                 <select name="crewLeader" id="crewLeader" class="rcorners2">
                     <template v-for="leader in user[1]">
 
@@ -41,7 +41,7 @@
 
             <div class="form-group row">
 
-                <label for="typeTeam" class="col-sm-2 rcorners1">Type d'équipe</label>
+                <label for="typeTeam" class="col-sm-2 rcorners1">{{$t("typeTeam")}}</label>
                 <select name="Leader" id="typeTeam" class="rcorners2" v-model="selected">
                     <template v-for="shift in user[2]">
                         <option v-if="shift.worksite === user[0][0].worksiteID" v-bind:value="shift.type">
@@ -54,7 +54,7 @@
 
 
             <div class="form-group row">
-                <label for="workingDebut" class="col-sm-2 rcorners1">Heure de début</label>
+                <label for="workingDebut" class="col-sm-2 rcorners1">{{$t("startTime")}}</label>
                 <div class="col-sm-10">
                     <template v-for="shift in user[2]">
                         <input v-if="shift.type===selected" type="text" id="workingDebut" readonly
@@ -67,7 +67,7 @@
             </div>
 
             <div class="form-group row">
-                <label for="workingEnd" class="col-sm-2 rcorners1">Heure de fin</label>
+                <label for="workingEnd" class="col-sm-2 rcorners1">{{$t("endTime")}}</label>
                 <div class="col-sm-10">
                     <template v-for="shift in user[2]">
                         <input v-if="shift.type===selected" type="text" id="workingEnd" readonly
@@ -131,7 +131,7 @@
                     <div class="row production">
                         <div class="col">
                             <p align="center" class="form-control-plaintext rcorners1">
-                                Production {{productionLine.productionline_name}}
+                                {{$t("line")}}  {{productionLine.productionline_name}}
                             </p>
                         </div>
                         <!--

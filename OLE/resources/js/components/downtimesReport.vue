@@ -10,7 +10,7 @@
             <div class="d-flex">
 
                 <form>
-                    <label class="" for="site">Site : </label>
+                    <label class="" for="site">{{$t("site")}} : </label>
                     <select name="site" id="site" class="form-select" v-model="site">
                         <template v-for="site in sites[0]">
                             <option v-bind:value="site.name">
@@ -26,7 +26,7 @@
 
             <div class="d-flex">
                 <form>
-                    <label class="" for="productionline">Ligne de production : </label>
+                    <label class="" for="productionline">{{$t("productionLine")}} : </label>
                     <select name="productionline" id="productionline" class="form-select" v-model="productionline">
                         <template v-for="productionline in sites[1]">
                             <template v-if="productionline.name === site">
@@ -43,7 +43,7 @@
 
 
             <br/>
-            <input v-on:click="load()" type="button" class="btn btn-outline-info" value="Charger">
+            <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
 
             <br/>
             <br/>
@@ -56,18 +56,18 @@
 
                     <div class="col">
                         <p>
-                            Plant Operating Time :<!-- {{ allEvents['POInfo'][0].plantOperatingTime}}--> mn <br/>
-                            Planned Production Time : <!--{{ allEvents['POInfo'][0].plannedProductionTime}} -->mn <br/>
-                            Load factor :<!-- {{ allEvents['POInfo'][0].loadFactor}}--> % <br/>
+                            {{$t("plantOperatingTime")}} :<!-- {{ allEvents['POInfo'][0].plantOperatingTime}}--> mn <br/>
+                            {{$t("plannedProductionTime")}} : <!--{{ allEvents['POInfo'][0].plannedProductionTime}} -->mn <br/>
+                            {{$t("loadFactor")}} :<!-- {{ allEvents['POInfo'][0].loadFactor}}--> % <br/>
                         </p>
                     </div>
 
                     <div class="col">
 
                         <p>
-                            Volume packed : {{littersProduced}} L <br/>
-                            Nber of Production Order : {{ allEvents['SITE'].length}} <br/>
-                            Nber of items Produced : {{ qtyProduced }} Bottles<br/>
+                            {{$t("volumePacked")}} : {{littersProduced}} L <br/>
+                            {{$t("numberOfProductionOrder")}} : {{ allEvents['SITE'].length}} <br/>
+                            {{$t("numberOfItemsProduced")}} : {{ qtyProduced }}  {{$t("bottles")}} <br/>
 
                         </p>
 
@@ -79,13 +79,13 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Planned Downtime (Prioritize list)</th>
-                            <th scope="col">Duration</th>
+                            <th scope="col"> {{$t("plannedDowntime")}}  ({{$t("prioritizeList")}})</th>
+                            <th scope="col">{{$t("duration(Minutes)")}} </th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <th scope="row">1. No production planned (PP)</th>
+                            <th scope="row">1. {{$t("noProductionPlanned")}} (PP)</th>
                             <template v-if="allEvents['PP'][0].Duration === null">
                                 <td>0 mn</td>
                             </template>
@@ -95,7 +95,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">2. Planned Maintenance Activities (PM)</th>
+                            <th scope="row">2. {{$t("plannedMaintenanceActivites")}} (PM)</th>
                             <template v-if="allEvents['PM'][0].Duration === null">
                                 <td>0 mn</td>
                             </template>
@@ -104,7 +104,7 @@
                             </template>
                         </tr>
                         <tr>
-                            <th scope="row">3. Capital project implementation (CP)</th>
+                            <th scope="row">3. {{$t("capitalProjectImplementation")}} (CP)</th>
                             <template v-if="allEvents['CP'][0].Duration === null">
                                 <td>0 mn</td>
                             </template>
@@ -113,7 +113,7 @@
                             </template>
                         </tr>
                         <tr>
-                            <th scope="row">4. Breaks, meeting, shift change (BM)</th>
+                            <th scope="row">4. {{$t("breaksMeetingShiftChange")}} (BM)</th>
                             <template v-if="allEvents['BM'][0].Duration === null">
                                 <td>0 mn</td>
                             </template>
@@ -131,14 +131,14 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Unplanned Downtime</th>
-                            <th scope="col">Duration</th>
-                            <th scope="col">Nber Events</th>
+                            <th scope="col">{{$t("unplannedDowntime")}}</th>
+                            <th scope="col">{{$t("duration(Minutes)")}}</th>
+                            <th scope="col">{{$t("numberOfEvents")}}</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <th scope="row">1. Cleaning in place (CIP)</th>
+                            <th scope="row">1. {{$t("cleaningInPlace")}} (CIP)</th>
                             <template v-if="allEvents['CIP'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -152,7 +152,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">2. Change-Over (COV)</th>
+                            <th scope="row">2. {{$t("changeoOver")}} (COV)</th>
                             <template v-if="allEvents['COV'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -166,7 +166,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">3. Batch Number Change (BNC)</th>
+                            <th scope="row">3. {{$t("batchNumberChange")}} (BNC)</th>
                             <template v-if="allEvents['BNC'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -180,7 +180,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">4. Unplanned External Events (UEE)</th>
+                            <th scope="row">4. {{$t("unplannedExternalEvents")}} (UEE)</th>
                             <template v-if="allEvents['UEE'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -194,7 +194,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">5. Unplanned Shutdown of Machine (USM)</th>
+                            <th scope="row">5. {{$t("unplannedShutdownOfMachine")}} (USM)</th>
                             <template v-if="allEvents['USM'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -207,7 +207,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">6. Filler Unplanned Shutdown (UEE)</th>
+                            <th scope="row">6. {{$t("fillerUnplannedShutdown")}} (UEE)</th>
                             <template v-if="allEvents['FUS'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -230,14 +230,14 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Speed Losses</th>
-                            <th scope="col">Duration</th>
-                            <th scope="col">Nber Events</th>
+                            <th scope="col">{{$t("speedl    osses")}}</th>
+                            <th scope="col">{{$t("duration(Minutes)")}}</th>
+                            <th scope="col">{{$t("numberOfEvents")}}</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                            <th scope="row">1. Reduced Rate at Filler (RRF)</th>
+                            <th scope="row">1. {{$t("reducedRateAtFiller")}} (RRF)</th>
                             <template v-if="allEvents['RRF'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -251,7 +251,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">2. Reduced Rate at a Machine (RRM)</th>
+                            <th scope="row">2. {{$t("reducedRateAtAnOtherMachine")}} (RRM)</th>
                             <template v-if="allEvents['RRM'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -265,7 +265,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">3. Filler Own Stoppage (FOS)</th>
+                            <th scope="row">3. {{$t("fillerOwnStoppage")}} (FOS)</th>
                             <template v-if="allEvents['FOS'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -277,7 +277,7 @@
 
                         </tr>
                         <tr>
-                            <th scope="row">4. Filler Stoppage by other Machine (FSM)</th>
+                            <th scope="row">4. {{$t("fillerOwnStoppageByAnOtherMachine")}}(FSM)</th>
                             <template v-if="allEvents['FSM'][0].Duration === null">
                                 <td>0 mn</td>
                                 <td>0</td>
@@ -299,16 +299,16 @@
 
         <div class="col">
             <h1>
-                Fenetre de production
+                {{$t("productionShift")}}
 
             </h1>
             <br/>
             <div class="d-flex">
-                <label class="" for="startingPO">De</label>
+                <label class="" for="startingPO">{{$t("from")}}</label>
                 <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
 
-                <label class="" for="endingPO">A</label>
+                <label class="" for="endingPO">{{$t("to")}}</label>
                 <input type="date" id="endingPO" class=""
                        required v-model="endingDate">
             </div>
@@ -322,12 +322,12 @@
                     <div class="row">
                         <div class="col">
                             <canvas id="can" width="200" height="200"/>
-                            <h5>Form Volume Split</h5>
+                            <h5>{{$t("formVolumeSplit")}}</h5>
                         </div>
 
                         <div class="col">
                             <canvas id="can2" width="200" height="200"/>
-                            <h5>Pack Size Split</h5>
+                            <h5>{{$t("packSizeSplit")}}</h5>
 
                         </div>
 
@@ -336,13 +336,13 @@
                     <br/>
 
 
-                    <h5>Plant Operating Time Overview</h5>
+                    <h5>{{$t("plantOperatingTimeOverview")}} </h5>
                     <div class="row rect" id="rect1">
                         <p class="blueBack">
-                            Planned Production Time (PPT)
+                            {{$t("plannedProductionTime")}} (PPT)
                         </p>
                         <p class="greenBack">
-                            Planned Downtime (PD)
+                            {{$t("plannedDowntime")}} (PD)
                         </p>
                         <p>
 
@@ -353,10 +353,10 @@
 
                     <div class="row rect" id="rect2">
                         <p class="blueBack">
-                            Operating Time (OT)
+                            {{$t("operatingTime")}} (OT)
                         </p>
                         <p class="redBack">
-                            Unplanned Downtime (UD)
+                            {{$t("unplannedDowntime")}} (UD)
                         </p>
                         <p>
 
@@ -366,10 +366,10 @@
 
                     <div class="row rect" id="rect3">
                         <p class="blueBack">
-                            Net Operating Time (NOT)
+                            {{$t("netOperatingTime")}} (NOT)
                         </p>
                         <p class="redBack">
-                            Speed Losses (SL)
+                           {{$t("speedLosses")}} (SL)
                         </p>
                         <p>
                             {{(performance* 100).toFixed(2)}}%
@@ -378,10 +378,10 @@
 
                     <div class="row rect" id="rect4">
                         <p class="blueBack">
-                            Valuable Operating Time (VOT)
+                            {{$t("valuableOperatingTime")}} (VOT)
                         </p>
                         <p class="redBack">
-                            Quality Losses (QL)
+                            {{$t("qualityLosses")}} (QL)
                         </p>
                         <p>
                             {{(quality* 100).toFixed(2)}}%
@@ -401,7 +401,7 @@
                     <canvas id="Availability">
                     </canvas>
                     <template v-if="show===1">
-                        <h5>Availability</h5>
+                        <h5>{{$t("availability")}}</h5>
                     </template>
                 </div>
 
@@ -409,7 +409,7 @@
                     <canvas id="Performance">
                     </canvas>
                     <template v-if="show===1">
-                        <h5>Performance</h5>
+                        <h5>{{$t("performance")}}</h5>
                     </template>
                 </div>
 
@@ -422,7 +422,7 @@
                     <canvas id="Quality">
                     </canvas>
                     <template v-if="show===1">
-                        <h5>Quality</h5>
+                        <h5>{{$t("quality")}}</h5>
                     </template>
                 </div>
 
@@ -455,6 +455,7 @@
 
         data() {
             return {
+                lo : this.$t("load"),
                 site: '',
                 productionline: '',
                 product: '',

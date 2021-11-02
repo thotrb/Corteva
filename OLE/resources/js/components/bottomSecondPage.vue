@@ -8,13 +8,13 @@
             <template v-for="productionline in productionlines">
                 <label class="checkbox">
                     <input type="checkbox" class="check" v-on:click="setValue()">
-                    <span id="endPO" class="response PO">Fin de PO</span>
+                    <span id="endPO" class="response PO">{{$t("endPO")}}</span>
                 </label>
 
 
                 <label class="checkbox">
                     <input type="checkbox" class="check" v-on:click="setValue()">
-                    <span id="endTeam" class="response team">Fin d'équipe</span>
+                    <span id="endTeam" class="response team">{{$t("endTeam")}}</span>
                 </label>
 
             </template>
@@ -28,7 +28,7 @@
             </button>
         </div>
         <div align="left">
-            <button type="button" class="btn btn-danger" @click.prevent="backPage()">Retour</button>
+            <button type="button" class="btn btn-danger" @click.prevent="backPage()">{{$t("back")}}</button>
         </div>
     </div>
 
@@ -51,6 +51,7 @@
 
                 PO: sessionStorage.getItem("pos").split(','),
 
+
             }
         },
 
@@ -63,12 +64,12 @@
                 for (let i = 0; i < elements.length; i++) {
                     if (checkBoxes[i].checked) {
                         console.log(i);
-                        elements[i].innerHTML = "Oui";
+                        elements[i].innerHTML = this.$t("yes");
                     } else {
                         if (i % 2 === 0) {
-                            elements[i].innerHTML = "Fin de PO";
+                            elements[i].innerHTML = this.$t("endPO");
                         } else {
-                            elements[i].innerHTML = "Fin d'équipe";
+                            elements[i].innerHTML = this.$t("endTeam");
 
                         }
                     }
@@ -88,7 +89,7 @@
                 console.log(elements);
 
                 for (let i = 0; i < elements.length; i++) {
-                    if (elements[i].innerHTML === "Oui") {
+                    if (elements[i].innerHTML === this.$t("yes")) {
                         indice = i;
                         nbSelected++;
                     }

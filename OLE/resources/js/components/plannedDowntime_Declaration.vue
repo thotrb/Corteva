@@ -6,16 +6,16 @@
 
 
                 <div align="center" class="rcorners2 table-info-data">
-                    <h4>Historique des arrêts</h4>
+                    <h4>{{$t("downtimesHistory")}}</h4>
                     <br>
 
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Type</th>
-                            <th scope="col">Date de saisie</th>
-                            <th scope="col">Durée (minutes)</th>
-                            <th scope="col">Commentaire</th>
+                            <th scope="col">{{$t("type")}}</th>
+                            <th scope="col">{{$t("entryTime")}}</th>
+                            <th scope="col">{{$t("duration(Minutes)")}}</th>
+                            <th scope="col">{{$t("comments")}}</th>
 
                         </tr>
                         </thead>
@@ -58,14 +58,14 @@
 
 
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label rcorners1" for="totalDuration">Durée (minutes)</label>
+                <label class="col-sm-2 col-form-label rcorners1" for="totalDuration">{{$t("duration(Minutes)")}}</label>
                 <div class="col-sm-10">
                     <input type="number" id="totalDuration" class="form-control-plaintext rcorners2" required>
                 </div>
             </div>
 
             <div class="form-group row">
-                <label for="comments" class="col-sm-2 rcorners1">Commentaires</label>
+                <label for="comments" class="col-sm-2 rcorners1">{{$t("comments")}}</label>
                 <div class="col-sm-10">
                     <textarea id="comments">
                     </textarea>
@@ -77,18 +77,18 @@
             <div align="right">
                 <button class="btn btn-primary border-danger align-items-right btn-danger" type="button"
                         @click.prevent="backOrigin()">
-                    Annuler
+                    {{$t("cancel")}}
                 </button>
             </div>
             <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                 <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                         @click.prevent="backPage()">
-                    Retour
+                    {{$t("back")}}
                 </button>
 
                 <button class="btn btn-primary d-flex align-items-center btn-warning" id="addReasonButton" type="button"
                         @click.prevent="addReason()">
-                    Ajouter une raison
+                    {{$t("addAReason")}}
                 </button>
 
 

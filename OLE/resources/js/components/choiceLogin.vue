@@ -4,15 +4,15 @@
         <br>
         <div class="row">
             <div class="col">
-                <button v-on:click="displayLoginPage('op')" class="btn btn-primary">Connexion opérateur</button>
+                <button v-on:click="displayLoginPage('op')" class="btn btn-primary">{{ $t("choiceLoginOperator") }}</button>
             </div>
 
             <div class="col">
-                <button v-on:click="displayLoginPage('sup')" class="btn btn-primary">Connexion superviseur</button>
+                <button v-on:click="displayLoginPage('sup')" class="btn btn-primary">{{ $t("choiceLoginSupervisor") }}</button>
             </div>
 
             <div class="col">
-                <button v-on:click="displayLoginPage('admin')" class="btn btn-primary">Connexion administrateur</button>
+                <button v-on:click="displayLoginPage('admin')" class="btn btn-primary">{{ $t("choiceLoginAdministrator") }}</button>
             </div>
         </div>
     </div>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+
     export default {
         name: "choiceLogin",
         data() {

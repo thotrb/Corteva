@@ -2,10 +2,10 @@
     <div >
         <div align="center" class="productionName rcorners2">
             <template v-if="downtimeType === 'unplannedDowntime'">
-                Arrêt de production non planifié
+                {{$t("unplannedDowntime")}}
             </template>
             <template v-else>
-                Arrêt de production planifié
+                {{$t("plannedDowntime")}}
             </template>
         </div>
 
@@ -32,7 +32,7 @@
 
         <div align="left">
             <button type="button" class="btn btn-danger" @click.prevent="backPage()">
-                Retour
+                {{$t("back")}}
             </button>
         </div>
     </div>

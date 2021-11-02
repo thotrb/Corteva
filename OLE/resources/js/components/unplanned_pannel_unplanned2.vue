@@ -44,7 +44,7 @@
 
             <div align="left">
                 <button type="button" class="btn btn-danger" @click.prevent="backPage()">
-                    Retour
+                    {{$t("back")}}
                 </button>
             </div>
 
@@ -54,14 +54,14 @@
         <template v-if="printedStep === 2">
             <form>
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label rcorners1" for="time">Durée (minutes)</label>
+                    <label class="col-sm-2 col-form-label rcorners1" for="time">{{$t("duration(Minutes)")}}</label>
                     <div class="col-sm-10">
                         <input type="number" id="time" class="form-control-plaintext rcorners2">
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label for="comments" class="col-sm-2 rcorners1">Commentaires</label>
+                    <label for="comments" class="col-sm-2 rcorners1">{{$t("comments")}}</label>
                     <div class="col-sm-10">
                         <textarea type="text" id="comments" class="form-control-plaintext rcorners2"></textarea>
                     </div>
@@ -71,13 +71,13 @@
                 <div align="right">
                     <button class="btn btn-primary border-danger align-items-right btn-danger" type="button"
                             @click.prevent="backOrigin()">
-                        Annuler
+                        {{$t("cancel")}}
                     </button>
                 </div>
                 <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                     <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                             @click.prevent="backPage()">
-                        Retour
+                        {{$t("back")}}
                     </button>
 
                         <button class="btn btn-primary border-success align-items-center btn-success" type="button"

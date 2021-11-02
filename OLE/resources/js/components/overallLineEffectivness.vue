@@ -25,7 +25,7 @@
 
                 <div class="d-flex">
                     <form>
-                        <label class="" for="productionline">Ligne de production : </label>
+                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
                         <select name="productionline" id="productionline" class="form-select" v-model="productionline">
                             <template v-for="productionline in sites[1]">
                                 <template v-if="productionline.name === site">
@@ -42,7 +42,7 @@
 
                 <br/>
 
-                <input v-on:click="load()" type="button" class="btn btn-outline-info" value="Charger">
+                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
 
                 <br/>
                 <br/>
@@ -51,8 +51,7 @@
 
             <div class="col">
                 <h1>
-                    Fenetre de production
-
+                    {{$t("productionShift")}}
                 </h1>
                 <br/>
 
@@ -81,10 +80,13 @@
             </template>
             <div class="d-flex">
                 <div class="col-8">
+                    <!--
+                                        <div class="wrapper">
+                                            <canvas id="myChart5"></canvas>
+                                        </div>
+                    -->
+                    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
 
-                    <div class="wrapper">
-                        <canvas id="myChart5"></canvas>
-                    </div>
                 </div>
 
 
@@ -95,31 +97,31 @@
                             <thead>
                             <tr>
                                 <th scope="col"></th>
-                                <th scope="col">Peak Season</th>
-                                <th scope="col">All Year</th>
+                                <th scope="col">{{$t("peakSeason")}}</th>
+                                <th scope="col">{{$t("allYear")}}</th>
 
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <th scope="row">Availability</th>
-                                <td>{{moyenneAvailability * 100}} % </td>
-                                <td>{{moyenneAvailability * 100}} %</td>
+                                <th scope="row">{{$t("availability")}}</th>
+                                <td>{{(AvailabilityPerMonth[peakSeason]*100).toFixed(2)}} %</td>
+                                <td>{{(availability * 100).toFixed(2)}} %</td>
                             </tr>
                             <tr>
-                                <th scope="row">Performance</th>
-                                <td>{{moyennePerformance * 100}} %</td>
-                                <td>{{moyennePerformance * 100}} %</td>
+                                <th scope="row">{{$t("performance")}}</th>
+                                <td>{{(PerformancePerMonth[peakSeason]*100).toFixed(2)}} %</td>
+                                <td>{{(performance * 100).toFixed(2)}} %</td>
                             </tr>
                             <tr>
-                                <th scope="row">Quality</th>
-                                <td>{{moyenneQuality * 100}} % </td>
-                                <td>{{moyenneQuality * 100}} % </td>
+                                <th scope="row">{{$t("quality")}}</th>
+                                <td>{{(QualityPerMonth[peakSeason]*100).toFixed(2)}} %</td>
+                                <td>{{(quality * 100).toFixed(2)}} %</td>
                             </tr>
                             <tr>
                                 <th scope="row">OLE</th>
-                                <td>{{moyenneOLE * 100}} % </td>
-                                <td>{{moyenneOLE * 100}} % </td>
+                                <td>{{(OLEPerMonth[peakSeason]*100).toFixed(2)}} %</td>
+                                <td>{{(OLE * 100).toFixed(2)}} %</td>
                             </tr>
                             </tbody>
                         </table>
@@ -127,7 +129,7 @@
                         <br/>
 
                         <h3>
-                            Trend versus previous year
+                            {{$t("trendVersusPreviousYear")}}
                         </h3>
 
                         <br/>
@@ -142,23 +144,23 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <th scope="row">Availability</th>
-                                <td>{{((moyenneAvailability - moyenneAvailability2)*100).toFixed(2) }} % </td>
+                                <th scope="row">{{$t("availability")}}</th>
+                                <td>{{((availability - availability2)*100).toFixed(2) }} %</td>
 
                             </tr>
                             <tr>
-                                <th scope="row">Performance</th>
-                                <td>{{((moyennePerformance - moyennePerformance2)*100).toFixed(2) }} % </td>
+                                <th scope="row">{{$t("performance")}}</th>
+                                <td>{{((performance - performance2)*100).toFixed(2) }} %</td>
 
 
                             </tr>
                             <tr>
-                                <th scope="row">Quality</th>
-                                <td>{{((moyenneQuality - moyenneQuality2)*100).toFixed(2) }} %</td>
+                                <th scope="row">{{$t("quality")}}</th>
+                                <td>{{((quality - quality2)*100).toFixed(2) }} %</td>
                             </tr>
                             <tr>
                                 <th scope="row">OLE</th>
-                                <td>{{((moyenneOLE - moyenneOLE2)*100).toFixed(2) }} % </td>
+                                <td>{{((OLE - OLE2)*100).toFixed(2) }} %</td>
                             </tr>
                             </tbody>
                         </table>
@@ -166,8 +168,6 @@
 
                     </template>
                 </div>
-
-
 
 
             </div>
@@ -218,16 +218,29 @@
                 plannedProductionTimePerMonth2: [],
                 operatingTimePerMonth2: [],
 
-                moyenneOLE: 0,
-                moyenneQuality: 0,
-                moyennePerformance:0,
-                moyenneAvailability:0,
+                peakSeason: 0,
 
+                plannedDowntimes: 0,
+                unplannedDowntimes: 0,
+                plannedProductionTime: 0,
+                operatingTime: 0,
+                netOperatingTime: 0,
+                performance: 0,
+                availability: 0,
+                quality: 0,
+                OLE: 0,
 
-                moyenneOLE2: 0,
-                moyenneQuality2: 0,
-                moyennePerformance2:0,
-                moyenneAvailability2:0,
+                plannedDowntimes2: 0,
+                unplannedDowntimes2: 0,
+                plannedProductionTime2: 0,
+                operatingTime2: 0,
+                netOperatingTime2: 0,
+                performance2: 0,
+                availability2: 0,
+                quality2: 0,
+                OLE2: 0,
+
+                lo : this.$t("load"),
             }
         },
 
@@ -246,9 +259,11 @@
                     this.$store.dispatch('fetchAllEvents', tab);
                     await this.resolveAfter15Second();
                     this.loadProductionTime();
+                    this.loadProductionTimeThisYear();
 
-                    firstDayYear = this.year-1 + '-01-01';
-                    lastDayYear = this.year-1 + '-12-31';
+
+                    firstDayYear = this.year - 1 + '-01-01';
+                    lastDayYear = this.year - 1 + '-12-31';
                     tab = [];
                     tab.push(this.site);
                     tab.push(this.productionline);
@@ -257,10 +272,199 @@
                     this.$store.dispatch('fetchAllEvents', tab);
                     await this.resolveAfter15Second();
                     this.loadProductionTime2();
+                    this.loadProductionTimePreviousYear();
+
 
                     this.show = 1;
                     this.graph2();
                 }
+
+
+            },
+
+            loadProductionTimePreviousYear : function(){
+                var sommePlannedEvents = 0;
+                var sommeUnplannedEvents = 0;
+
+                var sommeQtyProduced = 0;
+                var sommeRejection = 0;
+
+                var fillerCounter = 0;
+                var caperCounter = 0;
+                var labelerCounter = 0;
+                var wieghtBoxCounter = 0;
+
+                this.netOperatingTime2 = 0;
+                var sommeWorkingTime = 0;
+
+
+                for (let i = 0; i < this.allEvents['SITE'].length; i++) {
+
+                    sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+
+
+                    let PO = this.allEvents['SITE'][i];
+                    sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+                    sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+                    fillerCounter += PO.fillerCounter * 1;
+                    caperCounter += PO.caperCounter * 1;
+                    labelerCounter += PO.labelerCounter * 1;
+                    wieghtBoxCounter += PO.weightBoxCounter * 1;
+                    this.netOperatingTime2 += (this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1) / this.allEvents['SITE'][i].idealRate * 1;
+                    for (let j = 0; j < this.allEvents['EVENTS'].length; j++) {
+
+                        if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+                            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+
+
+                        }
+
+                    }
+
+                    for (let k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+                        if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+                            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+                        }
+                    }
+                }
+
+
+                this.plannedDowntimes2 = sommePlannedEvents;
+                this.unplannedDowntimes2 = sommeUnplannedEvents;
+
+
+                this.plannedProductionTime2 = sommeWorkingTime - sommePlannedEvents;
+                this.operatingTime2 = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+
+                this.availability2 = (this.operatingTime2 / this.plannedProductionTime2);
+                this.performance2 = (this.netOperatingTime2 / this.operatingTime2);
+
+                console.log('net OP TIME : ');
+                console.log(this.netOperatingTime2);
+                console.log(' OP TIME : ');
+                console.log(this.operatingTime2);
+
+                if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0
+                    && labelerCounter === 0 && wieghtBoxCounter === 0) {
+                    this.quality2 = 1;
+                } else {
+                    var s = (fillerCounter - sommeQtyProduced) + (caperCounter - sommeQtyProduced)
+                        + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+                    this.quality2 = ((sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s));
+
+                }
+
+
+                if (this.operatingTime2 === 0) {
+                    this.availability2 = 0;
+
+                }
+
+                if (this.netOperatingTime2 === 0) {
+                    this.performance2 = 0;
+                    this.unplannedDowntimes2 = 1;
+                }
+
+                if (this.plannedProductionTime2 === 0) {
+                    this.plannedDowntimes2 = 1;
+                }
+
+                this.OLE2 = (this.availability2 * this.performance2 * this.quality2);
+
+
+            },
+
+            loadProductionTimeThisYear : function(){
+
+
+                var sommePlannedEvents = 0;
+                var sommeUnplannedEvents = 0;
+
+                var sommeQtyProduced = 0;
+                var sommeRejection = 0;
+
+                var fillerCounter = 0;
+                var caperCounter = 0;
+                var labelerCounter = 0;
+                var wieghtBoxCounter = 0;
+
+                this.netOperatingTime = 0;
+                var sommeWorkingTime = 0;
+
+
+                for (let i = 0; i < this.allEvents['SITE'].length; i++) {
+
+                    sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+
+
+                    let PO = this.allEvents['SITE'][i];
+                    sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+                    sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+                    fillerCounter += PO.fillerCounter * 1;
+                    caperCounter += PO.caperCounter * 1;
+                    labelerCounter += PO.labelerCounter * 1;
+                    wieghtBoxCounter += PO.weightBoxCounter * 1;
+                    this.netOperatingTime += (this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1) / this.allEvents['SITE'][i].idealRate * 1;
+                    for (let j = 0; j < this.allEvents['EVENTS'].length; j++) {
+
+                        if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+                            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+
+
+                        }
+
+                    }
+
+                    for (let k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+                        if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+                            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+                        }
+                    }
+                }
+
+
+                this.plannedDowntimes = sommePlannedEvents;
+                this.unplannedDowntimes = sommeUnplannedEvents;
+
+
+                this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
+                this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+
+                this.availability =( this.operatingTime / this.plannedProductionTime);
+                this.performance = (this.netOperatingTime / this.operatingTime);
+
+                console.log('net OP TIME : ');
+                console.log(this.netOperatingTime);
+                console.log(' OP TIME : ');
+                console.log(this.operatingTime);
+
+                if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0
+                    && labelerCounter === 0 && wieghtBoxCounter === 0) {
+                    this.quality = 1;
+                } else {
+                    var s = (fillerCounter - sommeQtyProduced) + (caperCounter - sommeQtyProduced)
+                        + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+                    this.quality = ((sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s));
+
+                }
+
+
+                if (this.operatingTime === 0) {
+                    this.availability = 0;
+
+                }
+
+                if (this.netOperatingTime === 0) {
+                    this.performance = 0;
+                    this.unplannedDowntimes = 1;
+                }
+
+                if (this.plannedProductionTime === 0) {
+                    this.plannedDowntimes = 1;
+                }
+
+                this.OLE = this.availability * this.performance * this.quality;
+
 
 
             },
@@ -273,8 +477,8 @@
                 });
             },
 
-            loadProductionTime: function () {
 
+            loadProductionTime: function () {
 
 
                 var sommeWorkingTimePerMonth = [];
@@ -348,6 +552,17 @@
                             sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
                         }
                     }
+
+                    var max = -1;
+                    for(let i=0; i<sommeWorkingTimePerMonth.length; i++){
+
+                        if(sommeWorkingTimePerMonth[i] > max){
+                            max = sommeWorkingTimePerMonth[i];
+                            this.peakSeason = i;
+                        }
+                    }
+
+
                 }
 
                 this.plannedDowntimesPerMonth = sumPlannedEventsPerMonth;
@@ -408,25 +623,9 @@
 
 
 
-
-                for (let i = 0; i < this.OLEPerMonth.length; i++) {
-                    this.moyenneOLE += this.OLEPerMonth[i];
-                    this.moyenneAvailability += this.AvailabilityPerMonth[i];
-                    this.moyennePerformance += this.PerformancePerMonth[i];
-                    this.moyenneQuality += this.QualityPerMonth[i];
-                }
-
-                this.moyenneOLE = (this.moyenneOLE/12).toFixed(2);
-                this.moyenneAvailability = (this.moyenneAvailability/12).toFixed(2);
-                this.moyennePerformance = (this.moyennePerformance/12).toFixed(2);
-                this.moyenneQuality = (this.moyenneQuality/12).toFixed(2);
-
-
-
-
             },
 
-            loadProductionTime2 : function (){
+            loadProductionTime2: function () {
 
                 var sommeWorkingTimePerMonth = [];
                 var sommeQtyProducedPerMonth = [];
@@ -553,174 +752,114 @@
                 }
 
 
-
-
-                for (let i = 0; i < this.OLEPerMonth2.length; i++) {
-                    this.moyenneOLE2 += this.OLEPerMonth2[i];
-                    this.moyenneAvailability2 += this.AvailabilityPerMonth2[i];
-                    this.moyennePerformance2 += this.PerformancePerMonth2[i];
-                    this.moyenneQuality2 += this.QualityPerMonth2[i];
-                }
-
-                this.moyenneOLE2 = (this.moyenneOLE2/12).toFixed(2);
-                this.moyenneAvailability2 = (this.moyenneAvailability2/12).toFixed(2);
-                this.moyennePerformance2 = (this.moyennePerformance2/12).toFixed(2);
-                this.moyenneQuality2 = (this.moyenneQuality2/12).toFixed(2);
-
-
-
-
             },
 
             graph2: function () {
 
+
                 var chart = new CanvasJS.Chart("chartContainer", {
                     animationEnabled: true,
                     theme: "light2",
-                    title:{
-                        text: "Site Traffic"
+                    title: {
+                        text: "Overall Line Effectiveness"
                     },
-                    axisX:{
-                        valueFormatString: "DD MMM",
-                        crosshair: {
-                            enabled: true,
-                            snapToDataPoint: true
-                        }
+                    axisX: {
+                        valueFormatString: "MMM"
                     },
-                    axisY: {
-                        title: "Number of Visits",
-                        includeZero: true,
-                        crosshair: {
-                            enabled: true
-                        }
+                    axisY: {},
+                    toolTip: {
+                        shared: true
                     },
-                    toolTip:{
-                        shared:true
+                    legend: {
+                        cursor: "pointer",
+                        //itemclick: this.toggleDataSeries
                     },
-                    legend:{
-                        cursor:"pointer",
-                        verticalAlign: "bottom",
-                        horizontalAlign: "left",
-                        dockInsidePlotArea: true,
-                        itemclick: toogleDataSeries
-                    },
-                    data: [{
-                        type: "line",
-                        showInLegend: true,
-                        name: "Total Visit",
-                        markerType: "square",
-                        xValueFormatString: "DD MMM, YYYY",
-                        color: "#F08080",
-                        dataPoints: [
-                            { x: new Date(2017, 0, 3), y: 650 },
-                            { x: new Date(2017, 0, 4), y: 700 },
-                            { x: new Date(2017, 0, 5), y: 710 },
-                            { x: new Date(2017, 0, 6), y: 658 },
-                            { x: new Date(2017, 0, 7), y: 734 },
-                            { x: new Date(2017, 0, 8), y: 963 },
-                            { x: new Date(2017, 0, 9), y: 847 },
-                            { x: new Date(2017, 0, 10), y: 853 },
-                            { x: new Date(2017, 0, 11), y: 869 },
-                            { x: new Date(2017, 0, 12), y: 943 },
-                            { x: new Date(2017, 0, 13), y: 970 },
-                            { x: new Date(2017, 0, 14), y: 869 },
-                            { x: new Date(2017, 0, 15), y: 890 },
-                            { x: new Date(2017, 0, 16), y: 930 }
-                        ]
-                    },
+                    data: [
+                        {
+                            type: "column",
+                            name: "OLE",
+                            showInLegend: true,
+                            xValueFormatString: "MMMM YYYY",
+                            yValueFormatString: "#,##0",
+                            dataPoints: [
+                                {x: new Date(this.year, 0), y: this.OLEPerMonth[0]},
+                                {x: new Date(this.year, 1), y: this.OLEPerMonth[1]},
+                                {x: new Date(this.year, 2), y: this.OLEPerMonth[2]},
+                                {x: new Date(this.year, 3), y: this.OLEPerMonth[3]},
+                                {x: new Date(this.year, 4), y: this.OLEPerMonth[4]},
+                                {x: new Date(this.year, 5), y: this.OLEPerMonth[5]},
+                                {x: new Date(this.year, 6), y: this.OLEPerMonth[6]},
+                                {x: new Date(this.year, 7), y: this.OLEPerMonth[7]},
+                                {x: new Date(this.year, 8), y: this.OLEPerMonth[8]},
+                                {x: new Date(this.year, 9), y: this.OLEPerMonth[9]},
+                                {x: new Date(this.year, 10), y: this.OLEPerMonth[10]},
+                                {x: new Date(this.year, 11), y: this.OLEPerMonth[11]}
+                            ]
+                        },
                         {
                             type: "line",
+                            name: "Performance",
                             showInLegend: true,
-                            name: "Unique Visit",
-                            lineDashType: "dash",
+                            yValueFormatString: "#,##0",
                             dataPoints: [
-                                { x: new Date(2017, 0, 3), y: 510 },
-                                { x: new Date(2017, 0, 4), y: 560 },
-                                { x: new Date(2017, 0, 5), y: 540 },
-                                { x: new Date(2017, 0, 6), y: 558 },
-                                { x: new Date(2017, 0, 7), y: 544 },
-                                { x: new Date(2017, 0, 8), y: 693 },
-                                { x: new Date(2017, 0, 9), y: 657 },
-                                { x: new Date(2017, 0, 10), y: 663 },
-                                { x: new Date(2017, 0, 11), y: 639 },
-                                { x: new Date(2017, 0, 12), y: 673 },
-                                { x: new Date(2017, 0, 13), y: 660 },
-                                { x: new Date(2017, 0, 14), y: 562 },
-                                { x: new Date(2017, 0, 15), y: 643 },
-                                { x: new Date(2017, 0, 16), y: 570 }
+                                {x: new Date(this.year, 0), y: this.PerformancePerMonth[0]},
+                                {x: new Date(this.year, 1), y: this.PerformancePerMonth[1]},
+                                {x: new Date(this.year, 2), y: this.PerformancePerMonth[2]},
+                                {x: new Date(this.year, 3), y: this.PerformancePerMonth[3]},
+                                {x: new Date(this.year, 4), y: this.PerformancePerMonth[4]},
+                                {x: new Date(this.year, 5), y: this.PerformancePerMonth[5]},
+                                {x: new Date(this.year, 6), y: this.PerformancePerMonth[6]},
+                                {x: new Date(this.year, 7), y: this.PerformancePerMonth[7]},
+                                {x: new Date(this.year, 8), y: this.PerformancePerMonth[8]},
+                                {x: new Date(this.year, 9), y: this.PerformancePerMonth[9]},
+                                {x: new Date(this.year, 10), y: this.PerformancePerMonth[10]},
+                                {x: new Date(this.year, 11), y: this.PerformancePerMonth[11]}
+                            ]
+                        },
+                        {
+                            type: "line",
+                            name: "Availability",
+                            showInLegend: true,
+                            yValueFormatString: "#,##0",
+                            dataPoints: [
+                                {x: new Date(this.year, 0), y: this.AvailabilityPerMonth[0]},
+                                {x: new Date(this.year, 1), y: this.AvailabilityPerMonth[1]},
+                                {x: new Date(this.year, 2), y: this.AvailabilityPerMonth[2]},
+                                {x: new Date(this.year, 3), y: this.AvailabilityPerMonth[3]},
+                                {x: new Date(this.year, 4), y: this.AvailabilityPerMonth[4]},
+                                {x: new Date(this.year, 5), y: this.AvailabilityPerMonth[5]},
+                                {x: new Date(this.year, 6), y: this.AvailabilityPerMonth[6]},
+                                {x: new Date(this.year, 7), y: this.AvailabilityPerMonth[7]},
+                                {x: new Date(this.year, 8), y: this.AvailabilityPerMonth[8]},
+                                {x: new Date(this.year, 9), y: this.AvailabilityPerMonth[9]},
+                                {x: new Date(this.year, 10), y: this.AvailabilityPerMonth[10]},
+                                {x: new Date(this.year, 11), y: this.AvailabilityPerMonth[11]}
+                            ]
+                        },
+                        {
+                            type: "line",
+                            name: "Quality",
+                            showInLegend: true,
+                            yValueFormatString: "#,##0",
+                            dataPoints: [
+                                {x: new Date(this.year, 0), y: this.QualityPerMonth[0]},
+                                {x: new Date(this.year, 1), y: this.QualityPerMonth[1]},
+                                {x: new Date(this.year, 2), y: this.QualityPerMonth[2]},
+                                {x: new Date(this.year, 3), y: this.QualityPerMonth[3]},
+                                {x: new Date(this.year, 4), y: this.QualityPerMonth[4]},
+                                {x: new Date(this.year, 5), y: this.QualityPerMonth[5]},
+                                {x: new Date(this.year, 6), y: this.QualityPerMonth[6]},
+                                {x: new Date(this.year, 7), y: this.QualityPerMonth[7]},
+                                {x: new Date(this.year, 8), y: this.QualityPerMonth[8]},
+                                {x: new Date(this.year, 9), y: this.QualityPerMonth[9]},
+                                {x: new Date(this.year, 10), y: this.QualityPerMonth[10]},
+                                {x: new Date(this.year, 11), y: this.QualityPerMonth[11]}
                             ]
                         }]
                 });
                 chart.render();
 
-
-
-
-                var ctx = document.getElementById("myChart5").getContext('2d');
-                var tab = [];
-                var colors = [];
-                colors.push("#008d93");
-
-                var ar = [];
-                for (let j = 0; j < this.OLEPerMonth.length; j++) {
-                    ar.push((this.OLEPerMonth[j] * 100).toFixed(2));
-                }
-                var obj = {
-                    label: 'Overall Line Effectivness',
-                    backgroundColor: colors[0],
-                    data: ar
-                };
-
-                tab.push(obj);
-
-
-                console.log('tab');
-
-                console.log(tab);
-
-
-                var myChart = new Chart(ctx, {
-                    type: 'bar',
-                    animationEnabled: true,
-                    theme: "light2",
-                    title:{
-                        text: "Overall Line Effectiveness"
-                    },
-                    data: {
-                        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                        datasets: tab,
-
-                    },
-                    options: {
-                        tooltips: {
-                            displayColors: true,
-                            callbacks: {
-                                mode: 'x',
-                            },
-                        },
-                        scales: {
-                            xAxes: [{
-                                stacked: true,
-                                gridLines: {
-                                    display: false,
-                                }
-                            }],
-                            yAxes: [{
-                                stacked: true,
-                                ticks: {
-                                    beginAtZero: true,
-                                },
-                                type: 'linear',
-                            }]
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        legend: {position: 'bottom'},
-                    }
-                });
-
             },
-
 
 
         },
@@ -729,7 +868,7 @@
         mounted() {
             this.$store.dispatch('fetchSites');
             let chartJs = document.createElement('script');
-            chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
+            chartJs.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
             document.head.appendChild(chartJs);
 
             for (let i = this.startYear; i <= this.currentYear; i++) this.years.push(i);

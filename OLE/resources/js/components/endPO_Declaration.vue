@@ -7,12 +7,12 @@
         <template v-if="displayNumber === 0">
             <div align="center">
                 <div align="center" class="col productionName rcorners2">
-                    Performance
+                    {{$t("performance")}}
                 </div>
 
                 <form>
                     <div class="form-group row blockInput">
-                        <label class="col-sm-2 col-form-label rcorners1" for="startingPO">Heure de début de PO</label>
+                        <label class="col-sm-2 col-form-label rcorners1" for="startingPO">{{$t("POStartTime")}}</label>
                         <div class="col-sm-10">
                             <!--<input type="number" id="startingPO" class="form-control-plaintext rcorners2"
                             v-bind:value="startPO" disabled>-->
@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="form-group row blockInput">
-                        <label for="endingPO" class="col-sm-2 rcorners1">Heure de fin de PO</label>
+                        <label for="endingPO" class="col-sm-2 rcorners1">{{$t("POEndTime")}}</label>
                         <div class="col-sm-10">
                             <!--<input type="number" id="endingPO" class="form-control-plaintext rcorners2"
                             v-bind:value="endPO">-->
@@ -35,8 +35,7 @@
                     </div>
 
                     <div class="form-group row blockInput">
-                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">Quantité finale produite <br>(en
-                            nombre de caisse) </label>
+                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">{{$t("finalQuantityProduced(Cases)")}}<br> </label>
                         <div class="col-sm-10">
                             <input type="number" id="finalQuantityProduced" class="form-control-plaintext rcorners2"
                                    v-model="finalQuantityProduced">
@@ -45,7 +44,7 @@
 
                     <button class="btn btn-primary d-flex align-items-center btn-info" type="button"
                             @click.prevent="validateCalculation()">
-                        Valider
+                        {{$t("validate")}}
                     </button>
 
 
@@ -58,27 +57,27 @@
 
                         <div align="left">
 
-                            TOTAL PO PRODUCTION TIME (min): {{totalProductionTime}}
+                            {{$t("totalPOProductionTime")}} (min): {{totalProductionTime}}
                             <br/>
-                            TOTAL PO OPERATING TIME (min): {{totalOperatingTime}}
+                            {{$t("totalPOOperatingTime")}} (min): {{totalOperatingTime}}
                             <br/>
-                            DIFFERENCE (min): {{totalProductionTime - totalOperatingTime}}
+                            {{$t("difference")}} (min): {{totalProductionTime - totalOperatingTime}}
                             <br/>
 
-                            TOTAL PO PERFORMANCE (%) : {{performance * 100}}
+                            {{$t("totalPOPerformance")}} (%) : {{performance * 100}}
                         </div>
 
                         <br/>
 
                         <template v-if="speedLoss.length <= 0">
-                            <h4>Aucune perte de performance enregistrée</h4>
+                            <h4>{{$t("noPerformanceRegistered")}}</h4>
                         </template>
                         <template v-else>
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th scope="col">Raison</th>
-                                    <th scope="col">Commentaire</th>
+                                    <th scope="col">{{$t("reason")}}</th>
+                                    <th scope="col">{{$t("comments")}}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -101,7 +100,7 @@
                 <div align="right">
                     <button class="btn btn-primary border-danger align-items-right btn-danger" type="button"
                             @click.prevent="backPage()">
-                        Annuler
+                        {{$t("cancel")}}
                     </button>
                 </div>
 
@@ -110,13 +109,13 @@
                     <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                         <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                                 @click.prevent="backPage()">
-                            Retour
+                            {{$t("back")}}
                         </button>
 
                         <button class="btn btn-primary d-flex align-items-center btn-warning" id="addReasonButton"
                                 type="button"
                                 @click.prevent="addSpeedLoss()">
-                            Justification perte de performance
+                            {{$t("speedLossJustification")}}
                         </button>
 
 
@@ -134,7 +133,7 @@
         <template v-if="displayNumber ===1">
             <div>
                 <div align="center" class="productionName rcorners2">
-                    Perte de vitesse {{nbSpeedLosses + 1}}
+                    {{$t("speedLoss")}} {{nbSpeedLosses + 1}}
                 </div>
 
                 <br/>
@@ -147,7 +146,7 @@
                             <input type="radio"
                                    id="answer1" name="reponseQuestion"
                                    value="Reduced Rate At Filler" class="response">
-                            <span>Niveau réduit au remplisseur</span>
+                            <span>{{$t("reducedRateAtFiller")}}</span>
                         </label>
 
                     </div>
@@ -157,7 +156,7 @@
                             <input type="radio"
                                    id="answer2" name="reponseQuestion"
                                    value="Reduce Rate At An Other Machine" class="response">
-                            <span>Niveau réduit à une autre machine</span>
+                            <span>{{$t("reduceRateAtAnOtherMachine")}}</span>
                         </label>
 
 
@@ -169,7 +168,7 @@
                             <input type="radio"
                                    id="answer3" name="reponseQuestion"
                                    value="Filler Own Stoppage" class="response">
-                            <span>Remplisseur mis à l'arrêt de lui-même</span>
+                            <span>{{$t("fillerOwnStoppage")}}</span>
                         </label>
 
 
@@ -180,7 +179,7 @@
                             <input type="radio"
                                    id="answer4" name="reponseQuestion"
                                    value="Filler Own Stoppage By An Other Machine" class="response">
-                            <span>Remplisseur mis à l'arrêt par une autre source</span>
+                            <span>{{$t("fillerOwnStoppageByAnOtherMachine")}}</span>
                         </label>
 
                     </div>
@@ -191,7 +190,7 @@
 
                 <form>
                     <div class="form-group row">
-                        <label for="comments" class="col-sm-2 rcorners1">Commentaires</label>
+                        <label for="comments" class="col-sm-2 rcorners1">{{$t("comments")}}</label>
                         <div class="col-sm-10">
                             <textarea id="comments" class="form-control-plaintext rcorners2"></textarea>
                         </div>
@@ -203,7 +202,7 @@
                 <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                     <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                             @click.prevent="resetPage()">
-                        Retour
+                        {{$t("back")}}
                     </button>
 
 
@@ -221,7 +220,7 @@
 
             <div align="center">
                 <div align="center" class="col productionName rcorners2">
-                    Qualité
+                    {{$t("quality")}}
                 </div>
 
 
@@ -229,16 +228,16 @@
                     <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col"> Remplisseuse</th>
-                        <th scope="col">Visseuse</th>
-                        <th scope="col">Etiqueteuse</th>
-                        <th scope="col">Poids des boites</th>
+                        <th scope="col">{{$t("filler")}}</th>
+                        <th scope="col">{{$t("caper")}}</th>
+                        <th scope="col">{{$t("labeller")}}</th>
+                        <th scope="col">{{$t("boxWeigher")}}</th>
 
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <th scope="row">Compteur</th>
+                        <th scope="row">{{$t("counter")}}</th>
                         <td>
                             <input type="number" id="FillerCounter" class="rcorners2" v-model="FillerCounter">
                         </td>
@@ -255,7 +254,7 @@
 
                     </tr>
                     <tr>
-                        <th scope="row">Rejection</th>
+                        <th scope="row">{{$t("rejection")}}</th>
                         <td>
                             <input type="number" id="FillerRejection" class="rcorners2" v-model="FillerRejection">
                         </td>
@@ -280,7 +279,7 @@
             <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                 <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                         @click.prevent="resetPage()">
-                    Retour
+                    {{$t("back")}}
                 </button>
 
 
@@ -295,35 +294,36 @@
 
         <template v-if="displayNumber===3">
 
-            <h2 align="center">Récapitulatif</h2>
+            <h2 align="center">{{$t("summary")}}</h2>
 
             <br>
 
             <span>
 
-                TOTAL PO PRODUCTION TIME (min): {{totalProductionTime}}
+                {{$t("totalPOProductionTime")}} (min): {{totalProductionTime}}
                 <br/>
-                TOTAL PO OPERATING TIME (min): {{totalOperatingTime}}
+                {{$t("totalPOOperatingTime")}} (min): {{totalOperatingTime}}
                 <br/>
-                DIFFERENCE (min): {{totalProductionTime - totalOperatingTime}}
+                {{$t("difference")}}(min): {{totalProductionTime - totalOperatingTime}}
                 <br/>
             </span>
 
             <br/>
 
 
-            <h5>Pertes de vitesse</h5>
+            <h5>{{$t("speedlosses")}}</h5>
 
             <template v-if="speedLoss.length <= 0">
-                <h5>Aucune perte de performance enregistrée</h5>
+                <h5>{{$t("noPerformanceRegistered")}}</h5>
             </template>
+
 
             <template v-else>
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col">Raison</th>
-                        <th scope="col">Commentaire</th>
+                        <th scope="col">{{$t("reason")}}</th>
+                        <th scope="col">{{$t("comments")}}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -340,7 +340,7 @@
             </template>
 
 
-            <h5>Qualité</h5>
+            <h5>{{$t("quality")}}</h5>
 
             <br/>
 
@@ -349,16 +349,16 @@
                 <thead>
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col"> Remplisseuse</th>
-                    <th scope="col">Caper</th>
-                    <th scope="col">Etiqueteuse</th>
-                    <th scope="col">Poids des boites</th>
+                    <th scope="col"> {{$t("filler")}}</th>
+                    <th scope="col">{{$t("caper")}}</th>
+                    <th scope="col">{{$t("labeller")}}</th>
+                    <th scope="col">{{$t("boxWeigher")}}</th>
 
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <th scope="row">Compteur</th>
+                    <th scope="row">{{$t("counter")}}</th>
                     <td>
                         {{FillerCounter}}
                     </td>
@@ -374,7 +374,7 @@
 
                 </tr>
                 <tr>
-                    <th scope="row">Rejection</th>
+                    <th scope="row">{{$t("rejection")}}</th>
                     <td>
                         {{FillerRejection}}
                     </td>
@@ -394,15 +394,15 @@
             </table>
             <br/>
 
-            <h5>Indicateurs</h5>
+            <h5>{{$t("indicators")}}</h5>
 
             <span>
 
-                 Disponibilité (%) :  {{availability * 100}}
+                 {{$t("availability")}} (%) :  {{availability * 100}}
                 <br/>
-                 Performance (%) :  {{performance * 100}}
+                 {{$t("performance")}} (%) :  {{performance * 100}}
                 <br/>
-                 Qualité (%) :  {{quality * 100}}
+                 {{$t("quality")}} (%) :  {{quality * 100}}
                 <br/>
                  OLE (%) :  {{OLE * 100}}
 
@@ -413,13 +413,13 @@
             <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                 <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
                         @click.prevent="validateInformations()">
-                    Retour
+                    {{$t("back")}}
                 </button>
 
 
                 <button class="btn btn-primary border-success align-items-center btn-success" type="button"
                         @click.prevent="saveEndPO()">
-                    Valider
+                    {{$t("validate")}}
                 </button>
             </div>
         </template>

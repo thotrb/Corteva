@@ -2372,12 +2372,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       for (var i = 0; i < elements.length; i++) {
         if (checkBoxes[i].checked) {
           console.log(i);
-          elements[i].innerHTML = "Oui";
+          elements[i].innerHTML = this.$t("yes");
         } else {
           if (i % 2 === 0) {
-            elements[i].innerHTML = "Fin de PO";
+            elements[i].innerHTML = this.$t("endPO");
           } else {
-            elements[i].innerHTML = "Fin d'équipe";
+            elements[i].innerHTML = this.$t("endTeam");
           }
         }
       }
@@ -2392,7 +2392,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       console.log(elements);
 
       for (var i = 0; i < elements.length; i++) {
-        if (elements[i].innerHTML === "Oui") {
+        if (elements[i].innerHTML === this.$t("yes")) {
           indice = i;
           nbSelected++;
         }
@@ -3191,6 +3191,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   name: "downtimesReport",
   data: function data() {
     return {
+      lo: this.$t("load"),
       site: '',
       productionline: '',
       product: '',
@@ -4611,7 +4612,10 @@ __webpack_require__.r(__webpack_exports__);
     return {
       url: sessionStorage.getItem("url"),
       username: '',
-      password: ''
+      password: '',
+      us: this.$t("user"),
+      pass: this.$t("password"),
+      lo: this.$t("connection")
     };
   },
   methods: {
@@ -5036,6 +5040,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbar",
   data: function data() {
@@ -5048,6 +5061,9 @@ __webpack_require__.r(__webpack_exports__);
     nextPage: function nextPage() {
       console.log(this.url + this.selection);
       window.location.href = this.url + this.selection;
+    },
+    swapLanguage: function swapLanguage(language) {
+      this.$i18n.locale = language;
     }
   }
 });
@@ -5292,14 +5308,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       unplannedDowntimesPerMonth2: [],
       plannedProductionTimePerMonth2: [],
       operatingTimePerMonth2: [],
-      moyenneOLE: 0,
-      moyenneQuality: 0,
-      moyennePerformance: 0,
-      moyenneAvailability: 0,
-      moyenneOLE2: 0,
-      moyenneQuality2: 0,
-      moyennePerformance2: 0,
-      moyenneAvailability2: 0
+      peakSeason: 0,
+      plannedDowntimes: 0,
+      unplannedDowntimes: 0,
+      plannedProductionTime: 0,
+      operatingTime: 0,
+      netOperatingTime: 0,
+      performance: 0,
+      availability: 0,
+      quality: 0,
+      OLE: 0,
+      plannedDowntimes2: 0,
+      unplannedDowntimes2: 0,
+      plannedProductionTime2: 0,
+      operatingTime2: 0,
+      netOperatingTime2: 0,
+      performance2: 0,
+      availability2: 0,
+      quality2: 0,
+      OLE2: 0,
+      lo: this.$t("load")
     };
   },
   methods: {
@@ -5311,7 +5339,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 if (!(this.productionline !== '' && this.year !== '')) {
-                  _context.next = 25;
+                  _context.next = 27;
                   break;
                 }
 
@@ -5328,6 +5356,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 11:
                 this.loadProductionTime();
+                this.loadProductionTimeThisYear();
                 firstDayYear = this.year - 1 + '-01-01';
                 lastDayYear = this.year - 1 + '-12-31';
                 tab = [];
@@ -5336,15 +5365,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(firstDayYear);
                 tab.push(lastDayYear);
                 this.$store.dispatch('fetchAllEvents', tab);
-                _context.next = 22;
+                _context.next = 23;
                 return this.resolveAfter15Second();
 
-              case 22:
+              case 23:
                 this.loadProductionTime2();
+                this.loadProductionTimePreviousYear();
                 this.show = 1;
                 this.graph2();
 
-              case 25:
+              case 27:
               case "end":
                 return _context.stop();
             }
@@ -5358,6 +5388,144 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return load;
     }(),
+    loadProductionTimePreviousYear: function loadProductionTimePreviousYear() {
+      var sommePlannedEvents = 0;
+      var sommeUnplannedEvents = 0;
+      var sommeQtyProduced = 0;
+      var sommeRejection = 0;
+      var fillerCounter = 0;
+      var caperCounter = 0;
+      var labelerCounter = 0;
+      var wieghtBoxCounter = 0;
+      this.netOperatingTime2 = 0;
+      var sommeWorkingTime = 0;
+
+      for (var i = 0; i < this.allEvents['SITE'].length; i++) {
+        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+        var PO = this.allEvents['SITE'][i];
+        sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounter += PO.fillerCounter * 1;
+        caperCounter += PO.caperCounter * 1;
+        labelerCounter += PO.labelerCounter * 1;
+        wieghtBoxCounter += PO.weightBoxCounter * 1;
+        this.netOperatingTime2 += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1 / this.allEvents['SITE'][i].idealRate * 1;
+
+        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+          }
+        }
+
+        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+          }
+        }
+      }
+
+      this.plannedDowntimes2 = sommePlannedEvents;
+      this.unplannedDowntimes2 = sommeUnplannedEvents;
+      this.plannedProductionTime2 = sommeWorkingTime - sommePlannedEvents;
+      this.operatingTime2 = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+      this.availability2 = this.operatingTime2 / this.plannedProductionTime2;
+      this.performance2 = this.netOperatingTime2 / this.operatingTime2;
+      console.log('net OP TIME : ');
+      console.log(this.netOperatingTime2);
+      console.log(' OP TIME : ');
+      console.log(this.operatingTime2);
+
+      if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0 && labelerCounter === 0 && wieghtBoxCounter === 0) {
+        this.quality2 = 1;
+      } else {
+        var s = fillerCounter - sommeQtyProduced + (caperCounter - sommeQtyProduced) + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+        this.quality2 = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s);
+      }
+
+      if (this.operatingTime2 === 0) {
+        this.availability2 = 0;
+      }
+
+      if (this.netOperatingTime2 === 0) {
+        this.performance2 = 0;
+        this.unplannedDowntimes2 = 1;
+      }
+
+      if (this.plannedProductionTime2 === 0) {
+        this.plannedDowntimes2 = 1;
+      }
+
+      this.OLE2 = this.availability2 * this.performance2 * this.quality2;
+    },
+    loadProductionTimeThisYear: function loadProductionTimeThisYear() {
+      var sommePlannedEvents = 0;
+      var sommeUnplannedEvents = 0;
+      var sommeQtyProduced = 0;
+      var sommeRejection = 0;
+      var fillerCounter = 0;
+      var caperCounter = 0;
+      var labelerCounter = 0;
+      var wieghtBoxCounter = 0;
+      this.netOperatingTime = 0;
+      var sommeWorkingTime = 0;
+
+      for (var i = 0; i < this.allEvents['SITE'].length; i++) {
+        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+        var PO = this.allEvents['SITE'][i];
+        sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounter += PO.fillerCounter * 1;
+        caperCounter += PO.caperCounter * 1;
+        labelerCounter += PO.labelerCounter * 1;
+        wieghtBoxCounter += PO.weightBoxCounter * 1;
+        this.netOperatingTime += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1 / this.allEvents['SITE'][i].idealRate * 1;
+
+        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
+            sommeUnplannedEvents += this.allEvents['EVENTS'][j].total_duration * 1;
+          }
+        }
+
+        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
+            sommePlannedEvents += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+          }
+        }
+      }
+
+      this.plannedDowntimes = sommePlannedEvents;
+      this.unplannedDowntimes = sommeUnplannedEvents;
+      this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
+      this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+      this.availability = this.operatingTime / this.plannedProductionTime;
+      this.performance = this.netOperatingTime / this.operatingTime;
+      console.log('net OP TIME : ');
+      console.log(this.netOperatingTime);
+      console.log(' OP TIME : ');
+      console.log(this.operatingTime);
+
+      if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0 && labelerCounter === 0 && wieghtBoxCounter === 0) {
+        this.quality = 1;
+      } else {
+        var s = fillerCounter - sommeQtyProduced + (caperCounter - sommeQtyProduced) + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
+        this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s);
+      }
+
+      if (this.operatingTime === 0) {
+        this.availability = 0;
+      }
+
+      if (this.netOperatingTime === 0) {
+        this.performance = 0;
+        this.unplannedDowntimes = 1;
+      }
+
+      if (this.plannedProductionTime === 0) {
+        this.plannedDowntimes = 1;
+      }
+
+      this.OLE = this.availability * this.performance * this.quality;
+    },
     resolveAfter15Second: function resolveAfter15Second() {
       return new Promise(function (resolve) {
         setTimeout(function () {
@@ -5422,17 +5590,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
           }
         }
+
+        var max = -1;
+
+        for (var _i2 = 0; _i2 < sommeWorkingTimePerMonth.length; _i2++) {
+          if (sommeWorkingTimePerMonth[_i2] > max) {
+            max = sommeWorkingTimePerMonth[_i2];
+            this.peakSeason = _i2;
+          }
+        }
       }
 
       this.plannedDowntimesPerMonth = sumPlannedEventsPerMonth;
       this.unplannedDowntimesPerMonth = sumUnplannedEventsPerMonth;
 
-      for (var _i2 = 0; _i2 < this.plannedProductionTimePerMonth.length; _i2++) {
-        this.plannedProductionTimePerMonth[_i2] = sommeWorkingTimePerMonth[_i2] - sumPlannedEventsPerMonth[_i2];
+      for (var _i3 = 0; _i3 < this.plannedProductionTimePerMonth.length; _i3++) {
+        this.plannedProductionTimePerMonth[_i3] = sommeWorkingTimePerMonth[_i3] - sumPlannedEventsPerMonth[_i3];
       }
 
-      for (var _i3 = 0; _i3 < this.operatingTimePerMonth.length; _i3++) {
-        this.operatingTimePerMonth[_i3] = sommeWorkingTimePerMonth[_i3] - sumPlannedEventsPerMonth[_i3] - sumUnplannedEventsPerMonth[_i3];
+      for (var _i4 = 0; _i4 < this.operatingTimePerMonth.length; _i4++) {
+        this.operatingTimePerMonth[_i4] = sommeWorkingTimePerMonth[_i4] - sumPlannedEventsPerMonth[_i4] - sumUnplannedEventsPerMonth[_i4];
       }
       /**
        console.log('indice :');
@@ -5442,51 +5619,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
        **/
 
 
-      for (var _i4 = 0; _i4 < this.AvailabilityPerMonth.length; _i4++) {
-        if (this.operatingTimePerMonth[_i4] === 0) {
-          this.AvailabilityPerMonth[_i4] = 0;
+      for (var _i5 = 0; _i5 < this.AvailabilityPerMonth.length; _i5++) {
+        if (this.operatingTimePerMonth[_i5] === 0) {
+          this.AvailabilityPerMonth[_i5] = 0;
         } else {
-          this.AvailabilityPerMonth[_i4] = this.operatingTimePerMonth[_i4] / this.plannedProductionTimePerMonth[_i4];
+          this.AvailabilityPerMonth[_i5] = this.operatingTimePerMonth[_i5] / this.plannedProductionTimePerMonth[_i5];
         }
       }
 
-      for (var _i5 = 0; _i5 < this.PerformancePerMonth.length; _i5++) {
-        if (this.netOperatingTimePerMonth[_i5] === 0) {
-          this.PerformancePerMonth[_i5] = 0;
+      for (var _i6 = 0; _i6 < this.PerformancePerMonth.length; _i6++) {
+        if (this.netOperatingTimePerMonth[_i6] === 0) {
+          this.PerformancePerMonth[_i6] = 0;
         } else {
-          this.PerformancePerMonth[_i5] = this.netOperatingTimePerMonth[_i5] / this.operatingTimePerMonth[_i5];
+          this.PerformancePerMonth[_i6] = this.netOperatingTimePerMonth[_i6] / this.operatingTimePerMonth[_i6];
         }
       }
 
-      for (var _i6 = 0; _i6 < this.QualityPerMonth.length; _i6++) {
-        if (sommeRejectionPerMonth[_i6] === 0 && fillerCounterPerMonth[_i6] === 0 && caperCounterPerMonth[_i6] === 0 && labelerCounterPerMonth[_i6] === 0 && weightBoxCounterPerMonth[_i6] === 0) {
-          this.QualityPerMonth[_i6] = 1;
+      for (var _i7 = 0; _i7 < this.QualityPerMonth.length; _i7++) {
+        if (sommeRejectionPerMonth[_i7] === 0 && fillerCounterPerMonth[_i7] === 0 && caperCounterPerMonth[_i7] === 0 && labelerCounterPerMonth[_i7] === 0 && weightBoxCounterPerMonth[_i7] === 0) {
+          this.QualityPerMonth[_i7] = 1;
         } else {
-          var s = fillerCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6] + (caperCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]) + (labelerCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]) + (weightBoxCounterPerMonth[_i6] - sommeQtyProducedPerMonth[_i6]);
-          this.QualityPerMonth[_i6] = sommeQtyProducedPerMonth[_i6] / (sommeQtyProducedPerMonth[_i6] + sommeRejectionPerMonth[_i6] + s);
+          var s = fillerCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7] + (caperCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]) + (labelerCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]) + (weightBoxCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]);
+          this.QualityPerMonth[_i7] = sommeQtyProducedPerMonth[_i7] / (sommeQtyProducedPerMonth[_i7] + sommeRejectionPerMonth[_i7] + s);
         }
       }
 
-      for (var _i7 = 0; _i7 < this.OLEPerMonth.length; _i7++) {
-        this.OLEPerMonth[_i7] = this.AvailabilityPerMonth[_i7] * this.PerformancePerMonth[_i7] * this.QualityPerMonth[_i7];
+      for (var _i8 = 0; _i8 < this.OLEPerMonth.length; _i8++) {
+        this.OLEPerMonth[_i8] = this.AvailabilityPerMonth[_i8] * this.PerformancePerMonth[_i8] * this.QualityPerMonth[_i8];
       }
 
       console.log(sommeQtyProducedPerMonth);
       console.log(this.PerformancePerMonth);
       console.log(this.QualityPerMonth);
       console.log(this.AvailabilityPerMonth);
-
-      for (var _i8 = 0; _i8 < this.OLEPerMonth.length; _i8++) {
-        this.moyenneOLE += this.OLEPerMonth[_i8];
-        this.moyenneAvailability += this.AvailabilityPerMonth[_i8];
-        this.moyennePerformance += this.PerformancePerMonth[_i8];
-        this.moyenneQuality += this.QualityPerMonth[_i8];
-      }
-
-      this.moyenneOLE = (this.moyenneOLE / 12).toFixed(2);
-      this.moyenneAvailability = (this.moyenneAvailability / 12).toFixed(2);
-      this.moyennePerformance = (this.moyennePerformance / 12).toFixed(2);
-      this.moyenneQuality = (this.moyenneQuality / 12).toFixed(2);
     },
     loadProductionTime2: function loadProductionTime2() {
       var sommeWorkingTimePerMonth = [];
@@ -5593,215 +5758,203 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       for (var _i15 = 0; _i15 < this.OLEPerMonth2.length; _i15++) {
         this.OLEPerMonth2[_i15] = this.AvailabilityPerMonth2[_i15] * this.PerformancePerMonth2[_i15] * this.QualityPerMonth2[_i15];
       }
-
-      for (var _i16 = 0; _i16 < this.OLEPerMonth2.length; _i16++) {
-        this.moyenneOLE2 += this.OLEPerMonth2[_i16];
-        this.moyenneAvailability2 += this.AvailabilityPerMonth2[_i16];
-        this.moyennePerformance2 += this.PerformancePerMonth2[_i16];
-        this.moyenneQuality2 += this.QualityPerMonth2[_i16];
-      }
-
-      this.moyenneOLE2 = (this.moyenneOLE2 / 12).toFixed(2);
-      this.moyenneAvailability2 = (this.moyenneAvailability2 / 12).toFixed(2);
-      this.moyennePerformance2 = (this.moyennePerformance2 / 12).toFixed(2);
-      this.moyenneQuality2 = (this.moyenneQuality2 / 12).toFixed(2);
     },
     graph2: function graph2() {
       var chart = new CanvasJS.Chart("chartContainer", {
         animationEnabled: true,
         theme: "light2",
         title: {
-          text: "Site Traffic"
+          text: "Overall Line Effectiveness"
         },
         axisX: {
-          valueFormatString: "DD MMM",
-          crosshair: {
-            enabled: true,
-            snapToDataPoint: true
-          }
+          valueFormatString: "MMM"
         },
-        axisY: {
-          title: "Number of Visits",
-          includeZero: true,
-          crosshair: {
-            enabled: true
-          }
-        },
+        axisY: {},
         toolTip: {
           shared: true
         },
         legend: {
-          cursor: "pointer",
-          verticalAlign: "bottom",
-          horizontalAlign: "left",
-          dockInsidePlotArea: true,
-          itemclick: toogleDataSeries
+          cursor: "pointer" //itemclick: this.toggleDataSeries
+
         },
         data: [{
-          type: "line",
+          type: "column",
+          name: "OLE",
           showInLegend: true,
-          name: "Total Visit",
-          markerType: "square",
-          xValueFormatString: "DD MMM, YYYY",
-          color: "#F08080",
+          xValueFormatString: "MMMM YYYY",
+          yValueFormatString: "#,##0",
           dataPoints: [{
-            x: new Date(2017, 0, 3),
-            y: 650
+            x: new Date(this.year, 0),
+            y: this.OLEPerMonth[0]
           }, {
-            x: new Date(2017, 0, 4),
-            y: 700
+            x: new Date(this.year, 1),
+            y: this.OLEPerMonth[1]
           }, {
-            x: new Date(2017, 0, 5),
-            y: 710
+            x: new Date(this.year, 2),
+            y: this.OLEPerMonth[2]
           }, {
-            x: new Date(2017, 0, 6),
-            y: 658
+            x: new Date(this.year, 3),
+            y: this.OLEPerMonth[3]
           }, {
-            x: new Date(2017, 0, 7),
-            y: 734
+            x: new Date(this.year, 4),
+            y: this.OLEPerMonth[4]
           }, {
-            x: new Date(2017, 0, 8),
-            y: 963
+            x: new Date(this.year, 5),
+            y: this.OLEPerMonth[5]
           }, {
-            x: new Date(2017, 0, 9),
-            y: 847
+            x: new Date(this.year, 6),
+            y: this.OLEPerMonth[6]
           }, {
-            x: new Date(2017, 0, 10),
-            y: 853
+            x: new Date(this.year, 7),
+            y: this.OLEPerMonth[7]
           }, {
-            x: new Date(2017, 0, 11),
-            y: 869
+            x: new Date(this.year, 8),
+            y: this.OLEPerMonth[8]
           }, {
-            x: new Date(2017, 0, 12),
-            y: 943
+            x: new Date(this.year, 9),
+            y: this.OLEPerMonth[9]
           }, {
-            x: new Date(2017, 0, 13),
-            y: 970
+            x: new Date(this.year, 10),
+            y: this.OLEPerMonth[10]
           }, {
-            x: new Date(2017, 0, 14),
-            y: 869
-          }, {
-            x: new Date(2017, 0, 15),
-            y: 890
-          }, {
-            x: new Date(2017, 0, 16),
-            y: 930
+            x: new Date(this.year, 11),
+            y: this.OLEPerMonth[11]
           }]
         }, {
           type: "line",
+          name: "Performance",
           showInLegend: true,
-          name: "Unique Visit",
-          lineDashType: "dash",
+          yValueFormatString: "#,##0",
           dataPoints: [{
-            x: new Date(2017, 0, 3),
-            y: 510
+            x: new Date(this.year, 0),
+            y: this.PerformancePerMonth[0]
           }, {
-            x: new Date(2017, 0, 4),
-            y: 560
+            x: new Date(this.year, 1),
+            y: this.PerformancePerMonth[1]
           }, {
-            x: new Date(2017, 0, 5),
-            y: 540
+            x: new Date(this.year, 2),
+            y: this.PerformancePerMonth[2]
           }, {
-            x: new Date(2017, 0, 6),
-            y: 558
+            x: new Date(this.year, 3),
+            y: this.PerformancePerMonth[3]
           }, {
-            x: new Date(2017, 0, 7),
-            y: 544
+            x: new Date(this.year, 4),
+            y: this.PerformancePerMonth[4]
           }, {
-            x: new Date(2017, 0, 8),
-            y: 693
+            x: new Date(this.year, 5),
+            y: this.PerformancePerMonth[5]
           }, {
-            x: new Date(2017, 0, 9),
-            y: 657
+            x: new Date(this.year, 6),
+            y: this.PerformancePerMonth[6]
           }, {
-            x: new Date(2017, 0, 10),
-            y: 663
+            x: new Date(this.year, 7),
+            y: this.PerformancePerMonth[7]
           }, {
-            x: new Date(2017, 0, 11),
-            y: 639
+            x: new Date(this.year, 8),
+            y: this.PerformancePerMonth[8]
           }, {
-            x: new Date(2017, 0, 12),
-            y: 673
+            x: new Date(this.year, 9),
+            y: this.PerformancePerMonth[9]
           }, {
-            x: new Date(2017, 0, 13),
-            y: 660
+            x: new Date(this.year, 10),
+            y: this.PerformancePerMonth[10]
           }, {
-            x: new Date(2017, 0, 14),
-            y: 562
+            x: new Date(this.year, 11),
+            y: this.PerformancePerMonth[11]
+          }]
+        }, {
+          type: "line",
+          name: "Availability",
+          showInLegend: true,
+          yValueFormatString: "#,##0",
+          dataPoints: [{
+            x: new Date(this.year, 0),
+            y: this.AvailabilityPerMonth[0]
           }, {
-            x: new Date(2017, 0, 15),
-            y: 643
+            x: new Date(this.year, 1),
+            y: this.AvailabilityPerMonth[1]
           }, {
-            x: new Date(2017, 0, 16),
-            y: 570
+            x: new Date(this.year, 2),
+            y: this.AvailabilityPerMonth[2]
+          }, {
+            x: new Date(this.year, 3),
+            y: this.AvailabilityPerMonth[3]
+          }, {
+            x: new Date(this.year, 4),
+            y: this.AvailabilityPerMonth[4]
+          }, {
+            x: new Date(this.year, 5),
+            y: this.AvailabilityPerMonth[5]
+          }, {
+            x: new Date(this.year, 6),
+            y: this.AvailabilityPerMonth[6]
+          }, {
+            x: new Date(this.year, 7),
+            y: this.AvailabilityPerMonth[7]
+          }, {
+            x: new Date(this.year, 8),
+            y: this.AvailabilityPerMonth[8]
+          }, {
+            x: new Date(this.year, 9),
+            y: this.AvailabilityPerMonth[9]
+          }, {
+            x: new Date(this.year, 10),
+            y: this.AvailabilityPerMonth[10]
+          }, {
+            x: new Date(this.year, 11),
+            y: this.AvailabilityPerMonth[11]
+          }]
+        }, {
+          type: "line",
+          name: "Quality",
+          showInLegend: true,
+          yValueFormatString: "#,##0",
+          dataPoints: [{
+            x: new Date(this.year, 0),
+            y: this.QualityPerMonth[0]
+          }, {
+            x: new Date(this.year, 1),
+            y: this.QualityPerMonth[1]
+          }, {
+            x: new Date(this.year, 2),
+            y: this.QualityPerMonth[2]
+          }, {
+            x: new Date(this.year, 3),
+            y: this.QualityPerMonth[3]
+          }, {
+            x: new Date(this.year, 4),
+            y: this.QualityPerMonth[4]
+          }, {
+            x: new Date(this.year, 5),
+            y: this.QualityPerMonth[5]
+          }, {
+            x: new Date(this.year, 6),
+            y: this.QualityPerMonth[6]
+          }, {
+            x: new Date(this.year, 7),
+            y: this.QualityPerMonth[7]
+          }, {
+            x: new Date(this.year, 8),
+            y: this.QualityPerMonth[8]
+          }, {
+            x: new Date(this.year, 9),
+            y: this.QualityPerMonth[9]
+          }, {
+            x: new Date(this.year, 10),
+            y: this.QualityPerMonth[10]
+          }, {
+            x: new Date(this.year, 11),
+            y: this.QualityPerMonth[11]
           }]
         }]
       });
       chart.render();
-      var ctx = document.getElementById("myChart5").getContext('2d');
-      var tab = [];
-      var colors = [];
-      colors.push("#008d93");
-      var ar = [];
-
-      for (var j = 0; j < this.OLEPerMonth.length; j++) {
-        ar.push((this.OLEPerMonth[j] * 100).toFixed(2));
-      }
-
-      var obj = {
-        label: 'Overall Line Effectivness',
-        backgroundColor: colors[0],
-        data: ar
-      };
-      tab.push(obj);
-      console.log('tab');
-      console.log(tab);
-      var myChart = new Chart(ctx, {
-        type: 'bar',
-        animationEnabled: true,
-        theme: "light2",
-        title: {
-          text: "Overall Line Effectiveness"
-        },
-        data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-          datasets: tab
-        },
-        options: {
-          tooltips: {
-            displayColors: true,
-            callbacks: {
-              mode: 'x'
-            }
-          },
-          scales: {
-            xAxes: [{
-              stacked: true,
-              gridLines: {
-                display: false
-              }
-            }],
-            yAxes: [{
-              stacked: true,
-              ticks: {
-                beginAtZero: true
-              },
-              type: 'linear'
-            }]
-          },
-          responsive: true,
-          maintainAspectRatio: false,
-          legend: {
-            position: 'bottom'
-          }
-        }
-      });
     }
   },
   mounted: function mounted() {
     this.$store.dispatch('fetchSites');
     var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
+    chartJs.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
     document.head.appendChild(chartJs);
 
     for (var i = this.startYear; i <= this.currentYear; i++) {
@@ -5996,7 +6149,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       tool: '',
       username: sessionStorage.getItem("username"),
       index: -1,
-      show: 0
+      show: 0,
+      lo: this.$t("load")
     };
   },
   methods: {
@@ -8989,8 +9143,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "i18n": () => (/* binding */ i18n)
+/* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
 /* harmony import */ var _store_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./store/index */ "./resources/js/store/index.js");
+/* harmony import */ var vue_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-i18n */ "./node_modules/vue-i18n/dist/vue-i18n.esm.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -9001,6 +9159,31 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js").default;
 
 
+ // Import de vue-i18n
+
+vue__WEBPACK_IMPORTED_MODULE_1__.default.use(vue_i18n__WEBPACK_IMPORTED_MODULE_2__.default); // Utilisation de VueI18n dans Vue
+
+function loadLocaleMessages() {
+  var locales = __webpack_require__("./resources/lang sync recursive [A-Za-z0-9-_,\\s]+\\.json$/");
+
+  var messages = {};
+  locales.keys().forEach(function (key) {
+    var matched = key.match(/([A-Za-z0-9-_]+)\./i);
+
+    if (matched && matched.length > 1) {
+      var locale = matched[1];
+      messages[locale] = locales(key);
+    }
+  });
+  return messages;
+} // Création d'une instance i18n exportée pour être utilisée partout dans Vue
+
+
+var i18n = new vue_i18n__WEBPACK_IMPORTED_MODULE_2__.default({
+  locale: 'en',
+  fallbackLocale: 'en',
+  messages: loadLocaleMessages()
+});
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -9039,6 +9222,8 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeShutdowns',
  */
 
 var app = new vue__WEBPACK_IMPORTED_MODULE_1__.default({
+  i18n: i18n,
+  // Utilisation de i18n
   el: '#app',
   store: _store_index__WEBPACK_IMPORTED_MODULE_0__.default
 });
@@ -47406,6 +47591,2269 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./node_modules/vue-i18n/dist/vue-i18n.esm.js":
+/*!****************************************************!*\
+  !*** ./node_modules/vue-i18n/dist/vue-i18n.esm.js ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/*!
+ * vue-i18n v8.26.5 
+ * (c) 2021 kazuya kawaguchi
+ * Released under the MIT License.
+ */
+/*  */
+
+/**
+ * constants
+ */
+
+var numberFormatKeys = [
+  'compactDisplay',
+  'currency',
+  'currencyDisplay',
+  'currencySign',
+  'localeMatcher',
+  'notation',
+  'numberingSystem',
+  'signDisplay',
+  'style',
+  'unit',
+  'unitDisplay',
+  'useGrouping',
+  'minimumIntegerDigits',
+  'minimumFractionDigits',
+  'maximumFractionDigits',
+  'minimumSignificantDigits',
+  'maximumSignificantDigits'
+];
+
+/**
+ * utilities
+ */
+
+function warn (msg, err) {
+  if (typeof console !== 'undefined') {
+    console.warn('[vue-i18n] ' + msg);
+    /* istanbul ignore if */
+    if (err) {
+      console.warn(err.stack);
+    }
+  }
+}
+
+function error (msg, err) {
+  if (typeof console !== 'undefined') {
+    console.error('[vue-i18n] ' + msg);
+    /* istanbul ignore if */
+    if (err) {
+      console.error(err.stack);
+    }
+  }
+}
+
+var isArray = Array.isArray;
+
+function isObject (obj) {
+  return obj !== null && typeof obj === 'object'
+}
+
+function isBoolean (val) {
+  return typeof val === 'boolean'
+}
+
+function isString (val) {
+  return typeof val === 'string'
+}
+
+var toString = Object.prototype.toString;
+var OBJECT_STRING = '[object Object]';
+function isPlainObject (obj) {
+  return toString.call(obj) === OBJECT_STRING
+}
+
+function isNull (val) {
+  return val === null || val === undefined
+}
+
+function isFunction (val) {
+  return typeof val === 'function'
+}
+
+function parseArgs () {
+  var args = [], len = arguments.length;
+  while ( len-- ) args[ len ] = arguments[ len ];
+
+  var locale = null;
+  var params = null;
+  if (args.length === 1) {
+    if (isObject(args[0]) || isArray(args[0])) {
+      params = args[0];
+    } else if (typeof args[0] === 'string') {
+      locale = args[0];
+    }
+  } else if (args.length === 2) {
+    if (typeof args[0] === 'string') {
+      locale = args[0];
+    }
+    /* istanbul ignore if */
+    if (isObject(args[1]) || isArray(args[1])) {
+      params = args[1];
+    }
+  }
+
+  return { locale: locale, params: params }
+}
+
+function looseClone (obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+function remove (arr, item) {
+  if (arr.delete(item)) {
+    return arr
+  }
+}
+
+function arrayFrom (arr) {
+  var ret = [];
+  arr.forEach(function (a) { return ret.push(a); });
+  return ret
+}
+
+function includes (arr, item) {
+  return !!~arr.indexOf(item)
+}
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwn (obj, key) {
+  return hasOwnProperty.call(obj, key)
+}
+
+function merge (target) {
+  var arguments$1 = arguments;
+
+  var output = Object(target);
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments$1[i];
+    if (source !== undefined && source !== null) {
+      var key = (void 0);
+      for (key in source) {
+        if (hasOwn(source, key)) {
+          if (isObject(source[key])) {
+            output[key] = merge(output[key], source[key]);
+          } else {
+            output[key] = source[key];
+          }
+        }
+      }
+    }
+  }
+  return output
+}
+
+function looseEqual (a, b) {
+  if (a === b) { return true }
+  var isObjectA = isObject(a);
+  var isObjectB = isObject(b);
+  if (isObjectA && isObjectB) {
+    try {
+      var isArrayA = isArray(a);
+      var isArrayB = isArray(b);
+      if (isArrayA && isArrayB) {
+        return a.length === b.length && a.every(function (e, i) {
+          return looseEqual(e, b[i])
+        })
+      } else if (!isArrayA && !isArrayB) {
+        var keysA = Object.keys(a);
+        var keysB = Object.keys(b);
+        return keysA.length === keysB.length && keysA.every(function (key) {
+          return looseEqual(a[key], b[key])
+        })
+      } else {
+        /* istanbul ignore next */
+        return false
+      }
+    } catch (e) {
+      /* istanbul ignore next */
+      return false
+    }
+  } else if (!isObjectA && !isObjectB) {
+    return String(a) === String(b)
+  } else {
+    return false
+  }
+}
+
+/**
+ * Sanitizes html special characters from input strings. For mitigating risk of XSS attacks.
+ * @param rawText The raw input from the user that should be escaped.
+ */
+function escapeHtml(rawText) {
+  return rawText
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+/**
+ * Escapes html tags and special symbols from all provided params which were returned from parseArgs().params.
+ * This method performs an in-place operation on the params object.
+ *
+ * @param {any} params Parameters as provided from `parseArgs().params`.
+ *                     May be either an array of strings or a string->any map.
+ *
+ * @returns The manipulated `params` object.
+ */
+function escapeParams(params) {
+  if(params != null) {
+    Object.keys(params).forEach(function (key) {
+      if(typeof(params[key]) == 'string') {
+        params[key] = escapeHtml(params[key]);
+      }
+    });
+  }
+  return params
+}
+
+/*  */
+
+function extend (Vue) {
+  if (!Vue.prototype.hasOwnProperty('$i18n')) {
+    // $FlowFixMe
+    Object.defineProperty(Vue.prototype, '$i18n', {
+      get: function get () { return this._i18n }
+    });
+  }
+
+  Vue.prototype.$t = function (key) {
+    var values = [], len = arguments.length - 1;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 1 ];
+
+    var i18n = this.$i18n;
+    return i18n._t.apply(i18n, [ key, i18n.locale, i18n._getMessages(), this ].concat( values ))
+  };
+
+  Vue.prototype.$tc = function (key, choice) {
+    var values = [], len = arguments.length - 2;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 2 ];
+
+    var i18n = this.$i18n;
+    return i18n._tc.apply(i18n, [ key, i18n.locale, i18n._getMessages(), this, choice ].concat( values ))
+  };
+
+  Vue.prototype.$te = function (key, locale) {
+    var i18n = this.$i18n;
+    return i18n._te(key, i18n.locale, i18n._getMessages(), locale)
+  };
+
+  Vue.prototype.$d = function (value) {
+    var ref;
+
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    return (ref = this.$i18n).d.apply(ref, [ value ].concat( args ))
+  };
+
+  Vue.prototype.$n = function (value) {
+    var ref;
+
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    return (ref = this.$i18n).n.apply(ref, [ value ].concat( args ))
+  };
+}
+
+/*  */
+
+/**
+ * Mixin
+ * 
+ * If `bridge` mode, empty mixin is returned,
+ * else regulary mixin implementation is returned.
+ */
+function defineMixin (bridge) {
+  if ( bridge === void 0 ) bridge = false;
+
+  function mounted () {
+    if (this !== this.$root && this.$options.__INTLIFY_META__ && this.$el) {
+      this.$el.setAttribute('data-intlify', this.$options.__INTLIFY_META__);
+    }
+  }
+
+  return bridge
+    ? { mounted: mounted } // delegate `vue-i18n-bridge` mixin implementation
+    : { // regulary 
+    beforeCreate: function beforeCreate () {
+      var options = this.$options;
+      options.i18n = options.i18n || ((options.__i18nBridge || options.__i18n) ? {} : null);
+
+      if (options.i18n) {
+        if (options.i18n instanceof VueI18n) {
+          // init locale messages via custom blocks
+          if ((options.__i18nBridge || options.__i18n)) {
+            try {
+              var localeMessages = options.i18n && options.i18n.messages ? options.i18n.messages : {};
+              var _i18n = options.__i18nBridge || options.__i18n;
+              _i18n.forEach(function (resource) {
+                localeMessages = merge(localeMessages, JSON.parse(resource));
+              });
+              Object.keys(localeMessages).forEach(function (locale) {
+                options.i18n.mergeLocaleMessage(locale, localeMessages[locale]);
+              });
+            } catch (e) {
+              if (true) {
+                error("Cannot parse locale messages via custom blocks.", e);
+              }
+            }
+          }
+          this._i18n = options.i18n;
+          this._i18nWatcher = this._i18n.watchI18nData();
+        } else if (isPlainObject(options.i18n)) {
+          var rootI18n = this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n
+            ? this.$root.$i18n
+            : null;
+          // component local i18n
+          if (rootI18n) {
+            options.i18n.root = this.$root;
+            options.i18n.formatter = rootI18n.formatter;
+            options.i18n.fallbackLocale = rootI18n.fallbackLocale;
+            options.i18n.formatFallbackMessages = rootI18n.formatFallbackMessages;
+            options.i18n.silentTranslationWarn = rootI18n.silentTranslationWarn;
+            options.i18n.silentFallbackWarn = rootI18n.silentFallbackWarn;
+            options.i18n.pluralizationRules = rootI18n.pluralizationRules;
+            options.i18n.preserveDirectiveContent = rootI18n.preserveDirectiveContent;
+          }
+
+          // init locale messages via custom blocks
+          if ((options.__i18nBridge || options.__i18n)) {
+            try {
+              var localeMessages$1 = options.i18n && options.i18n.messages ? options.i18n.messages : {};
+              var _i18n$1 = options.__i18nBridge || options.__i18n;
+              _i18n$1.forEach(function (resource) {
+                localeMessages$1 = merge(localeMessages$1, JSON.parse(resource));
+              });
+              options.i18n.messages = localeMessages$1;
+            } catch (e) {
+              if (true) {
+                warn("Cannot parse locale messages via custom blocks.", e);
+              }
+            }
+          }
+
+          var ref = options.i18n;
+          var sharedMessages = ref.sharedMessages;
+          if (sharedMessages && isPlainObject(sharedMessages)) {
+            options.i18n.messages = merge(options.i18n.messages, sharedMessages);
+          }
+
+          this._i18n = new VueI18n(options.i18n);
+          this._i18nWatcher = this._i18n.watchI18nData();
+
+          if (options.i18n.sync === undefined || !!options.i18n.sync) {
+            this._localeWatcher = this.$i18n.watchLocale();
+          }
+
+          if (rootI18n) {
+            rootI18n.onComponentInstanceCreated(this._i18n);
+          }
+        } else {
+          if (true) {
+            warn("Cannot be interpreted 'i18n' option.");
+          }
+        }
+      } else if (this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n) {
+        // root i18n
+        this._i18n = this.$root.$i18n;
+      } else if (options.parent && options.parent.$i18n && options.parent.$i18n instanceof VueI18n) {
+        // parent i18n
+        this._i18n = options.parent.$i18n;
+      }
+    },
+
+    beforeMount: function beforeMount () {
+      var options = this.$options;
+      options.i18n = options.i18n || ((options.__i18nBridge || options.__i18n) ? {} : null);
+
+      if (options.i18n) {
+        if (options.i18n instanceof VueI18n) {
+          // init locale messages via custom blocks
+          this._i18n.subscribeDataChanging(this);
+          this._subscribing = true;
+        } else if (isPlainObject(options.i18n)) {
+          this._i18n.subscribeDataChanging(this);
+          this._subscribing = true;
+        } else {
+          if (true) {
+            warn("Cannot be interpreted 'i18n' option.");
+          }
+        }
+      } else if (this.$root && this.$root.$i18n && this.$root.$i18n instanceof VueI18n) {
+        this._i18n.subscribeDataChanging(this);
+        this._subscribing = true;
+      } else if (options.parent && options.parent.$i18n && options.parent.$i18n instanceof VueI18n) {
+        this._i18n.subscribeDataChanging(this);
+        this._subscribing = true;
+      }
+    },
+
+    mounted: mounted,
+
+    beforeDestroy: function beforeDestroy () {
+      if (!this._i18n) { return }
+
+      var self = this;
+      this.$nextTick(function () {
+        if (self._subscribing) {
+          self._i18n.unsubscribeDataChanging(self);
+          delete self._subscribing;
+        }
+
+        if (self._i18nWatcher) {
+          self._i18nWatcher();
+          self._i18n.destroyVM();
+          delete self._i18nWatcher;
+        }
+
+        if (self._localeWatcher) {
+          self._localeWatcher();
+          delete self._localeWatcher;
+        }
+      });
+    }
+  }
+}
+
+/*  */
+
+var interpolationComponent = {
+  name: 'i18n',
+  functional: true,
+  props: {
+    tag: {
+      type: [String, Boolean, Object],
+      default: 'span'
+    },
+    path: {
+      type: String,
+      required: true
+    },
+    locale: {
+      type: String
+    },
+    places: {
+      type: [Array, Object]
+    }
+  },
+  render: function render (h, ref) {
+    var data = ref.data;
+    var parent = ref.parent;
+    var props = ref.props;
+    var slots = ref.slots;
+
+    var $i18n = parent.$i18n;
+    if (!$i18n) {
+      if (true) {
+        warn('Cannot find VueI18n instance!');
+      }
+      return
+    }
+
+    var path = props.path;
+    var locale = props.locale;
+    var places = props.places;
+    var params = slots();
+    var children = $i18n.i(
+      path,
+      locale,
+      onlyHasDefaultPlace(params) || places
+        ? useLegacyPlaces(params.default, places)
+        : params
+    );
+
+    var tag = (!!props.tag && props.tag !== true) || props.tag === false ? props.tag : 'span';
+    return tag ? h(tag, data, children) : children
+  }
+};
+
+function onlyHasDefaultPlace (params) {
+  var prop;
+  for (prop in params) {
+    if (prop !== 'default') { return false }
+  }
+  return Boolean(prop)
+}
+
+function useLegacyPlaces (children, places) {
+  var params = places ? createParamsFromPlaces(places) : {};
+
+  if (!children) { return params }
+
+  // Filter empty text nodes
+  children = children.filter(function (child) {
+    return child.tag || child.text.trim() !== ''
+  });
+
+  var everyPlace = children.every(vnodeHasPlaceAttribute);
+  if ( true && everyPlace) {
+    warn('`place` attribute is deprecated in next major version. Please switch to Vue slots.');
+  }
+
+  return children.reduce(
+    everyPlace ? assignChildPlace : assignChildIndex,
+    params
+  )
+}
+
+function createParamsFromPlaces (places) {
+  if (true) {
+    warn('`places` prop is deprecated in next major version. Please switch to Vue slots.');
+  }
+
+  return Array.isArray(places)
+    ? places.reduce(assignChildIndex, {})
+    : Object.assign({}, places)
+}
+
+function assignChildPlace (params, child) {
+  if (child.data && child.data.attrs && child.data.attrs.place) {
+    params[child.data.attrs.place] = child;
+  }
+  return params
+}
+
+function assignChildIndex (params, child, index) {
+  params[index] = child;
+  return params
+}
+
+function vnodeHasPlaceAttribute (vnode) {
+  return Boolean(vnode.data && vnode.data.attrs && vnode.data.attrs.place)
+}
+
+/*  */
+
+var numberComponent = {
+  name: 'i18n-n',
+  functional: true,
+  props: {
+    tag: {
+      type: [String, Boolean, Object],
+      default: 'span'
+    },
+    value: {
+      type: Number,
+      required: true
+    },
+    format: {
+      type: [String, Object]
+    },
+    locale: {
+      type: String
+    }
+  },
+  render: function render (h, ref) {
+    var props = ref.props;
+    var parent = ref.parent;
+    var data = ref.data;
+
+    var i18n = parent.$i18n;
+
+    if (!i18n) {
+      if (true) {
+        warn('Cannot find VueI18n instance!');
+      }
+      return null
+    }
+
+    var key = null;
+    var options = null;
+
+    if (isString(props.format)) {
+      key = props.format;
+    } else if (isObject(props.format)) {
+      if (props.format.key) {
+        key = props.format.key;
+      }
+
+      // Filter out number format options only
+      options = Object.keys(props.format).reduce(function (acc, prop) {
+        var obj;
+
+        if (includes(numberFormatKeys, prop)) {
+          return Object.assign({}, acc, ( obj = {}, obj[prop] = props.format[prop], obj ))
+        }
+        return acc
+      }, null);
+    }
+
+    var locale = props.locale || i18n.locale;
+    var parts = i18n._ntp(props.value, locale, key, options);
+
+    var values = parts.map(function (part, index) {
+      var obj;
+
+      var slot = data.scopedSlots && data.scopedSlots[part.type];
+      return slot ? slot(( obj = {}, obj[part.type] = part.value, obj.index = index, obj.parts = parts, obj )) : part.value
+    });
+
+    var tag = (!!props.tag && props.tag !== true) || props.tag === false ? props.tag : 'span';
+    return tag
+      ? h(tag, {
+        attrs: data.attrs,
+        'class': data['class'],
+        staticClass: data.staticClass
+      }, values)
+      : values
+  }
+};
+
+/*  */
+
+function bind (el, binding, vnode) {
+  if (!assert(el, vnode)) { return }
+
+  t(el, binding, vnode);
+}
+
+function update (el, binding, vnode, oldVNode) {
+  if (!assert(el, vnode)) { return }
+
+  var i18n = vnode.context.$i18n;
+  if (localeEqual(el, vnode) &&
+    (looseEqual(binding.value, binding.oldValue) &&
+     looseEqual(el._localeMessage, i18n.getLocaleMessage(i18n.locale)))) { return }
+
+  t(el, binding, vnode);
+}
+
+function unbind (el, binding, vnode, oldVNode) {
+  var vm = vnode.context;
+  if (!vm) {
+    warn('Vue instance does not exists in VNode context');
+    return
+  }
+
+  var i18n = vnode.context.$i18n || {};
+  if (!binding.modifiers.preserve && !i18n.preserveDirectiveContent) {
+    el.textContent = '';
+  }
+  el._vt = undefined;
+  delete el['_vt'];
+  el._locale = undefined;
+  delete el['_locale'];
+  el._localeMessage = undefined;
+  delete el['_localeMessage'];
+}
+
+function assert (el, vnode) {
+  var vm = vnode.context;
+  if (!vm) {
+    warn('Vue instance does not exists in VNode context');
+    return false
+  }
+
+  if (!vm.$i18n) {
+    warn('VueI18n instance does not exists in Vue instance');
+    return false
+  }
+
+  return true
+}
+
+function localeEqual (el, vnode) {
+  var vm = vnode.context;
+  return el._locale === vm.$i18n.locale
+}
+
+function t (el, binding, vnode) {
+  var ref$1, ref$2;
+
+  var value = binding.value;
+
+  var ref = parseValue(value);
+  var path = ref.path;
+  var locale = ref.locale;
+  var args = ref.args;
+  var choice = ref.choice;
+  if (!path && !locale && !args) {
+    warn('value type not supported');
+    return
+  }
+
+  if (!path) {
+    warn('`path` is required in v-t directive');
+    return
+  }
+
+  var vm = vnode.context;
+  if (choice != null) {
+    el._vt = el.textContent = (ref$1 = vm.$i18n).tc.apply(ref$1, [ path, choice ].concat( makeParams(locale, args) ));
+  } else {
+    el._vt = el.textContent = (ref$2 = vm.$i18n).t.apply(ref$2, [ path ].concat( makeParams(locale, args) ));
+  }
+  el._locale = vm.$i18n.locale;
+  el._localeMessage = vm.$i18n.getLocaleMessage(vm.$i18n.locale);
+}
+
+function parseValue (value) {
+  var path;
+  var locale;
+  var args;
+  var choice;
+
+  if (isString(value)) {
+    path = value;
+  } else if (isPlainObject(value)) {
+    path = value.path;
+    locale = value.locale;
+    args = value.args;
+    choice = value.choice;
+  }
+
+  return { path: path, locale: locale, args: args, choice: choice }
+}
+
+function makeParams (locale, args) {
+  var params = [];
+
+  locale && params.push(locale);
+  if (args && (Array.isArray(args) || isPlainObject(args))) {
+    params.push(args);
+  }
+
+  return params
+}
+
+var Vue;
+
+function install (_Vue, options) {
+  if ( options === void 0 ) options = { bridge: false };
+
+  /* istanbul ignore if */
+  if ( true && install.installed && _Vue === Vue) {
+    warn('already installed.');
+    return
+  }
+  install.installed = true;
+
+  Vue = _Vue;
+
+  var version = (Vue.version && Number(Vue.version.split('.')[0])) || -1;
+  /* istanbul ignore if */
+  if ( true && version < 2) {
+    warn(("vue-i18n (" + (install.version) + ") need to use Vue 2.0 or later (Vue: " + (Vue.version) + ")."));
+    return
+  }
+
+  extend(Vue);
+  Vue.mixin(defineMixin(options.bridge));
+  Vue.directive('t', { bind: bind, update: update, unbind: unbind });
+  Vue.component(interpolationComponent.name, interpolationComponent);
+  Vue.component(numberComponent.name, numberComponent);
+
+  // use simple mergeStrategies to prevent i18n instance lose '__proto__'
+  var strats = Vue.config.optionMergeStrategies;
+  strats.i18n = function (parentVal, childVal) {
+    return childVal === undefined
+      ? parentVal
+      : childVal
+  };
+}
+
+/*  */
+
+var BaseFormatter = function BaseFormatter () {
+  this._caches = Object.create(null);
+};
+
+BaseFormatter.prototype.interpolate = function interpolate (message, values) {
+  if (!values) {
+    return [message]
+  }
+  var tokens = this._caches[message];
+  if (!tokens) {
+    tokens = parse(message);
+    this._caches[message] = tokens;
+  }
+  return compile(tokens, values)
+};
+
+
+
+var RE_TOKEN_LIST_VALUE = /^(?:\d)+/;
+var RE_TOKEN_NAMED_VALUE = /^(?:\w)+/;
+
+function parse (format) {
+  var tokens = [];
+  var position = 0;
+
+  var text = '';
+  while (position < format.length) {
+    var char = format[position++];
+    if (char === '{') {
+      if (text) {
+        tokens.push({ type: 'text', value: text });
+      }
+
+      text = '';
+      var sub = '';
+      char = format[position++];
+      while (char !== undefined && char !== '}') {
+        sub += char;
+        char = format[position++];
+      }
+      var isClosed = char === '}';
+
+      var type = RE_TOKEN_LIST_VALUE.test(sub)
+        ? 'list'
+        : isClosed && RE_TOKEN_NAMED_VALUE.test(sub)
+          ? 'named'
+          : 'unknown';
+      tokens.push({ value: sub, type: type });
+    } else if (char === '%') {
+      // when found rails i18n syntax, skip text capture
+      if (format[(position)] !== '{') {
+        text += char;
+      }
+    } else {
+      text += char;
+    }
+  }
+
+  text && tokens.push({ type: 'text', value: text });
+
+  return tokens
+}
+
+function compile (tokens, values) {
+  var compiled = [];
+  var index = 0;
+
+  var mode = Array.isArray(values)
+    ? 'list'
+    : isObject(values)
+      ? 'named'
+      : 'unknown';
+  if (mode === 'unknown') { return compiled }
+
+  while (index < tokens.length) {
+    var token = tokens[index];
+    switch (token.type) {
+      case 'text':
+        compiled.push(token.value);
+        break
+      case 'list':
+        compiled.push(values[parseInt(token.value, 10)]);
+        break
+      case 'named':
+        if (mode === 'named') {
+          compiled.push((values)[token.value]);
+        } else {
+          if (true) {
+            warn(("Type of token '" + (token.type) + "' and format of value '" + mode + "' don't match!"));
+          }
+        }
+        break
+      case 'unknown':
+        if (true) {
+          warn("Detect 'unknown' type of token!");
+        }
+        break
+    }
+    index++;
+  }
+
+  return compiled
+}
+
+/*  */
+
+/**
+ *  Path parser
+ *  - Inspired:
+ *    Vue.js Path parser
+ */
+
+// actions
+var APPEND = 0;
+var PUSH = 1;
+var INC_SUB_PATH_DEPTH = 2;
+var PUSH_SUB_PATH = 3;
+
+// states
+var BEFORE_PATH = 0;
+var IN_PATH = 1;
+var BEFORE_IDENT = 2;
+var IN_IDENT = 3;
+var IN_SUB_PATH = 4;
+var IN_SINGLE_QUOTE = 5;
+var IN_DOUBLE_QUOTE = 6;
+var AFTER_PATH = 7;
+var ERROR = 8;
+
+var pathStateMachine = [];
+
+pathStateMachine[BEFORE_PATH] = {
+  'ws': [BEFORE_PATH],
+  'ident': [IN_IDENT, APPEND],
+  '[': [IN_SUB_PATH],
+  'eof': [AFTER_PATH]
+};
+
+pathStateMachine[IN_PATH] = {
+  'ws': [IN_PATH],
+  '.': [BEFORE_IDENT],
+  '[': [IN_SUB_PATH],
+  'eof': [AFTER_PATH]
+};
+
+pathStateMachine[BEFORE_IDENT] = {
+  'ws': [BEFORE_IDENT],
+  'ident': [IN_IDENT, APPEND],
+  '0': [IN_IDENT, APPEND],
+  'number': [IN_IDENT, APPEND]
+};
+
+pathStateMachine[IN_IDENT] = {
+  'ident': [IN_IDENT, APPEND],
+  '0': [IN_IDENT, APPEND],
+  'number': [IN_IDENT, APPEND],
+  'ws': [IN_PATH, PUSH],
+  '.': [BEFORE_IDENT, PUSH],
+  '[': [IN_SUB_PATH, PUSH],
+  'eof': [AFTER_PATH, PUSH]
+};
+
+pathStateMachine[IN_SUB_PATH] = {
+  "'": [IN_SINGLE_QUOTE, APPEND],
+  '"': [IN_DOUBLE_QUOTE, APPEND],
+  '[': [IN_SUB_PATH, INC_SUB_PATH_DEPTH],
+  ']': [IN_PATH, PUSH_SUB_PATH],
+  'eof': ERROR,
+  'else': [IN_SUB_PATH, APPEND]
+};
+
+pathStateMachine[IN_SINGLE_QUOTE] = {
+  "'": [IN_SUB_PATH, APPEND],
+  'eof': ERROR,
+  'else': [IN_SINGLE_QUOTE, APPEND]
+};
+
+pathStateMachine[IN_DOUBLE_QUOTE] = {
+  '"': [IN_SUB_PATH, APPEND],
+  'eof': ERROR,
+  'else': [IN_DOUBLE_QUOTE, APPEND]
+};
+
+/**
+ * Check if an expression is a literal value.
+ */
+
+var literalValueRE = /^\s?(?:true|false|-?[\d.]+|'[^']*'|"[^"]*")\s?$/;
+function isLiteral (exp) {
+  return literalValueRE.test(exp)
+}
+
+/**
+ * Strip quotes from a string
+ */
+
+function stripQuotes (str) {
+  var a = str.charCodeAt(0);
+  var b = str.charCodeAt(str.length - 1);
+  return a === b && (a === 0x22 || a === 0x27)
+    ? str.slice(1, -1)
+    : str
+}
+
+/**
+ * Determine the type of a character in a keypath.
+ */
+
+function getPathCharType (ch) {
+  if (ch === undefined || ch === null) { return 'eof' }
+
+  var code = ch.charCodeAt(0);
+
+  switch (code) {
+    case 0x5B: // [
+    case 0x5D: // ]
+    case 0x2E: // .
+    case 0x22: // "
+    case 0x27: // '
+      return ch
+
+    case 0x5F: // _
+    case 0x24: // $
+    case 0x2D: // -
+      return 'ident'
+
+    case 0x09: // Tab
+    case 0x0A: // Newline
+    case 0x0D: // Return
+    case 0xA0:  // No-break space
+    case 0xFEFF:  // Byte Order Mark
+    case 0x2028:  // Line Separator
+    case 0x2029:  // Paragraph Separator
+      return 'ws'
+  }
+
+  return 'ident'
+}
+
+/**
+ * Format a subPath, return its plain form if it is
+ * a literal string or number. Otherwise prepend the
+ * dynamic indicator (*).
+ */
+
+function formatSubPath (path) {
+  var trimmed = path.trim();
+  // invalid leading 0
+  if (path.charAt(0) === '0' && isNaN(path)) { return false }
+
+  return isLiteral(trimmed) ? stripQuotes(trimmed) : '*' + trimmed
+}
+
+/**
+ * Parse a string path into an array of segments
+ */
+
+function parse$1 (path) {
+  var keys = [];
+  var index = -1;
+  var mode = BEFORE_PATH;
+  var subPathDepth = 0;
+  var c;
+  var key;
+  var newChar;
+  var type;
+  var transition;
+  var action;
+  var typeMap;
+  var actions = [];
+
+  actions[PUSH] = function () {
+    if (key !== undefined) {
+      keys.push(key);
+      key = undefined;
+    }
+  };
+
+  actions[APPEND] = function () {
+    if (key === undefined) {
+      key = newChar;
+    } else {
+      key += newChar;
+    }
+  };
+
+  actions[INC_SUB_PATH_DEPTH] = function () {
+    actions[APPEND]();
+    subPathDepth++;
+  };
+
+  actions[PUSH_SUB_PATH] = function () {
+    if (subPathDepth > 0) {
+      subPathDepth--;
+      mode = IN_SUB_PATH;
+      actions[APPEND]();
+    } else {
+      subPathDepth = 0;
+      if (key === undefined) { return false }
+      key = formatSubPath(key);
+      if (key === false) {
+        return false
+      } else {
+        actions[PUSH]();
+      }
+    }
+  };
+
+  function maybeUnescapeQuote () {
+    var nextChar = path[index + 1];
+    if ((mode === IN_SINGLE_QUOTE && nextChar === "'") ||
+      (mode === IN_DOUBLE_QUOTE && nextChar === '"')) {
+      index++;
+      newChar = '\\' + nextChar;
+      actions[APPEND]();
+      return true
+    }
+  }
+
+  while (mode !== null) {
+    index++;
+    c = path[index];
+
+    if (c === '\\' && maybeUnescapeQuote()) {
+      continue
+    }
+
+    type = getPathCharType(c);
+    typeMap = pathStateMachine[mode];
+    transition = typeMap[type] || typeMap['else'] || ERROR;
+
+    if (transition === ERROR) {
+      return // parse error
+    }
+
+    mode = transition[0];
+    action = actions[transition[1]];
+    if (action) {
+      newChar = transition[2];
+      newChar = newChar === undefined
+        ? c
+        : newChar;
+      if (action() === false) {
+        return
+      }
+    }
+
+    if (mode === AFTER_PATH) {
+      return keys
+    }
+  }
+}
+
+
+
+
+
+var I18nPath = function I18nPath () {
+  this._cache = Object.create(null);
+};
+
+/**
+ * External parse that check for a cache hit first
+ */
+I18nPath.prototype.parsePath = function parsePath (path) {
+  var hit = this._cache[path];
+  if (!hit) {
+    hit = parse$1(path);
+    if (hit) {
+      this._cache[path] = hit;
+    }
+  }
+  return hit || []
+};
+
+/**
+ * Get path value from path string
+ */
+I18nPath.prototype.getPathValue = function getPathValue (obj, path) {
+  if (!isObject(obj)) { return null }
+
+  var paths = this.parsePath(path);
+  if (paths.length === 0) {
+    return null
+  } else {
+    var length = paths.length;
+    var last = obj;
+    var i = 0;
+    while (i < length) {
+      var value = last[paths[i]];
+      if (value === undefined || value === null) {
+        return null
+      }
+      last = value;
+      i++;
+    }
+
+    return last
+  }
+};
+
+/*  */
+
+
+
+var htmlTagMatcher = /<\/?[\w\s="/.':;#-\/]+>/;
+var linkKeyMatcher = /(?:@(?:\.[a-z]+)?:(?:[\w\-_|./]+|\([\w\-_|./]+\)))/g;
+var linkKeyPrefixMatcher = /^@(?:\.([a-z]+))?:/;
+var bracketsMatcher = /[()]/g;
+var defaultModifiers = {
+  'upper': function (str) { return str.toLocaleUpperCase(); },
+  'lower': function (str) { return str.toLocaleLowerCase(); },
+  'capitalize': function (str) { return ("" + (str.charAt(0).toLocaleUpperCase()) + (str.substr(1))); }
+};
+
+var defaultFormatter = new BaseFormatter();
+
+var VueI18n = function VueI18n (options) {
+  var this$1 = this;
+  if ( options === void 0 ) options = {};
+
+  // Auto install if it is not done yet and `window` has `Vue`.
+  // To allow users to avoid auto-installation in some cases,
+  // this code should be placed here. See #290
+  /* istanbul ignore if */
+  if (!Vue && typeof window !== 'undefined' && window.Vue) {
+    install(window.Vue);
+  }
+
+  var locale = options.locale || 'en-US';
+  var fallbackLocale = options.fallbackLocale === false
+    ? false
+    : options.fallbackLocale || 'en-US';
+  var messages = options.messages || {};
+  var dateTimeFormats = options.dateTimeFormats || options.datetimeFormats || {};
+  var numberFormats = options.numberFormats || {};
+
+  this._vm = null;
+  this._formatter = options.formatter || defaultFormatter;
+  this._modifiers = options.modifiers || {};
+  this._missing = options.missing || null;
+  this._root = options.root || null;
+  this._sync = options.sync === undefined ? true : !!options.sync;
+  this._fallbackRoot = options.fallbackRoot === undefined
+    ? true
+    : !!options.fallbackRoot;
+  this._formatFallbackMessages = options.formatFallbackMessages === undefined
+    ? false
+    : !!options.formatFallbackMessages;
+  this._silentTranslationWarn = options.silentTranslationWarn === undefined
+    ? false
+    : options.silentTranslationWarn;
+  this._silentFallbackWarn = options.silentFallbackWarn === undefined
+    ? false
+    : !!options.silentFallbackWarn;
+  this._dateTimeFormatters = {};
+  this._numberFormatters = {};
+  this._path = new I18nPath();
+  this._dataListeners = new Set();
+  this._componentInstanceCreatedListener = options.componentInstanceCreatedListener || null;
+  this._preserveDirectiveContent = options.preserveDirectiveContent === undefined
+    ? false
+    : !!options.preserveDirectiveContent;
+  this.pluralizationRules = options.pluralizationRules || {};
+  this._warnHtmlInMessage = options.warnHtmlInMessage || 'off';
+  this._postTranslation = options.postTranslation || null;
+  this._escapeParameterHtml = options.escapeParameterHtml || false;
+
+  if ('__VUE_I18N_BRIDGE__' in options) {
+    this.__VUE_I18N_BRIDGE__ = options.__VUE_I18N_BRIDGE__;
+  }
+
+  /**
+   * @param choice {number} a choice index given by the input to $tc: `$tc('path.to.rule', choiceIndex)`
+   * @param choicesLength {number} an overall amount of available choices
+   * @returns a final choice index
+  */
+  this.getChoiceIndex = function (choice, choicesLength) {
+    var thisPrototype = Object.getPrototypeOf(this$1);
+    if (thisPrototype && thisPrototype.getChoiceIndex) {
+      var prototypeGetChoiceIndex = (thisPrototype.getChoiceIndex);
+      return (prototypeGetChoiceIndex).call(this$1, choice, choicesLength)
+    }
+
+    // Default (old) getChoiceIndex implementation - english-compatible
+    var defaultImpl = function (_choice, _choicesLength) {
+      _choice = Math.abs(_choice);
+
+      if (_choicesLength === 2) {
+        return _choice
+          ? _choice > 1
+            ? 1
+            : 0
+          : 1
+      }
+
+      return _choice ? Math.min(_choice, 2) : 0
+    };
+
+    if (this$1.locale in this$1.pluralizationRules) {
+      return this$1.pluralizationRules[this$1.locale].apply(this$1, [choice, choicesLength])
+    } else {
+      return defaultImpl(choice, choicesLength)
+    }
+  };
+
+
+  this._exist = function (message, key) {
+    if (!message || !key) { return false }
+    if (!isNull(this$1._path.getPathValue(message, key))) { return true }
+    // fallback for flat key
+    if (message[key]) { return true }
+    return false
+  };
+
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    Object.keys(messages).forEach(function (locale) {
+      this$1._checkLocaleMessage(locale, this$1._warnHtmlInMessage, messages[locale]);
+    });
+  }
+
+  this._initVM({
+    locale: locale,
+    fallbackLocale: fallbackLocale,
+    messages: messages,
+    dateTimeFormats: dateTimeFormats,
+    numberFormats: numberFormats
+  });
+};
+
+var prototypeAccessors = { vm: { configurable: true },messages: { configurable: true },dateTimeFormats: { configurable: true },numberFormats: { configurable: true },availableLocales: { configurable: true },locale: { configurable: true },fallbackLocale: { configurable: true },formatFallbackMessages: { configurable: true },missing: { configurable: true },formatter: { configurable: true },silentTranslationWarn: { configurable: true },silentFallbackWarn: { configurable: true },preserveDirectiveContent: { configurable: true },warnHtmlInMessage: { configurable: true },postTranslation: { configurable: true },sync: { configurable: true } };
+
+VueI18n.prototype._checkLocaleMessage = function _checkLocaleMessage (locale, level, message) {
+  var paths = [];
+
+  var fn = function (level, locale, message, paths) {
+    if (isPlainObject(message)) {
+      Object.keys(message).forEach(function (key) {
+        var val = message[key];
+        if (isPlainObject(val)) {
+          paths.push(key);
+          paths.push('.');
+          fn(level, locale, val, paths);
+          paths.pop();
+          paths.pop();
+        } else {
+          paths.push(key);
+          fn(level, locale, val, paths);
+          paths.pop();
+        }
+      });
+    } else if (isArray(message)) {
+      message.forEach(function (item, index) {
+        if (isPlainObject(item)) {
+          paths.push(("[" + index + "]"));
+          paths.push('.');
+          fn(level, locale, item, paths);
+          paths.pop();
+          paths.pop();
+        } else {
+          paths.push(("[" + index + "]"));
+          fn(level, locale, item, paths);
+          paths.pop();
+        }
+      });
+    } else if (isString(message)) {
+      var ret = htmlTagMatcher.test(message);
+      if (ret) {
+        var msg = "Detected HTML in message '" + message + "' of keypath '" + (paths.join('')) + "' at '" + locale + "'. Consider component interpolation with '<i18n>' to avoid XSS. See https://bit.ly/2ZqJzkp";
+        if (level === 'warn') {
+          warn(msg);
+        } else if (level === 'error') {
+          error(msg);
+        }
+      }
+    }
+  };
+
+  fn(level, locale, message, paths);
+};
+
+VueI18n.prototype._initVM = function _initVM (data) {
+  var silent = Vue.config.silent;
+  Vue.config.silent = true;
+  this._vm = new Vue({ data: data, __VUE18N__INSTANCE__: true });
+  Vue.config.silent = silent;
+};
+
+VueI18n.prototype.destroyVM = function destroyVM () {
+  this._vm.$destroy();
+};
+
+VueI18n.prototype.subscribeDataChanging = function subscribeDataChanging (vm) {
+  this._dataListeners.add(vm);
+};
+
+VueI18n.prototype.unsubscribeDataChanging = function unsubscribeDataChanging (vm) {
+  remove(this._dataListeners, vm);
+};
+
+VueI18n.prototype.watchI18nData = function watchI18nData () {
+    var this$1 = this;
+  return this._vm.$watch('$data', function () {
+    var listeners = arrayFrom(this$1._dataListeners);
+    var i = listeners.length;
+    while(i--) {
+      Vue.nextTick(function () {
+        listeners[i] && listeners[i].$forceUpdate();
+      });
+    }
+  }, { deep: true })
+};
+
+VueI18n.prototype.watchLocale = function watchLocale () {
+  /* istanbul ignore if */
+  if (!this._sync || !this._root) { return null }
+  var target = this._vm;
+  return this._root.$i18n.vm.$watch('locale', function (val) {
+    target.$set(target, 'locale', val);
+    target.$forceUpdate();
+  }, { immediate: true })
+};
+
+VueI18n.prototype.onComponentInstanceCreated = function onComponentInstanceCreated (newI18n) {
+  if (this._componentInstanceCreatedListener) {
+    this._componentInstanceCreatedListener(newI18n, this);
+  }
+};
+
+prototypeAccessors.vm.get = function () { return this._vm };
+
+prototypeAccessors.messages.get = function () { return looseClone(this._getMessages()) };
+prototypeAccessors.dateTimeFormats.get = function () { return looseClone(this._getDateTimeFormats()) };
+prototypeAccessors.numberFormats.get = function () { return looseClone(this._getNumberFormats()) };
+prototypeAccessors.availableLocales.get = function () { return Object.keys(this.messages).sort() };
+
+prototypeAccessors.locale.get = function () { return this._vm.locale };
+prototypeAccessors.locale.set = function (locale) {
+  this._vm.$set(this._vm, 'locale', locale);
+};
+
+prototypeAccessors.fallbackLocale.get = function () { return this._vm.fallbackLocale };
+prototypeAccessors.fallbackLocale.set = function (locale) {
+  this._localeChainCache = {};
+  this._vm.$set(this._vm, 'fallbackLocale', locale);
+};
+
+prototypeAccessors.formatFallbackMessages.get = function () { return this._formatFallbackMessages };
+prototypeAccessors.formatFallbackMessages.set = function (fallback) { this._formatFallbackMessages = fallback; };
+
+prototypeAccessors.missing.get = function () { return this._missing };
+prototypeAccessors.missing.set = function (handler) { this._missing = handler; };
+
+prototypeAccessors.formatter.get = function () { return this._formatter };
+prototypeAccessors.formatter.set = function (formatter) { this._formatter = formatter; };
+
+prototypeAccessors.silentTranslationWarn.get = function () { return this._silentTranslationWarn };
+prototypeAccessors.silentTranslationWarn.set = function (silent) { this._silentTranslationWarn = silent; };
+
+prototypeAccessors.silentFallbackWarn.get = function () { return this._silentFallbackWarn };
+prototypeAccessors.silentFallbackWarn.set = function (silent) { this._silentFallbackWarn = silent; };
+
+prototypeAccessors.preserveDirectiveContent.get = function () { return this._preserveDirectiveContent };
+prototypeAccessors.preserveDirectiveContent.set = function (preserve) { this._preserveDirectiveContent = preserve; };
+
+prototypeAccessors.warnHtmlInMessage.get = function () { return this._warnHtmlInMessage };
+prototypeAccessors.warnHtmlInMessage.set = function (level) {
+    var this$1 = this;
+
+  var orgLevel = this._warnHtmlInMessage;
+  this._warnHtmlInMessage = level;
+  if (orgLevel !== level && (level === 'warn' || level === 'error')) {
+    var messages = this._getMessages();
+    Object.keys(messages).forEach(function (locale) {
+      this$1._checkLocaleMessage(locale, this$1._warnHtmlInMessage, messages[locale]);
+    });
+  }
+};
+
+prototypeAccessors.postTranslation.get = function () { return this._postTranslation };
+prototypeAccessors.postTranslation.set = function (handler) { this._postTranslation = handler; };
+
+prototypeAccessors.sync.get = function () { return this._sync };
+prototypeAccessors.sync.set = function (val) { this._sync = val; };
+
+VueI18n.prototype._getMessages = function _getMessages () { return this._vm.messages };
+VueI18n.prototype._getDateTimeFormats = function _getDateTimeFormats () { return this._vm.dateTimeFormats };
+VueI18n.prototype._getNumberFormats = function _getNumberFormats () { return this._vm.numberFormats };
+
+VueI18n.prototype._warnDefault = function _warnDefault (locale, key, result, vm, values, interpolateMode) {
+  if (!isNull(result)) { return result }
+  if (this._missing) {
+    var missingRet = this._missing.apply(null, [locale, key, vm, values]);
+    if (isString(missingRet)) {
+      return missingRet
+    }
+  } else {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(
+        "Cannot translate the value of keypath '" + key + "'. " +
+        'Use the value of keypath as default.'
+      );
+    }
+  }
+
+  if (this._formatFallbackMessages) {
+    var parsedArgs = parseArgs.apply(void 0, values);
+    return this._render(key, interpolateMode, parsedArgs.params, key)
+  } else {
+    return key
+  }
+};
+
+VueI18n.prototype._isFallbackRoot = function _isFallbackRoot (val) {
+  return !val && !isNull(this._root) && this._fallbackRoot
+};
+
+VueI18n.prototype._isSilentFallbackWarn = function _isSilentFallbackWarn (key) {
+  return this._silentFallbackWarn instanceof RegExp
+    ? this._silentFallbackWarn.test(key)
+    : this._silentFallbackWarn
+};
+
+VueI18n.prototype._isSilentFallback = function _isSilentFallback (locale, key) {
+  return this._isSilentFallbackWarn(key) && (this._isFallbackRoot() || locale !== this.fallbackLocale)
+};
+
+VueI18n.prototype._isSilentTranslationWarn = function _isSilentTranslationWarn (key) {
+  return this._silentTranslationWarn instanceof RegExp
+    ? this._silentTranslationWarn.test(key)
+    : this._silentTranslationWarn
+};
+
+VueI18n.prototype._interpolate = function _interpolate (
+  locale,
+  message,
+  key,
+  host,
+  interpolateMode,
+  values,
+  visitedLinkStack
+) {
+  if (!message) { return null }
+
+  var pathRet = this._path.getPathValue(message, key);
+  if (isArray(pathRet) || isPlainObject(pathRet)) { return pathRet }
+
+  var ret;
+  if (isNull(pathRet)) {
+    /* istanbul ignore else */
+    if (isPlainObject(message)) {
+      ret = message[key];
+      if (!(isString(ret) || isFunction(ret))) {
+        if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallback(locale, key)) {
+          warn(("Value of key '" + key + "' is not a string or function !"));
+        }
+        return null
+      }
+    } else {
+      return null
+    }
+  } else {
+    /* istanbul ignore else */
+    if (isString(pathRet) || isFunction(pathRet)) {
+      ret = pathRet;
+    } else {
+      if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallback(locale, key)) {
+        warn(("Value of key '" + key + "' is not a string or function!"));
+      }
+      return null
+    }
+  }
+
+  // Check for the existence of links within the translated string
+  if (isString(ret) && (ret.indexOf('@:') >= 0 || ret.indexOf('@.') >= 0)) {
+    ret = this._link(locale, message, ret, host, 'raw', values, visitedLinkStack);
+  }
+
+  return this._render(ret, interpolateMode, values, key)
+};
+
+VueI18n.prototype._link = function _link (
+  locale,
+  message,
+  str,
+  host,
+  interpolateMode,
+  values,
+  visitedLinkStack
+) {
+  var ret = str;
+
+  // Match all the links within the local
+  // We are going to replace each of
+  // them with its translation
+  var matches = ret.match(linkKeyMatcher);
+    
+  // eslint-disable-next-line no-autofix/prefer-const
+  for (var idx in matches) {
+    // ie compatible: filter custom array
+    // prototype method
+    if (!matches.hasOwnProperty(idx)) {
+      continue
+    }
+    var link = matches[idx];
+    var linkKeyPrefixMatches = link.match(linkKeyPrefixMatcher);
+    var linkPrefix = linkKeyPrefixMatches[0];
+      var formatterName = linkKeyPrefixMatches[1];
+
+    // Remove the leading @:, @.case: and the brackets
+    var linkPlaceholder = link.replace(linkPrefix, '').replace(bracketsMatcher, '');
+
+    if (includes(visitedLinkStack, linkPlaceholder)) {
+      if (true) {
+        warn(("Circular reference found. \"" + link + "\" is already visited in the chain of " + (visitedLinkStack.reverse().join(' <- '))));
+      }
+      return ret
+    }
+    visitedLinkStack.push(linkPlaceholder);
+
+    // Translate the link
+    var translated = this._interpolate(
+      locale, message, linkPlaceholder, host,
+      interpolateMode === 'raw' ? 'string' : interpolateMode,
+      interpolateMode === 'raw' ? undefined : values,
+      visitedLinkStack
+    );
+
+    if (this._isFallbackRoot(translated)) {
+      if ( true && !this._isSilentTranslationWarn(linkPlaceholder)) {
+        warn(("Fall back to translate the link placeholder '" + linkPlaceholder + "' with root locale."));
+      }
+      /* istanbul ignore if */
+      if (!this._root) { throw Error('unexpected error') }
+      var root = this._root.$i18n;
+      translated = root._translate(
+        root._getMessages(), root.locale, root.fallbackLocale,
+        linkPlaceholder, host, interpolateMode, values
+      );
+    }
+    translated = this._warnDefault(
+      locale, linkPlaceholder, translated, host,
+      isArray(values) ? values : [values],
+      interpolateMode
+    );
+
+    if (this._modifiers.hasOwnProperty(formatterName)) {
+      translated = this._modifiers[formatterName](translated);
+    } else if (defaultModifiers.hasOwnProperty(formatterName)) {
+      translated = defaultModifiers[formatterName](translated);
+    }
+
+    visitedLinkStack.pop();
+
+    // Replace the link with the translated
+    ret = !translated ? ret : ret.replace(link, translated);
+  }
+
+  return ret
+};
+
+VueI18n.prototype._createMessageContext = function _createMessageContext (values, formatter, path, interpolateMode) {
+    var this$1 = this;
+
+  var _list = isArray(values) ? values : [];
+  var _named = isObject(values) ? values : {};
+  var list = function (index) { return _list[index]; };
+  var named = function (key) { return _named[key]; };
+  var messages = this._getMessages();
+  var locale = this.locale;
+
+  return {
+    list: list,
+    named: named,
+    values: values,
+    formatter: formatter,
+    path: path,
+    messages: messages,
+    locale: locale,
+    linked: function (linkedKey) { return this$1._interpolate(locale, messages[locale] || {}, linkedKey, null, interpolateMode, undefined, [linkedKey]); }
+  }
+};
+
+VueI18n.prototype._render = function _render (message, interpolateMode, values, path) {
+  if (isFunction(message)) {
+    return message(
+      this._createMessageContext(values, this._formatter || defaultFormatter, path, interpolateMode)
+    )
+  }
+
+  var ret = this._formatter.interpolate(message, values, path);
+
+  // If the custom formatter refuses to work - apply the default one
+  if (!ret) {
+    ret = defaultFormatter.interpolate(message, values, path);
+  }
+
+  // if interpolateMode is **not** 'string' ('row'),
+  // return the compiled data (e.g. ['foo', VNode, 'bar']) with formatter
+  return interpolateMode === 'string' && !isString(ret) ? ret.join('') : ret
+};
+
+VueI18n.prototype._appendItemToChain = function _appendItemToChain (chain, item, blocks) {
+  var follow = false;
+  if (!includes(chain, item)) {
+    follow = true;
+    if (item) {
+      follow = item[item.length - 1] !== '!';
+      item = item.replace(/!/g, '');
+      chain.push(item);
+      if (blocks && blocks[item]) {
+        follow = blocks[item];
+      }
+    }
+  }
+  return follow
+};
+
+VueI18n.prototype._appendLocaleToChain = function _appendLocaleToChain (chain, locale, blocks) {
+  var follow;
+  var tokens = locale.split('-');
+  do {
+    var item = tokens.join('-');
+    follow = this._appendItemToChain(chain, item, blocks);
+    tokens.splice(-1, 1);
+  } while (tokens.length && (follow === true))
+  return follow
+};
+
+VueI18n.prototype._appendBlockToChain = function _appendBlockToChain (chain, block, blocks) {
+  var follow = true;
+  for (var i = 0; (i < block.length) && (isBoolean(follow)); i++) {
+    var locale = block[i];
+    if (isString(locale)) {
+      follow = this._appendLocaleToChain(chain, locale, blocks);
+    }
+  }
+  return follow
+};
+
+VueI18n.prototype._getLocaleChain = function _getLocaleChain (start, fallbackLocale) {
+  if (start === '') { return [] }
+
+  if (!this._localeChainCache) {
+    this._localeChainCache = {};
+  }
+
+  var chain = this._localeChainCache[start];
+  if (!chain) {
+    if (!fallbackLocale) {
+      fallbackLocale = this.fallbackLocale;
+    }
+    chain = [];
+
+    // first block defined by start
+    var block = [start];
+
+    // while any intervening block found
+    while (isArray(block)) {
+      block = this._appendBlockToChain(
+        chain,
+        block,
+        fallbackLocale
+      );
+    }
+
+    // last block defined by default
+    var defaults;
+    if (isArray(fallbackLocale)) {
+      defaults = fallbackLocale;
+    } else if (isObject(fallbackLocale)) {
+      /* $FlowFixMe */
+      if (fallbackLocale['default']) {
+        defaults = fallbackLocale['default'];
+      } else {
+        defaults = null;
+      }
+    } else {
+      defaults = fallbackLocale;
+    }
+
+    // convert defaults to array
+    if (isString(defaults)) {
+      block = [defaults];
+    } else {
+      block = defaults;
+    }
+    if (block) {
+      this._appendBlockToChain(
+        chain,
+        block,
+        null
+      );
+    }
+    this._localeChainCache[start] = chain;
+  }
+  return chain
+};
+
+VueI18n.prototype._translate = function _translate (
+  messages,
+  locale,
+  fallback,
+  key,
+  host,
+  interpolateMode,
+  args
+) {
+  var chain = this._getLocaleChain(locale, fallback);
+  var res;
+  for (var i = 0; i < chain.length; i++) {
+    var step = chain[i];
+    res =
+      this._interpolate(step, messages[step], key, host, interpolateMode, args, [key]);
+    if (!isNull(res)) {
+      if (step !== locale && "development" !== 'production' && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+        warn(("Fall back to translate the keypath '" + key + "' with '" + step + "' locale."));
+      }
+      return res
+    }
+  }
+  return null
+};
+
+VueI18n.prototype._t = function _t (key, _locale, messages, host) {
+    var ref;
+
+    var values = [], len = arguments.length - 4;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 4 ];
+  if (!key) { return '' }
+
+  var parsedArgs = parseArgs.apply(void 0, values);
+  if(this._escapeParameterHtml) {
+    parsedArgs.params = escapeParams(parsedArgs.params);
+  }
+
+  var locale = parsedArgs.locale || _locale;
+
+  var ret = this._translate(
+    messages, locale, this.fallbackLocale, key,
+    host, 'string', parsedArgs.params
+  );
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to translate the keypath '" + key + "' with root locale."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return (ref = this._root).$t.apply(ref, [ key ].concat( values ))
+  } else {
+    ret = this._warnDefault(locale, key, ret, host, values, 'string');
+    if (this._postTranslation && ret !== null && ret !== undefined) {
+      ret = this._postTranslation(ret, key);
+    }
+    return ret
+  }
+};
+
+VueI18n.prototype.t = function t (key) {
+    var ref;
+
+    var values = [], len = arguments.length - 1;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 1 ];
+  return (ref = this)._t.apply(ref, [ key, this.locale, this._getMessages(), null ].concat( values ))
+};
+
+VueI18n.prototype._i = function _i (key, locale, messages, host, values) {
+  var ret =
+    this._translate(messages, locale, this.fallbackLocale, key, host, 'raw', values);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(("Fall back to interpolate the keypath '" + key + "' with root locale."));
+    }
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.i(key, locale, values)
+  } else {
+    return this._warnDefault(locale, key, ret, host, [values], 'raw')
+  }
+};
+
+VueI18n.prototype.i = function i (key, locale, values) {
+  /* istanbul ignore if */
+  if (!key) { return '' }
+
+  if (!isString(locale)) {
+    locale = this.locale;
+  }
+
+  return this._i(key, locale, this._getMessages(), null, values)
+};
+
+VueI18n.prototype._tc = function _tc (
+  key,
+  _locale,
+  messages,
+  host,
+  choice
+) {
+    var ref;
+
+    var values = [], len = arguments.length - 5;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 5 ];
+  if (!key) { return '' }
+  if (choice === undefined) {
+    choice = 1;
+  }
+
+  var predefined = { 'count': choice, 'n': choice };
+  var parsedArgs = parseArgs.apply(void 0, values);
+  parsedArgs.params = Object.assign(predefined, parsedArgs.params);
+  values = parsedArgs.locale === null ? [parsedArgs.params] : [parsedArgs.locale, parsedArgs.params];
+  return this.fetchChoice((ref = this)._t.apply(ref, [ key, _locale, messages, host ].concat( values )), choice)
+};
+
+VueI18n.prototype.fetchChoice = function fetchChoice (message, choice) {
+  /* istanbul ignore if */
+  if (!message || !isString(message)) { return null }
+  var choices = message.split('|');
+
+  choice = this.getChoiceIndex(choice, choices.length);
+  if (!choices[choice]) { return message }
+  return choices[choice].trim()
+};
+
+VueI18n.prototype.tc = function tc (key, choice) {
+    var ref;
+
+    var values = [], len = arguments.length - 2;
+    while ( len-- > 0 ) values[ len ] = arguments[ len + 2 ];
+  return (ref = this)._tc.apply(ref, [ key, this.locale, this._getMessages(), null, choice ].concat( values ))
+};
+
+VueI18n.prototype._te = function _te (key, locale, messages) {
+    var args = [], len = arguments.length - 3;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 3 ];
+
+  var _locale = parseArgs.apply(void 0, args).locale || locale;
+  return this._exist(messages[_locale], key)
+};
+
+VueI18n.prototype.te = function te (key, locale) {
+  return this._te(key, this.locale, this._getMessages(), locale)
+};
+
+VueI18n.prototype.getLocaleMessage = function getLocaleMessage (locale) {
+  return looseClone(this._vm.messages[locale] || {})
+};
+
+VueI18n.prototype.setLocaleMessage = function setLocaleMessage (locale, message) {
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    this._checkLocaleMessage(locale, this._warnHtmlInMessage, message);
+  }
+  this._vm.$set(this._vm.messages, locale, message);
+};
+
+VueI18n.prototype.mergeLocaleMessage = function mergeLocaleMessage (locale, message) {
+  if (this._warnHtmlInMessage === 'warn' || this._warnHtmlInMessage === 'error') {
+    this._checkLocaleMessage(locale, this._warnHtmlInMessage, message);
+  }
+  this._vm.$set(this._vm.messages, locale, merge(
+    typeof this._vm.messages[locale] !== 'undefined' && Object.keys(this._vm.messages[locale]).length
+      ? Object.assign({}, this._vm.messages[locale])
+      : {},
+    message
+  ));
+};
+
+VueI18n.prototype.getDateTimeFormat = function getDateTimeFormat (locale) {
+  return looseClone(this._vm.dateTimeFormats[locale] || {})
+};
+
+VueI18n.prototype.setDateTimeFormat = function setDateTimeFormat (locale, format) {
+  this._vm.$set(this._vm.dateTimeFormats, locale, format);
+  this._clearDateTimeFormat(locale, format);
+};
+
+VueI18n.prototype.mergeDateTimeFormat = function mergeDateTimeFormat (locale, format) {
+  this._vm.$set(this._vm.dateTimeFormats, locale, merge(this._vm.dateTimeFormats[locale] || {}, format));
+  this._clearDateTimeFormat(locale, format);
+};
+
+VueI18n.prototype._clearDateTimeFormat = function _clearDateTimeFormat (locale, format) {
+  // eslint-disable-next-line no-autofix/prefer-const
+  for (var key in format) {
+    var id = locale + "__" + key;
+
+    if (!this._dateTimeFormatters.hasOwnProperty(id)) {
+      continue
+    }
+
+    delete this._dateTimeFormatters[id];
+  }
+};
+
+VueI18n.prototype._localizeDateTime = function _localizeDateTime (
+  value,
+  locale,
+  fallback,
+  dateTimeFormats,
+  key
+) {
+  var _locale = locale;
+  var formats = dateTimeFormats[_locale];
+
+  var chain = this._getLocaleChain(locale, fallback);
+  for (var i = 0; i < chain.length; i++) {
+    var current = _locale;
+    var step = chain[i];
+    formats = dateTimeFormats[step];
+    _locale = step;
+    // fallback locale
+    if (isNull(formats) || isNull(formats[key])) {
+      if (step !== locale && "development" !== 'production' && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+        warn(("Fall back to '" + step + "' datetime formats from '" + current + "' datetime formats."));
+      }
+    } else {
+      break
+    }
+  }
+
+  if (isNull(formats) || isNull(formats[key])) {
+    return null
+  } else {
+    var format = formats[key];
+    var id = _locale + "__" + key;
+    var formatter = this._dateTimeFormatters[id];
+    if (!formatter) {
+      formatter = this._dateTimeFormatters[id] = new Intl.DateTimeFormat(_locale, format);
+    }
+    return formatter.format(value)
+  }
+};
+
+VueI18n.prototype._d = function _d (value, locale, key) {
+  /* istanbul ignore if */
+  if ( true && !VueI18n.availabilities.dateTimeFormat) {
+    warn('Cannot format a Date value due to not supported Intl.DateTimeFormat.');
+    return ''
+  }
+
+  if (!key) {
+    return new Intl.DateTimeFormat(locale).format(value)
+  }
+
+  var ret =
+    this._localizeDateTime(value, locale, this.fallbackLocale, this._getDateTimeFormats(), key);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to datetime localization of root: key '" + key + "'."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.d(value, key, locale)
+  } else {
+    return ret || ''
+  }
+};
+
+VueI18n.prototype.d = function d (value) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+  var locale = this.locale;
+  var key = null;
+
+  if (args.length === 1) {
+    if (isString(args[0])) {
+      key = args[0];
+    } else if (isObject(args[0])) {
+      if (args[0].locale) {
+        locale = args[0].locale;
+      }
+      if (args[0].key) {
+        key = args[0].key;
+      }
+    }
+  } else if (args.length === 2) {
+    if (isString(args[0])) {
+      key = args[0];
+    }
+    if (isString(args[1])) {
+      locale = args[1];
+    }
+  }
+
+  return this._d(value, locale, key)
+};
+
+VueI18n.prototype.getNumberFormat = function getNumberFormat (locale) {
+  return looseClone(this._vm.numberFormats[locale] || {})
+};
+
+VueI18n.prototype.setNumberFormat = function setNumberFormat (locale, format) {
+  this._vm.$set(this._vm.numberFormats, locale, format);
+  this._clearNumberFormat(locale, format);
+};
+
+VueI18n.prototype.mergeNumberFormat = function mergeNumberFormat (locale, format) {
+  this._vm.$set(this._vm.numberFormats, locale, merge(this._vm.numberFormats[locale] || {}, format));
+  this._clearNumberFormat(locale, format);
+};
+
+VueI18n.prototype._clearNumberFormat = function _clearNumberFormat (locale, format) {
+  // eslint-disable-next-line no-autofix/prefer-const
+  for (var key in format) {
+    var id = locale + "__" + key;
+
+    if (!this._numberFormatters.hasOwnProperty(id)) {
+      continue
+    }
+
+    delete this._numberFormatters[id];
+  }
+};
+
+VueI18n.prototype._getNumberFormatter = function _getNumberFormatter (
+  value,
+  locale,
+  fallback,
+  numberFormats,
+  key,
+  options
+) {
+  var _locale = locale;
+  var formats = numberFormats[_locale];
+
+  var chain = this._getLocaleChain(locale, fallback);
+  for (var i = 0; i < chain.length; i++) {
+    var current = _locale;
+    var step = chain[i];
+    formats = numberFormats[step];
+    _locale = step;
+    // fallback locale
+    if (isNull(formats) || isNull(formats[key])) {
+      if (step !== locale && "development" !== 'production' && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+        warn(("Fall back to '" + step + "' number formats from '" + current + "' number formats."));
+      }
+    } else {
+      break
+    }
+  }
+
+  if (isNull(formats) || isNull(formats[key])) {
+    return null
+  } else {
+    var format = formats[key];
+
+    var formatter;
+    if (options) {
+      // If options specified - create one time number formatter
+      formatter = new Intl.NumberFormat(_locale, Object.assign({}, format, options));
+    } else {
+      var id = _locale + "__" + key;
+      formatter = this._numberFormatters[id];
+      if (!formatter) {
+        formatter = this._numberFormatters[id] = new Intl.NumberFormat(_locale, format);
+      }
+    }
+    return formatter
+  }
+};
+
+VueI18n.prototype._n = function _n (value, locale, key, options) {
+  /* istanbul ignore if */
+  if (!VueI18n.availabilities.numberFormat) {
+    if (true) {
+      warn('Cannot format a Number value due to not supported Intl.NumberFormat.');
+    }
+    return ''
+  }
+
+  if (!key) {
+    var nf = !options ? new Intl.NumberFormat(locale) : new Intl.NumberFormat(locale, options);
+    return nf.format(value)
+  }
+
+  var formatter = this._getNumberFormatter(value, locale, this.fallbackLocale, this._getNumberFormats(), key, options);
+  var ret = formatter && formatter.format(value);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key) && !this._isSilentFallbackWarn(key)) {
+      warn(("Fall back to number localization of root: key '" + key + "'."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n.n(value, Object.assign({}, { key: key, locale: locale }, options))
+  } else {
+    return ret || ''
+  }
+};
+
+VueI18n.prototype.n = function n (value) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+  var locale = this.locale;
+  var key = null;
+  var options = null;
+
+  if (args.length === 1) {
+    if (isString(args[0])) {
+      key = args[0];
+    } else if (isObject(args[0])) {
+      if (args[0].locale) {
+        locale = args[0].locale;
+      }
+      if (args[0].key) {
+        key = args[0].key;
+      }
+
+      // Filter out number format options only
+      options = Object.keys(args[0]).reduce(function (acc, key) {
+          var obj;
+
+        if (includes(numberFormatKeys, key)) {
+          return Object.assign({}, acc, ( obj = {}, obj[key] = args[0][key], obj ))
+        }
+        return acc
+      }, null);
+    }
+  } else if (args.length === 2) {
+    if (isString(args[0])) {
+      key = args[0];
+    }
+    if (isString(args[1])) {
+      locale = args[1];
+    }
+  }
+
+  return this._n(value, locale, key, options)
+};
+
+VueI18n.prototype._ntp = function _ntp (value, locale, key, options) {
+  /* istanbul ignore if */
+  if (!VueI18n.availabilities.numberFormat) {
+    if (true) {
+      warn('Cannot format to parts a Number value due to not supported Intl.NumberFormat.');
+    }
+    return []
+  }
+
+  if (!key) {
+    var nf = !options ? new Intl.NumberFormat(locale) : new Intl.NumberFormat(locale, options);
+    return nf.formatToParts(value)
+  }
+
+  var formatter = this._getNumberFormatter(value, locale, this.fallbackLocale, this._getNumberFormats(), key, options);
+  var ret = formatter && formatter.formatToParts(value);
+  if (this._isFallbackRoot(ret)) {
+    if ( true && !this._isSilentTranslationWarn(key)) {
+      warn(("Fall back to format number to parts of root: key '" + key + "' ."));
+    }
+    /* istanbul ignore if */
+    if (!this._root) { throw Error('unexpected error') }
+    return this._root.$i18n._ntp(value, locale, key, options)
+  } else {
+    return ret || []
+  }
+};
+
+Object.defineProperties( VueI18n.prototype, prototypeAccessors );
+
+var availabilities;
+// $FlowFixMe
+Object.defineProperty(VueI18n, 'availabilities', {
+  get: function get () {
+    if (!availabilities) {
+      var intlDefined = typeof Intl !== 'undefined';
+      availabilities = {
+        dateTimeFormat: intlDefined && typeof Intl.DateTimeFormat !== 'undefined',
+        numberFormat: intlDefined && typeof Intl.NumberFormat !== 'undefined'
+      };
+    }
+
+    return availabilities
+  }
+});
+
+VueI18n.install = install;
+VueI18n.version = '8.26.5';
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VueI18n);
+
+
+/***/ }),
+
 /***/ "./resources/js/components/CIP_Declaration.vue":
 /*!*****************************************************!*\
   !*** ./resources/js/components/CIP_Declaration.vue ***!
@@ -49505,13 +51953,54 @@ var render = function() {
     _c("br"),
     _vm._v(" "),
     _c("form", [
-      _vm._m(0),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "previousBulk" }
+          },
+          [_vm._v(_vm._s(_vm.$t("previousBulk")))]
+        ),
+        _vm._v(" "),
+        _vm._m(0)
+      ]),
       _vm._v(" "),
-      _vm._m(1),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "expectedDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("expectedDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(1)
+      ]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "totalDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("totalDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(2)
+      ]),
       _vm._v(" "),
-      _vm._m(3),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
+          [_vm._v(_vm._s(_vm.$t("comments")))]
+        ),
+        _vm._v(" "),
+        _vm._m(3)
+      ]),
       _vm._v(" "),
       _c("div", { attrs: { align: "right" } }, [
         _c(
@@ -49527,7 +52016,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n                Annuler\n            ")]
+          [
+            _vm._v(
+              "\n                " + _vm._s(_vm.$t("cancel")) + "\n            "
+            )
+          ]
         )
       ]),
       _vm._v(" "),
@@ -49551,7 +52044,11 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("\n                Retour\n            ")]
+            [
+              _vm._v(
+                "\n                " + _vm._s(_vm.$t("back")) + "\n            "
+              )
+            ]
           ),
           _vm._v(" "),
           _c(
@@ -49579,95 +52076,54 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "previousBulk" }
-        },
-        [_vm._v("Previous bulk")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: {
-            type: "text",
-            id: "previousBulk",
-            value: "prevBulk",
-            disabled: ""
-          }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: {
+          type: "text",
+          id: "previousBulk",
+          value: "prevBulk",
+          disabled: ""
+        }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "expectedDuration" }
-        },
-        [_vm._v("Durée CIP prévue (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: {
-            type: "number",
-            id: "expectedDuration",
-            value: "5",
-            disabled: ""
-          }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: {
+          type: "number",
+          id: "expectedDuration",
+          value: "5",
+          disabled: ""
+        }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "totalDuration" }
-        },
-        [_vm._v("Durée totale (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "number", id: "totalDuration" }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "number", id: "totalDuration" }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-        [_vm._v("Commentaires")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("textarea", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { id: "comments" }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { id: "comments" }
+      })
     ])
   }
 ]
@@ -49703,11 +52159,41 @@ var render = function() {
     _c("br"),
     _vm._v(" "),
     _c("form", [
-      _vm._m(0),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "expectedDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("expectedDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(0)
+      ]),
       _vm._v(" "),
-      _vm._m(1),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "totalDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("totalDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(1)
+      ]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
+          [_vm._v(_vm._s(_vm.$t("comments")))]
+        ),
+        _vm._v(" "),
+        _vm._m(2)
+      ]),
       _vm._v(" "),
       _c("div", { attrs: { align: "right" } }, [
         _c(
@@ -49723,7 +52209,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n                Annuler\n            ")]
+          [
+            _vm._v(
+              "\n                " + _vm._s(_vm.$t("cancel")) + "\n            "
+            )
+          ]
         )
       ]),
       _vm._v(" "),
@@ -49747,7 +52237,11 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("\n                Retour\n            ")]
+            [
+              _vm._v(
+                "\n                " + _vm._s(_vm.$t("back")) + "\n            "
+              )
+            ]
           ),
           _vm._v(" "),
           _c(
@@ -49775,184 +52269,154 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "expectedDuration" }
-        },
-        [_vm._v("Durée prévue (minutes)")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "col-sm-10", attrs: { id: "expectedDuration" } },
-        [
-          _c(
-            "div",
-            {
-              staticClass: "row",
-              staticStyle: { "margin-bottom": "30px" },
-              attrs: { align: "center" }
-            },
-            [
-              _c("div", { staticClass: "col-sm-4" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "checkbox labelsAnswer",
-                    attrs: { for: "answer1" }
-                  },
-                  [
-                    _c("input", {
-                      staticClass: "response",
-                      attrs: {
-                        type: "radio",
-                        id: "answer1",
-                        name: "reponseQuestion",
-                        value: "5"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("5")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-4" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "checkbox labelsAnswer",
-                    attrs: { for: "answer2" }
-                  },
-                  [
-                    _c("input", {
-                      staticClass: "response",
-                      attrs: {
-                        type: "radio",
-                        id: "answer2",
-                        name: "reponseQuestion",
-                        value: "15"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("15")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-4" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "checkbox labelsAnswer",
-                    attrs: { for: "answer3" }
-                  },
-                  [
-                    _c("input", {
-                      staticClass: "response",
-                      attrs: {
-                        type: "radio",
-                        id: "answer3",
-                        name: "reponseQuestion",
-                        value: "30"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("30")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-4" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "checkbox labelsAnswer",
-                    attrs: { for: "answer3" }
-                  },
-                  [
-                    _c("input", {
-                      staticClass: "response",
-                      attrs: {
-                        type: "radio",
-                        id: "answer5",
-                        name: "reponseQuestion",
-                        value: "45"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("45")])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-4" }, [
-                _c(
-                  "label",
-                  {
-                    staticClass: "checkbox labelsAnswer",
-                    attrs: { for: "answer4" }
-                  },
-                  [
-                    _c("input", {
-                      staticClass: "response",
-                      attrs: {
-                        type: "radio",
-                        id: "answer4",
-                        name: "reponseQuestion",
-                        value: "60"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("60")])
-                  ]
-                )
-              ])
-            ]
-          )
-        ]
-      )
+    return _c(
+      "div",
+      { staticClass: "col-sm-10", attrs: { id: "expectedDuration" } },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "row",
+            staticStyle: { "margin-bottom": "30px" },
+            attrs: { align: "center" }
+          },
+          [
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "checkbox labelsAnswer",
+                  attrs: { for: "answer1" }
+                },
+                [
+                  _c("input", {
+                    staticClass: "response",
+                    attrs: {
+                      type: "radio",
+                      id: "answer1",
+                      name: "reponseQuestion",
+                      value: "5"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", [_vm._v("5")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "checkbox labelsAnswer",
+                  attrs: { for: "answer2" }
+                },
+                [
+                  _c("input", {
+                    staticClass: "response",
+                    attrs: {
+                      type: "radio",
+                      id: "answer2",
+                      name: "reponseQuestion",
+                      value: "15"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", [_vm._v("15")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "checkbox labelsAnswer",
+                  attrs: { for: "answer3" }
+                },
+                [
+                  _c("input", {
+                    staticClass: "response",
+                    attrs: {
+                      type: "radio",
+                      id: "answer3",
+                      name: "reponseQuestion",
+                      value: "30"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", [_vm._v("30")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "checkbox labelsAnswer",
+                  attrs: { for: "answer3" }
+                },
+                [
+                  _c("input", {
+                    staticClass: "response",
+                    attrs: {
+                      type: "radio",
+                      id: "answer5",
+                      name: "reponseQuestion",
+                      value: "45"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", [_vm._v("45")])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "checkbox labelsAnswer",
+                  attrs: { for: "answer4" }
+                },
+                [
+                  _c("input", {
+                    staticClass: "response",
+                    attrs: {
+                      type: "radio",
+                      id: "answer4",
+                      name: "reponseQuestion",
+                      value: "60"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("span", [_vm._v("60")])
+                ]
+              )
+            ])
+          ]
+        )
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "number", id: "totalDuration" }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "totalDuration" }
-        },
-        [_vm._v("Durée totale (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "number", id: "totalDuration" }
-        })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-        [_vm._v("Commentaires")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("textarea", { staticClass: "rcorners2", attrs: { id: "comments" } })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", { staticClass: "rcorners2", attrs: { id: "comments" } })
     ])
   }
 ]
@@ -49988,11 +52452,41 @@ var render = function() {
     _c("br"),
     _vm._v(" "),
     _c("form", [
-      _vm._m(0),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "expectedDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("expectedDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(0)
+      ]),
       _vm._v(" "),
-      _vm._m(1),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "totalDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("totalDuration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(1)
+      ]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
+          [_vm._v(_vm._s(_vm.$t("comments")))]
+        ),
+        _vm._v(" "),
+        _vm._m(2)
+      ]),
       _vm._v(" "),
       _c("div", { attrs: { align: "right" } }, [
         _c(
@@ -50008,7 +52502,13 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n                    Annuler\n                ")]
+          [
+            _vm._v(
+              "\n                    " +
+                _vm._s(_vm.$t("cancel")) +
+                "\n                "
+            )
+          ]
         )
       ]),
       _vm._v(" "),
@@ -50032,7 +52532,13 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("\n                    Retour\n                ")]
+            [
+              _vm._v(
+                "\n                    " +
+                  _vm._s(_vm.$t("back")) +
+                  "\n                "
+              )
+            ]
           ),
           _vm._v(" "),
           _c(
@@ -50060,65 +52566,35 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "expectedDuration" }
-        },
-        [_vm._v("Durée prévue (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: {
-            type: "number",
-            id: "expectedDuration",
-            value: "5",
-            disabled: ""
-          }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: {
+          type: "number",
+          id: "expectedDuration",
+          value: "5",
+          disabled: ""
+        }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "totalDuration" }
-        },
-        [_vm._v("Durée totale (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "number", id: "totalDuration" }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "number", id: "totalDuration" }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-        [_vm._v("Commentaires")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("textarea", { staticClass: "rcorners2", attrs: { id: "comments" } })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", { staticClass: "rcorners2", attrs: { id: "comments" } })
     ])
   }
 ]
@@ -50173,7 +52649,7 @@ var render = function() {
               _c(
                 "span",
                 { staticClass: "response PO", attrs: { id: "endPO" } },
-                [_vm._v("Fin de PO")]
+                [_vm._v(_vm._s(_vm.$t("endPO")))]
               )
             ]),
             _vm._v(" "),
@@ -50191,7 +52667,7 @@ var render = function() {
               _c(
                 "span",
                 { staticClass: "response team", attrs: { id: "endTeam" } },
-                [_vm._v("Fin d'équipe")]
+                [_vm._v(_vm._s(_vm.$t("endTeam")))]
               )
             ])
           ]
@@ -50233,7 +52709,7 @@ var render = function() {
             }
           }
         },
-        [_vm._v("Retour")]
+        [_vm._v(_vm._s(_vm.$t("back")))]
       )
     ])
   ])
@@ -50276,7 +52752,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v("Connexion opérateur")]
+          [_vm._v(_vm._s(_vm.$t("choiceLoginOperator")))]
         )
       ]),
       _vm._v(" "),
@@ -50291,7 +52767,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v("Connexion superviseur")]
+          [_vm._v(_vm._s(_vm.$t("choiceLoginSupervisor")))]
         )
       ]),
       _vm._v(" "),
@@ -50306,7 +52782,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v("Connexion administrateur")]
+          [_vm._v(_vm._s(_vm.$t("choiceLoginAdministrator")))]
         )
       ])
     ])
@@ -50361,7 +52837,9 @@ var render = function() {
           },
           [
             _vm._v(
-              "\n                Arrêt de production planifié\n            "
+              "\n                " +
+                _vm._s(_vm.$t("plannedDowntime")) +
+                "\n            "
             )
           ]
         )
@@ -50383,7 +52861,9 @@ var render = function() {
           },
           [
             _vm._v(
-              "\n                Arrêt de production non planifié\n            "
+              "\n                " +
+                _vm._s(_vm.$t("unplannedDowntime")) +
+                "\n            "
             )
           ]
         )
@@ -50400,7 +52880,25 @@ var render = function() {
       },
       [
         _c("table", { staticClass: "table" }, [
-          _vm._m(0),
+          _c("thead", [
+            _c("tr", [
+              _c("th", { attrs: { scope: "col" } }, [
+                _vm._v(_vm._s(_vm.$t("type")))
+              ]),
+              _vm._v(" "),
+              _c("th", { attrs: { scope: "col" } }, [
+                _vm._v(_vm._s(_vm.$t("entryTime")))
+              ]),
+              _vm._v(" "),
+              _c("th", { attrs: { scope: "col" } }, [
+                _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+              ]),
+              _vm._v(" "),
+              _c("th", { attrs: { scope: "col" } }, [
+                _vm._v(_vm._s(_vm.$t("comments")))
+              ])
+            ])
+          ]),
           _vm._v(" "),
           _c(
             "tbody",
@@ -50458,29 +52956,12 @@ var render = function() {
             }
           }
         },
-        [_vm._v("Retour")]
+        [_vm._v(_vm._s(_vm.$t("back")))]
       )
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Type")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Date de saisie")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Durée (minutes)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Commentaire")])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -50510,7 +52991,9 @@ var render = function() {
       [
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
-            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _c("label", { attrs: { for: "site" } }, [
+              _vm._v(_vm._s(_vm.$t("site")) + " : ")
+            ]),
             _vm._v(" "),
             _c(
               "select",
@@ -50562,7 +53045,7 @@ var render = function() {
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
             _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v("Ligne de production : ")
+              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
             ]),
             _vm._v(" "),
             _c(
@@ -50628,7 +53111,7 @@ var render = function() {
         _vm._v(" "),
         _c("input", {
           staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: "Charger" },
+          attrs: { type: "button", value: _vm.lo },
           on: {
             click: function($event) {
               return _vm.load()
@@ -50645,26 +53128,58 @@ var render = function() {
         _vm.show === 1 && _vm.allEvents["PP"] !== null
           ? [
               _c("div", { staticClass: "row" }, [
-                _vm._m(0),
+                _c("div", { staticClass: "col" }, [
+                  _c("p", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("plantOperatingTime")) +
+                        " :"
+                    ),
+                    _vm._v(" mn "),
+                    _c("br"),
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("plannedProductionTime")) +
+                        " : "
+                    ),
+                    _vm._v("mn "),
+                    _c("br"),
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("loadFactor")) +
+                        " :"
+                    ),
+                    _vm._v(" % "),
+                    _c("br")
+                  ])
+                ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col" }, [
                   _c("p", [
                     _vm._v(
-                      "\n                        Volume packed : " +
+                      "\n                        " +
+                        _vm._s(_vm.$t("volumePacked")) +
+                        " : " +
                         _vm._s(_vm.littersProduced) +
                         " L "
                     ),
                     _c("br"),
                     _vm._v(
-                      "\n                        Nber of Production Order : " +
+                      "\n                        " +
+                        _vm._s(_vm.$t("numberOfProductionOrder")) +
+                        " : " +
                         _vm._s(_vm.allEvents["SITE"].length) +
                         " "
                     ),
                     _c("br"),
                     _vm._v(
-                      "\n                        Nber of items Produced : " +
+                      "\n                        " +
+                        _vm._s(_vm.$t("numberOfItemsProduced")) +
+                        " : " +
                         _vm._s(_vm.qtyProduced) +
-                        " Bottles"
+                        "  " +
+                        _vm._s(_vm.$t("bottles")) +
+                        " "
                     ),
                     _c("br")
                   ])
@@ -50673,14 +53188,34 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(1),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.$t("plannedDowntime")) +
+                            "  (" +
+                            _vm._s(_vm.$t("prioritizeList")) +
+                            ")"
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")) + " ")
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("1. No production planned (PP)")
+                          _vm._v(
+                            "1. " +
+                              _vm._s(_vm.$t("noProductionPlanned")) +
+                              " (PP)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["PP"][0].Duration === null
@@ -50701,7 +53236,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("2. Planned Maintenance Activities (PM)")
+                          _vm._v(
+                            "2. " +
+                              _vm._s(_vm.$t("plannedMaintenanceActivites")) +
+                              " (PM)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["PM"][0].Duration === null
@@ -50722,7 +53261,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("3. Capital project implementation (CP)")
+                          _vm._v(
+                            "3. " +
+                              _vm._s(_vm.$t("capitalProjectImplementation")) +
+                              " (CP)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["CP"][0].Duration === null
@@ -50743,7 +53286,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("4. Breaks, meeting, shift change (BM)")
+                          _vm._v(
+                            "4. " +
+                              _vm._s(_vm.$t("breaksMeetingShiftChange")) +
+                              " (BM)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["BM"][0].Duration === null
@@ -50765,14 +53312,30 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(2),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("unplannedDowntime")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("numberOfEvents")))
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("1. Cleaning in place (CIP)")
+                          _vm._v(
+                            "1. " + _vm._s(_vm.$t("cleaningInPlace")) + " (CIP)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["CIP"][0].Duration === null
@@ -50801,7 +53364,9 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("2. Change-Over (COV)")
+                          _vm._v(
+                            "2. " + _vm._s(_vm.$t("changeoOver")) + " (COV)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["COV"][0].Duration === null
@@ -50830,7 +53395,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("3. Batch Number Change (BNC)")
+                          _vm._v(
+                            "3. " +
+                              _vm._s(_vm.$t("batchNumberChange")) +
+                              " (BNC)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["BNC"][0].Duration === null
@@ -50859,7 +53428,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("4. Unplanned External Events (UEE)")
+                          _vm._v(
+                            "4. " +
+                              _vm._s(_vm.$t("unplannedExternalEvents")) +
+                              " (UEE)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["UEE"][0].Duration === null
@@ -50888,7 +53461,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("5. Unplanned Shutdown of Machine (USM)")
+                          _vm._v(
+                            "5. " +
+                              _vm._s(_vm.$t("unplannedShutdownOfMachine")) +
+                              " (USM)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["USM"][0].Duration === null
@@ -50917,7 +53494,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("6. Filler Unplanned Shutdown (UEE)")
+                          _vm._v(
+                            "6. " +
+                              _vm._s(_vm.$t("fillerUnplannedShutdown")) +
+                              " (UEE)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["FUS"][0].Duration === null
@@ -50949,14 +53530,32 @@ var render = function() {
               _vm._v(" "),
               _c("div", {}, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(3),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("speedl    osses")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("numberOfEvents")))
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c("tbody", [
                     _c(
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("1. Reduced Rate at Filler (RRF)")
+                          _vm._v(
+                            "1. " +
+                              _vm._s(_vm.$t("reducedRateAtFiller")) +
+                              " (RRF)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["RRF"][0].Duration === null
@@ -50985,7 +53584,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("2. Reduced Rate at a Machine (RRM)")
+                          _vm._v(
+                            "2. " +
+                              _vm._s(_vm.$t("reducedRateAtAnOtherMachine")) +
+                              " (RRM)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["RRM"][0].Duration === null
@@ -51014,7 +53617,11 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("3. Filler Own Stoppage (FOS)")
+                          _vm._v(
+                            "3. " +
+                              _vm._s(_vm.$t("fillerOwnStoppage")) +
+                              " (FOS)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["FOS"][0].Duration === null
@@ -51043,7 +53650,13 @@ var render = function() {
                       "tr",
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v("4. Filler Stoppage by other Machine (FSM)")
+                          _vm._v(
+                            "4. " +
+                              _vm._s(
+                                _vm.$t("fillerOwnStoppageByAnOtherMachine")
+                              ) +
+                              "(FSM)"
+                          )
                         ]),
                         _vm._v(" "),
                         _vm.allEvents["FSM"][0].Duration === null
@@ -51080,12 +53693,20 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("h1", [_vm._v("\n            Fenetre de production\n\n        ")]),
+        _c("h1", [
+          _vm._v(
+            "\n            " +
+              _vm._s(_vm.$t("productionShift")) +
+              "\n\n        "
+          )
+        ]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "startingPO" } }, [_vm._v("De")]),
+          _c("label", { attrs: { for: "startingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("from")))
+          ]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -51109,7 +53730,9 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _c("label", { attrs: { for: "endingPO" } }, [_vm._v("A")]),
+          _c("label", { attrs: { for: "endingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("to")))
+          ]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -51138,22 +53761,44 @@ var render = function() {
         _vm.show === 1
           ? [
               _c("div", { attrs: { id: "squareZone" } }, [
-                _vm._m(4),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col" }, [
+                    _c("canvas", {
+                      attrs: { id: "can", width: "200", height: "200" }
+                    }),
+                    _vm._v(" "),
+                    _c("h5", [_vm._v(_vm._s(_vm.$t("formVolumeSplit")))])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col" }, [
+                    _c("canvas", {
+                      attrs: { id: "can2", width: "200", height: "200" }
+                    }),
+                    _vm._v(" "),
+                    _c("h5", [_vm._v(_vm._s(_vm.$t("packSizeSplit")))])
+                  ])
+                ]),
                 _vm._v(" "),
                 _c("br"),
                 _vm._v(" "),
-                _c("h5", [_vm._v("Plant Operating Time Overview")]),
+                _c("h5", [
+                  _vm._v(_vm._s(_vm.$t("plantOperatingTimeOverview")) + " ")
+                ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "row rect", attrs: { id: "rect1" } }, [
                   _c("p", { staticClass: "blueBack" }, [
                     _vm._v(
-                      "\n                        Planned Production Time (PPT)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("plannedProductionTime")) +
+                        " (PPT)\n                    "
                     )
                   ]),
                   _vm._v(" "),
                   _c("p", { staticClass: "greenBack" }, [
                     _vm._v(
-                      "\n                        Planned Downtime (PD)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("plannedDowntime")) +
+                        " (PD)\n                    "
                     )
                   ]),
                   _vm._v(" "),
@@ -51174,13 +53819,17 @@ var render = function() {
                 _c("div", { staticClass: "row rect", attrs: { id: "rect2" } }, [
                   _c("p", { staticClass: "blueBack" }, [
                     _vm._v(
-                      "\n                        Operating Time (OT)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("operatingTime")) +
+                        " (OT)\n                    "
                     )
                   ]),
                   _vm._v(" "),
                   _c("p", { staticClass: "redBack" }, [
                     _vm._v(
-                      "\n                        Unplanned Downtime (UD)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("unplannedDowntime")) +
+                        " (UD)\n                    "
                     )
                   ]),
                   _vm._v(" "),
@@ -51201,13 +53850,17 @@ var render = function() {
                 _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
                   _c("p", { staticClass: "blueBack" }, [
                     _vm._v(
-                      "\n                        Net Operating Time (NOT)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("netOperatingTime")) +
+                        " (NOT)\n                    "
                     )
                   ]),
                   _vm._v(" "),
                   _c("p", { staticClass: "redBack" }, [
                     _vm._v(
-                      "\n                        Speed Losses (SL)\n                    "
+                      "\n                       " +
+                        _vm._s(_vm.$t("speedLosses")) +
+                        " (SL)\n                    "
                     )
                   ]),
                   _vm._v(" "),
@@ -51223,13 +53876,17 @@ var render = function() {
                 _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
                   _c("p", { staticClass: "blueBack" }, [
                     _vm._v(
-                      "\n                        Valuable Operating Time (VOT)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("valuableOperatingTime")) +
+                        " (VOT)\n                    "
                     )
                   ]),
                   _vm._v(" "),
                   _c("p", { staticClass: "redBack" }, [
                     _vm._v(
-                      "\n                        Quality Losses (QL)\n                    "
+                      "\n                        " +
+                        _vm._s(_vm.$t("qualityLosses")) +
+                        " (QL)\n                    "
                     )
                   ]),
                   _vm._v(" "),
@@ -51254,7 +53911,9 @@ var render = function() {
             [
               _c("canvas", { attrs: { id: "Availability" } }),
               _vm._v(" "),
-              _vm.show === 1 ? [_c("h5", [_vm._v("Availability")])] : _vm._e()
+              _vm.show === 1
+                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("availability")))])]
+                : _vm._e()
             ],
             2
           ),
@@ -51265,7 +53924,9 @@ var render = function() {
             [
               _c("canvas", { attrs: { id: "Performance" } }),
               _vm._v(" "),
-              _vm.show === 1 ? [_c("h5", [_vm._v("Performance")])] : _vm._e()
+              _vm.show === 1
+                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("performance")))])]
+                : _vm._e()
             ],
             2
           )
@@ -51280,7 +53941,9 @@ var render = function() {
             [
               _c("canvas", { attrs: { id: "Quality" } }),
               _vm._v(" "),
-              _vm.show === 1 ? [_c("h5", [_vm._v("Quality")])] : _vm._e()
+              _vm.show === 1
+                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("quality")))])]
+                : _vm._e()
             ],
             2
           ),
@@ -51303,86 +53966,7 @@ var render = function() {
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col" }, [
-      _c("p", [
-        _vm._v("\n                        Plant Operating Time :"),
-        _vm._v(" mn "),
-        _c("br"),
-        _vm._v("\n                        Planned Production Time : "),
-        _vm._v("mn "),
-        _c("br"),
-        _vm._v("\n                        Load factor :"),
-        _vm._v(" % "),
-        _c("br")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [
-          _vm._v("Planned Downtime (Prioritize list)")
-        ]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Unplanned Downtime")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nber Events")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Speed Losses")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nber Events")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col" }, [
-        _c("canvas", { attrs: { id: "can", width: "200", height: "200" } }),
-        _vm._v(" "),
-        _c("h5", [_vm._v("Form Volume Split")])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col" }, [
-        _c("canvas", { attrs: { id: "can2", width: "200", height: "200" } }),
-        _vm._v(" "),
-        _c("h5", [_vm._v("Pack Size Split")])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -51420,7 +54004,13 @@ var render = function() {
                     staticClass: "col productionName rcorners2",
                     attrs: { align: "center" }
                   },
-                  [_vm._v("\n                Performance\n            ")]
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(_vm.$t("performance")) +
+                        "\n            "
+                    )
+                  ]
                 ),
                 _vm._v(" "),
                 _c("form", [
@@ -51431,7 +54021,7 @@ var render = function() {
                         staticClass: "col-sm-2 col-form-label rcorners1",
                         attrs: { for: "startingPO" }
                       },
-                      [_vm._v("Heure de début de PO")]
+                      [_vm._v(_vm._s(_vm.$t("POStartTime")))]
                     ),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-sm-10" }, [
@@ -51472,7 +54062,7 @@ var render = function() {
                         staticClass: "col-sm-2 rcorners1",
                         attrs: { for: "endingPO" }
                       },
-                      [_vm._v("Heure de fin de PO")]
+                      [_vm._v(_vm._s(_vm.$t("POEndTime")))]
                     ),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-sm-10" }, [
@@ -51507,7 +54097,17 @@ var render = function() {
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group row blockInput" }, [
-                    _vm._m(0),
+                    _c(
+                      "label",
+                      {
+                        staticClass: "col-sm-2 rcorners1",
+                        attrs: { for: "finalQuantityProduced" }
+                      },
+                      [
+                        _vm._v(_vm._s(_vm.$t("finalQuantityProduced(Cases)"))),
+                        _c("br")
+                      ]
+                    ),
                     _vm._v(" "),
                     _c("div", { staticClass: "col-sm-10" }, [
                       _c("input", {
@@ -51547,7 +54147,13 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n                    Valider\n                ")]
+                    [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.$t("validate")) +
+                          "\n                "
+                      )
+                    ]
                   )
                 ]),
                 _vm._v(" "),
@@ -51566,19 +54172,25 @@ var render = function() {
                         [
                           _c("div", { attrs: { align: "left" } }, [
                             _vm._v(
-                              "\n\n                        TOTAL PO PRODUCTION TIME (min): " +
+                              "\n\n                        " +
+                                _vm._s(_vm.$t("totalPOProductionTime")) +
+                                " (min): " +
                                 _vm._s(_vm.totalProductionTime) +
                                 "\n                        "
                             ),
                             _c("br"),
                             _vm._v(
-                              "\n                        TOTAL PO OPERATING TIME (min): " +
+                              "\n                        " +
+                                _vm._s(_vm.$t("totalPOOperatingTime")) +
+                                " (min): " +
                                 _vm._s(_vm.totalOperatingTime) +
                                 "\n                        "
                             ),
                             _c("br"),
                             _vm._v(
-                              "\n                        DIFFERENCE (min): " +
+                              "\n                        " +
+                                _vm._s(_vm.$t("difference")) +
+                                " (min): " +
                                 _vm._s(
                                   _vm.totalProductionTime -
                                     _vm.totalOperatingTime
@@ -51587,7 +54199,9 @@ var render = function() {
                             ),
                             _c("br"),
                             _vm._v(
-                              "\n\n                        TOTAL PO PERFORMANCE (%) : " +
+                              "\n\n                        " +
+                                _vm._s(_vm.$t("totalPOPerformance")) +
+                                " (%) : " +
                                 _vm._s(_vm.performance * 100) +
                                 "\n                    "
                             )
@@ -51599,13 +54213,23 @@ var render = function() {
                             ? [
                                 _c("h4", [
                                   _vm._v(
-                                    "Aucune perte de performance enregistrée"
+                                    _vm._s(_vm.$t("noPerformanceRegistered"))
                                   )
                                 ])
                               ]
                             : [
                                 _c("table", { staticClass: "table" }, [
-                                  _vm._m(1),
+                                  _c("thead", [
+                                    _c("tr", [
+                                      _c("th", { attrs: { scope: "col" } }, [
+                                        _vm._v(_vm._s(_vm.$t("reason")))
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("th", { attrs: { scope: "col" } }, [
+                                        _vm._v(_vm._s(_vm.$t("comments")))
+                                      ])
+                                    ])
+                                  ]),
                                   _vm._v(" "),
                                   _c(
                                     "tbody",
@@ -51650,7 +54274,13 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n                    Annuler\n                ")]
+                    [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.$t("cancel")) +
+                          "\n                "
+                      )
+                    ]
                   )
                 ]),
                 _vm._v(" "),
@@ -51678,7 +54308,9 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                        Retour\n                    "
+                                "\n                        " +
+                                  _vm._s(_vm.$t("back")) +
+                                  "\n                    "
                               )
                             ]
                           ),
@@ -51698,7 +54330,9 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                        Justification perte de performance\n                    "
+                                "\n                        " +
+                                  _vm._s(_vm.$t("speedLossJustification")) +
+                                  "\n                    "
                               )
                             ]
                           ),
@@ -51743,7 +54377,9 @@ var render = function() {
                 },
                 [
                   _vm._v(
-                    "\n                Perte de vitesse " +
+                    "\n                " +
+                      _vm._s(_vm.$t("speedLoss")) +
+                      " " +
                       _vm._s(_vm.nbSpeedLosses + 1) +
                       "\n            "
                   )
@@ -51752,11 +54388,134 @@ var render = function() {
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
-              _vm._m(2),
+              _c(
+                "div",
+                {
+                  staticClass: "row",
+                  staticStyle: { "margin-bottom": "30px" },
+                  attrs: { align: "center" }
+                },
+                [
+                  _c("div", { staticClass: "col-sm-4" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "checkbox labelsAnswer",
+                        attrs: { for: "answer1" }
+                      },
+                      [
+                        _c("input", {
+                          staticClass: "response",
+                          attrs: {
+                            type: "radio",
+                            id: "answer1",
+                            name: "reponseQuestion",
+                            value: "Reduced Rate At Filler"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.$t("reducedRateAtFiller")))
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-sm-4" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "checkbox labelsAnswer",
+                        attrs: { for: "answer2" }
+                      },
+                      [
+                        _c("input", {
+                          staticClass: "response",
+                          attrs: {
+                            type: "radio",
+                            id: "answer2",
+                            name: "reponseQuestion",
+                            value: "Reduce Rate At An Other Machine"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.$t("reduceRateAtAnOtherMachine")))
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-sm-4" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "checkbox labelsAnswer",
+                        attrs: { for: "answer3" }
+                      },
+                      [
+                        _c("input", {
+                          staticClass: "response",
+                          attrs: {
+                            type: "radio",
+                            id: "answer3",
+                            name: "reponseQuestion",
+                            value: "Filler Own Stoppage"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.$t("fillerOwnStoppage")))
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-sm-4" }, [
+                    _c(
+                      "label",
+                      {
+                        staticClass: "checkbox labelsAnswer",
+                        attrs: { for: "answer4" }
+                      },
+                      [
+                        _c("input", {
+                          staticClass: "response",
+                          attrs: {
+                            type: "radio",
+                            id: "answer4",
+                            name: "reponseQuestion",
+                            value: "Filler Own Stoppage By An Other Machine"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.$t("fillerOwnStoppageByAnOtherMachine"))
+                          )
+                        ])
+                      ]
+                    )
+                  ])
+                ]
+              ),
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
-              _vm._m(3),
+              _c("form", [
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 rcorners1",
+                      attrs: { for: "comments" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("comments")))]
+                  ),
+                  _vm._v(" "),
+                  _vm._m(0)
+                ])
+              ]),
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
@@ -51780,7 +54539,13 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n                    Retour\n                ")]
+                    [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.$t("back")) +
+                          "\n                "
+                      )
+                    ]
                   ),
                   _vm._v(" "),
                   _c(
@@ -51813,7 +54578,13 @@ var render = function() {
                   staticClass: "col productionName rcorners2",
                   attrs: { align: "center" }
                 },
-                [_vm._v("\n                Qualité\n            ")]
+                [
+                  _vm._v(
+                    "\n                " +
+                      _vm._s(_vm.$t("quality")) +
+                      "\n            "
+                  )
+                ]
               ),
               _vm._v(" "),
               _c(
@@ -51823,12 +54594,32 @@ var render = function() {
                   attrs: { align: "center" }
                 },
                 [
-                  _vm._m(4),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("filler")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("caper")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("labeller")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c("tbody", [
                     _c("tr", [
                       _c("th", { attrs: { scope: "row" } }, [
-                        _vm._v("Compteur")
+                        _vm._v(_vm._s(_vm.$t("counter")))
                       ]),
                       _vm._v(" "),
                       _c("td", [
@@ -51930,7 +54721,7 @@ var render = function() {
                     _vm._v(" "),
                     _c("tr", [
                       _c("th", { attrs: { scope: "row" } }, [
-                        _vm._v("Rejection")
+                        _vm._v(_vm._s(_vm.$t("rejection")))
                       ]),
                       _vm._v(" "),
                       _c("td", [
@@ -52054,7 +54845,13 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("\n                Retour\n            ")]
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(_vm.$t("back")) +
+                        "\n            "
+                    )
+                  ]
                 ),
                 _vm._v(" "),
                 _c(
@@ -52079,25 +54876,33 @@ var render = function() {
       _vm._v(" "),
       _vm.displayNumber === 3
         ? [
-            _c("h2", { attrs: { align: "center" } }, [_vm._v("Récapitulatif")]),
+            _c("h2", { attrs: { align: "center" } }, [
+              _vm._v(_vm._s(_vm.$t("summary")))
+            ]),
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
             _c("span", [
               _vm._v(
-                "\n\n            TOTAL PO PRODUCTION TIME (min): " +
+                "\n\n            " +
+                  _vm._s(_vm.$t("totalPOProductionTime")) +
+                  " (min): " +
                   _vm._s(_vm.totalProductionTime) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
-                "\n            TOTAL PO OPERATING TIME (min): " +
+                "\n            " +
+                  _vm._s(_vm.$t("totalPOOperatingTime")) +
+                  " (min): " +
                   _vm._s(_vm.totalOperatingTime) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
-                "\n            DIFFERENCE (min): " +
+                "\n            " +
+                  _vm._s(_vm.$t("difference")) +
+                  "(min): " +
                   _vm._s(_vm.totalProductionTime - _vm.totalOperatingTime) +
                   "\n            "
               ),
@@ -52106,13 +54911,23 @@ var render = function() {
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
-            _c("h5", [_vm._v("Pertes de vitesse")]),
+            _c("h5", [_vm._v(_vm._s(_vm.$t("speedlosses")))]),
             _vm._v(" "),
             _vm.speedLoss.length <= 0
-              ? [_c("h5", [_vm._v("Aucune perte de performance enregistrée")])]
+              ? [_c("h5", [_vm._v(_vm._s(_vm.$t("noPerformanceRegistered")))])]
               : [
                   _c("table", { staticClass: "table" }, [
-                    _vm._m(5),
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("reason")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("comments")))
+                        ])
+                      ])
+                    ]),
                     _vm._v(" "),
                     _c(
                       "tbody",
@@ -52134,7 +54949,7 @@ var render = function() {
                   ])
                 ],
             _vm._v(" "),
-            _c("h5", [_vm._v("Qualité")]),
+            _c("h5", [_vm._v(_vm._s(_vm.$t("quality")))]),
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
@@ -52142,11 +54957,33 @@ var render = function() {
               "table",
               { staticClass: "table table-hover", attrs: { align: "center" } },
               [
-                _vm._m(6),
+                _c("thead", [
+                  _c("tr", [
+                    _c("th", { attrs: { scope: "col" } }),
+                    _vm._v(" "),
+                    _c("th", { attrs: { scope: "col" } }, [
+                      _vm._v(" " + _vm._s(_vm.$t("filler")))
+                    ]),
+                    _vm._v(" "),
+                    _c("th", { attrs: { scope: "col" } }, [
+                      _vm._v(_vm._s(_vm.$t("caper")))
+                    ]),
+                    _vm._v(" "),
+                    _c("th", { attrs: { scope: "col" } }, [
+                      _vm._v(_vm._s(_vm.$t("labeller")))
+                    ]),
+                    _vm._v(" "),
+                    _c("th", { attrs: { scope: "col" } }, [
+                      _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                    ])
+                  ])
+                ]),
                 _vm._v(" "),
                 _c("tbody", [
                   _c("tr", [
-                    _c("th", { attrs: { scope: "row" } }, [_vm._v("Compteur")]),
+                    _c("th", { attrs: { scope: "row" } }, [
+                      _vm._v(_vm._s(_vm.$t("counter")))
+                    ]),
                     _vm._v(" "),
                     _c("td", [
                       _vm._v(
@@ -52183,7 +55020,7 @@ var render = function() {
                   _vm._v(" "),
                   _c("tr", [
                     _c("th", { attrs: { scope: "row" } }, [
-                      _vm._v("Rejection")
+                      _vm._v(_vm._s(_vm.$t("rejection")))
                     ]),
                     _vm._v(" "),
                     _c("td", [
@@ -52224,23 +55061,29 @@ var render = function() {
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
-            _c("h5", [_vm._v("Indicateurs")]),
+            _c("h5", [_vm._v(_vm._s(_vm.$t("indicators")))]),
             _vm._v(" "),
             _c("span", [
               _vm._v(
-                "\n\n             Disponibilité (%) :  " +
+                "\n\n             " +
+                  _vm._s(_vm.$t("availability")) +
+                  " (%) :  " +
                   _vm._s(_vm.availability * 100) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
-                "\n             Performance (%) :  " +
+                "\n             " +
+                  _vm._s(_vm.$t("performance")) +
+                  " (%) :  " +
                   _vm._s(_vm.performance * 100) +
                   "\n            "
               ),
               _c("br"),
               _vm._v(
-                "\n             Qualité (%) :  " +
+                "\n             " +
+                  _vm._s(_vm.$t("quality")) +
+                  " (%) :  " +
                   _vm._s(_vm.quality * 100) +
                   "\n            "
               ),
@@ -52274,7 +55117,13 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("\n                Retour\n            ")]
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(_vm.$t("back")) +
+                        "\n            "
+                    )
+                  ]
                 ),
                 _vm._v(" "),
                 _c(
@@ -52290,7 +55139,13 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("\n                Valider\n            ")]
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(_vm.$t("validate")) +
+                        "\n            "
+                    )
+                  ]
                 )
               ]
             )
@@ -52305,194 +55160,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "label",
-      {
-        staticClass: "col-sm-2 rcorners1",
-        attrs: { for: "finalQuantityProduced" }
-      },
-      [
-        _vm._v("Quantité finale produite "),
-        _c("br"),
-        _vm._v("(en\n                        nombre de caisse) ")
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Raison")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Commentaire")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass: "row",
-        staticStyle: { "margin-bottom": "30px" },
-        attrs: { align: "center" }
-      },
-      [
-        _c("div", { staticClass: "col-sm-4" }, [
-          _c(
-            "label",
-            { staticClass: "checkbox labelsAnswer", attrs: { for: "answer1" } },
-            [
-              _c("input", {
-                staticClass: "response",
-                attrs: {
-                  type: "radio",
-                  id: "answer1",
-                  name: "reponseQuestion",
-                  value: "Reduced Rate At Filler"
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [_vm._v("Niveau réduit au remplisseur")])
-            ]
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-sm-4" }, [
-          _c(
-            "label",
-            { staticClass: "checkbox labelsAnswer", attrs: { for: "answer2" } },
-            [
-              _c("input", {
-                staticClass: "response",
-                attrs: {
-                  type: "radio",
-                  id: "answer2",
-                  name: "reponseQuestion",
-                  value: "Reduce Rate At An Other Machine"
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [_vm._v("Niveau réduit à une autre machine")])
-            ]
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-sm-4" }, [
-          _c(
-            "label",
-            { staticClass: "checkbox labelsAnswer", attrs: { for: "answer3" } },
-            [
-              _c("input", {
-                staticClass: "response",
-                attrs: {
-                  type: "radio",
-                  id: "answer3",
-                  name: "reponseQuestion",
-                  value: "Filler Own Stoppage"
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [_vm._v("Remplisseur mis à l'arrêt de lui-même")])
-            ]
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-sm-4" }, [
-          _c(
-            "label",
-            { staticClass: "checkbox labelsAnswer", attrs: { for: "answer4" } },
-            [
-              _c("input", {
-                staticClass: "response",
-                attrs: {
-                  type: "radio",
-                  id: "answer4",
-                  name: "reponseQuestion",
-                  value: "Filler Own Stoppage By An Other Machine"
-                }
-              }),
-              _vm._v(" "),
-              _c("span", [
-                _vm._v("Remplisseur mis à l'arrêt par une autre source")
-              ])
-            ]
-          )
-        ])
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("form", [
-      _c("div", { staticClass: "form-group row" }, [
-        _c(
-          "label",
-          { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-          [_vm._v("Commentaires")]
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-sm-10" }, [
-          _c("textarea", {
-            staticClass: "form-control-plaintext rcorners2",
-            attrs: { id: "comments" }
-          })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v(" Remplisseuse")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Visseuse")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Etiqueteuse")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Poids des boites")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Raison")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Commentaire")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v(" Remplisseuse")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Caper")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Etiqueteuse")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Poids des boites")])
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { id: "comments" }
+      })
     ])
   }
 ]
@@ -52547,7 +55219,7 @@ var render = function() {
               type: "text",
               id: "login",
               name: "login",
-              placeholder: "nom d'utilisateur"
+              placeholder: _vm.us
             },
             domProps: { value: _vm.username },
             on: {
@@ -52574,7 +55246,7 @@ var render = function() {
               type: "password",
               id: "password",
               name: "login",
-              placeholder: "mot de passe"
+              placeholder: _vm.pass
             },
             domProps: { value: _vm.password },
             on: {
@@ -52589,7 +55261,7 @@ var render = function() {
           _vm._v(" "),
           _c("input", {
             staticClass: "fadeIn fourth",
-            attrs: { type: "button", value: "Se Connecter" },
+            attrs: { type: "button", value: _vm.lo },
             on: {
               click: function($event) {
                 return _vm.log()
@@ -53115,6 +55787,34 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "d-flex" }, [
         _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-success",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.swapLanguage("fr")
+              }
+            }
+          },
+          [_vm._v("\n                FR\n            ")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-success",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.swapLanguage("en")
+              }
+            }
+          },
+          [_vm._v("\n                EN\n            ")]
+        ),
+        _vm._v(" "),
+        _c(
           "select",
           {
             directives: [
@@ -53145,23 +55845,33 @@ var render = function() {
           [
             _c("option", { attrs: { value: "packagingLineID" } }, [
               _vm._v(
-                "\n                    Packaging line ID\n                "
+                "\n                    " +
+                  _vm._s(_vm.$t("packagingLineID")) +
+                  "\n                "
               )
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "downtimesReport" } }, [
-              _vm._v("\n                    Downtimes report\n                ")
+              _vm._v(
+                "\n                    " +
+                  _vm._s(_vm.$t("downtimesReport")) +
+                  "\n                "
+              )
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "monthlyLoadFactor" } }, [
               _vm._v(
-                "\n                    Monthly load factor\n                "
+                "\n                    " +
+                  _vm._s(_vm.$t("monthlyLoadFactor")) +
+                  "\n                "
               )
             ]),
             _vm._v(" "),
             _c("option", { attrs: { value: "productionDashboard" } }, [
               _vm._v(
-                "\n                    Production dashboard\n                "
+                "\n                    " +
+                  _vm._s(_vm.$t("productionDashboard")) +
+                  "\n                "
               )
             ]),
             _vm._v(" "),
@@ -53184,7 +55894,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n                Ouvrir\n            ")]
+          [
+            _vm._v(
+              "\n                " + _vm._s(_vm.$t("open")) + "\n            "
+            )
+          ]
         )
       ])
     ])
@@ -53270,7 +55984,7 @@ var render = function() {
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
             _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v("Ligne de production : ")
+              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
             ]),
             _vm._v(" "),
             _c(
@@ -53336,7 +56050,7 @@ var render = function() {
         _vm._v(" "),
         _c("input", {
           staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: "Charger" },
+          attrs: { type: "button", value: _vm.lo },
           on: {
             click: function($event) {
               return _vm.load()
@@ -53354,7 +56068,9 @@ var render = function() {
       _c("div", { staticClass: "col" }, [
         _c("h1", [
           _vm._v(
-            "\n                    Fenetre de production\n\n                "
+            "\n                    " +
+              _vm._s(_vm.$t("productionShift")) +
+              "\n                "
           )
         ]),
         _vm._v(" "),
@@ -53430,50 +56146,84 @@ var render = function() {
               _vm.show === 1
                 ? [
                     _c("table", { staticClass: "table" }, [
-                      _vm._m(1),
+                      _c("thead", [
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "col" } }),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("peakSeason")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("allYear")))
+                          ])
+                        ])
+                      ]),
                       _vm._v(" "),
                       _c("tbody", [
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Availability")
+                            _vm._v(_vm._s(_vm.$t("availability")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
-                              _vm._s(_vm.moyenneAvailability * 100) + " % "
+                              _vm._s(
+                                (
+                                  _vm.AvailabilityPerMonth[_vm.peakSeason] * 100
+                                ).toFixed(2)
+                              ) + " %"
                             )
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyenneAvailability * 100) + " %")
+                            _vm._v(
+                              _vm._s((_vm.availability * 100).toFixed(2)) + " %"
+                            )
                           ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Performance")
+                            _vm._v(_vm._s(_vm.$t("performance")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyennePerformance * 100) + " %")
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  _vm.PerformancePerMonth[_vm.peakSeason] * 100
+                                ).toFixed(2)
+                              ) + " %"
+                            )
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyennePerformance * 100) + " %")
+                            _vm._v(
+                              _vm._s((_vm.performance * 100).toFixed(2)) + " %"
+                            )
                           ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Quality")
+                            _vm._v(_vm._s(_vm.$t("quality")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyenneQuality * 100) + " % ")
+                            _vm._v(
+                              _vm._s(
+                                (
+                                  _vm.QualityPerMonth[_vm.peakSeason] * 100
+                                ).toFixed(2)
+                              ) + " %"
+                            )
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyenneQuality * 100) + " % ")
+                            _vm._v(
+                              _vm._s((_vm.quality * 100).toFixed(2)) + " %"
+                            )
                           ])
                         ]),
                         _vm._v(" "),
@@ -53483,11 +56233,17 @@ var render = function() {
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyenneOLE * 100) + " % ")
+                            _vm._v(
+                              _vm._s(
+                                (_vm.OLEPerMonth[_vm.peakSeason] * 100).toFixed(
+                                  2
+                                )
+                              ) + " %"
+                            )
                           ]),
                           _vm._v(" "),
                           _c("td", [
-                            _vm._v(_vm._s(_vm.moyenneOLE * 100) + " % ")
+                            _vm._v(_vm._s((_vm.OLE * 100).toFixed(2)) + " %")
                           ])
                         ])
                       ])
@@ -53497,64 +56253,61 @@ var render = function() {
                     _vm._v(" "),
                     _c("h3", [
                       _vm._v(
-                        "\n                            Trend versus previous year\n                        "
+                        "\n                            " +
+                          _vm._s(_vm.$t("trendVersusPreviousYear")) +
+                          "\n                        "
                       )
                     ]),
                     _vm._v(" "),
                     _c("br"),
                     _vm._v(" "),
                     _c("table", { staticClass: "table" }, [
-                      _vm._m(2),
+                      _vm._m(1),
                       _vm._v(" "),
                       _c("tbody", [
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Availability")
+                            _vm._v(_vm._s(_vm.$t("availability")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
                               _vm._s(
                                 (
-                                  (_vm.moyenneAvailability -
-                                    _vm.moyenneAvailability2) *
+                                  (_vm.availability - _vm.availability2) *
                                   100
                                 ).toFixed(2)
-                              ) + " % "
+                              ) + " %"
                             )
                           ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Performance")
+                            _vm._v(_vm._s(_vm.$t("performance")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
                               _vm._s(
                                 (
-                                  (_vm.moyennePerformance -
-                                    _vm.moyennePerformance2) *
+                                  (_vm.performance - _vm.performance2) *
                                   100
                                 ).toFixed(2)
-                              ) + " % "
+                              ) + " %"
                             )
                           ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
                           _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v("Quality")
+                            _vm._v(_vm._s(_vm.$t("quality")))
                           ]),
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
                               _vm._s(
-                                (
-                                  (_vm.moyenneQuality - _vm.moyenneQuality2) *
-                                  100
-                                ).toFixed(2)
+                                ((_vm.quality - _vm.quality2) * 100).toFixed(2)
                               ) + " %"
                             )
                           ])
@@ -53567,12 +56320,8 @@ var render = function() {
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
-                              _vm._s(
-                                (
-                                  (_vm.moyenneOLE - _vm.moyenneOLE2) *
-                                  100
-                                ).toFixed(2)
-                              ) + " % "
+                              _vm._s(((_vm.OLE - _vm.OLE2) * 100).toFixed(2)) +
+                                " %"
                             )
                           ])
                         ])
@@ -53595,23 +56344,10 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col-8" }, [
-      _c("div", { staticClass: "wrapper" }, [
-        _c("canvas", { attrs: { id: "myChart5" } })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Peak Season")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("All Year")])
-      ])
+      _c("div", {
+        staticStyle: { height: "300px", width: "100%" },
+        attrs: { id: "chartContainer" }
+      })
     ])
   },
   function() {
@@ -53658,7 +56394,9 @@ var render = function() {
       [
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
-            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _c("label", { attrs: { for: "site" } }, [
+              _vm._v(_vm._s(_vm.$t("site")) + "  : ")
+            ]),
             _vm._v(" "),
             _c(
               "select",
@@ -53712,7 +56450,7 @@ var render = function() {
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
             _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v("Ligne de production : ")
+              _vm._v(_vm._s(_vm.$t("productionLine")) + "  : ")
             ]),
             _vm._v(" "),
             _c(
@@ -53778,7 +56516,7 @@ var render = function() {
         _vm._v(" "),
         _c("input", {
           staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: "Charger" },
+          attrs: { type: "button", value: _vm.lo },
           on: {
             click: function($event) {
               return _vm.load()
@@ -53792,7 +56530,7 @@ var render = function() {
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
-              _c("h2", [_vm._v("Diagramme de flux")]),
+              _c("h2", [_vm._v(_vm._s(_vm.$t("flowDiagram")))]),
               _vm._v(" "),
               _c("br"),
               _vm._v(" "),
@@ -53814,19 +56552,47 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("h1", [_vm._v("\n            Packaging Line ID\n        ")]),
+        _c("h1", [
+          _vm._v(
+            "\n            " + _vm._s(_vm.$t("packagingLineID")) + "\n        "
+          )
+        ]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _vm.show === 1
           ? [
               _c("h2", [
-                _vm._v("\n                Liste des machines\n            ")
+                _vm._v(
+                  "\n                " +
+                    _vm._s(_vm.$t("machineList")) +
+                    "\n            "
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(0),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("machine")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("operation")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("provider")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("model")))
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c(
                     "tbody",
@@ -53857,12 +56623,42 @@ var render = function() {
               _c("br"),
               _vm._v(" "),
               _c("h2", [
-                _vm._v("\n                Liste des formats\n            ")
+                _vm._v(
+                  "\n                " +
+                    _vm._s(_vm.$t("formatList")) +
+                    "\n            "
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "table-info-data" }, [
                 _c("table", { staticClass: "table" }, [
-                  _vm._m(1),
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("format")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("form")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("mat1")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("mat2")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("mat3")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("designRate")))
+                      ])
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c(
                     "tbody",
@@ -53900,46 +56696,7 @@ var render = function() {
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Machine")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Operation")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Fabricant")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Modele")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Format")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Forme")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mat1")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mat2")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mat3")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Design rate")])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -53971,12 +56728,30 @@ var render = function() {
           attrs: { align: "center" }
         },
         [
-          _c("h4", [_vm._v("Historique des arrêts")]),
+          _c("h4", [_vm._v(_vm._s(_vm.$t("downtimesHistory")))]),
           _vm._v(" "),
           _c("br"),
           _vm._v(" "),
           _c("table", { staticClass: "table" }, [
-            _vm._m(0),
+            _c("thead", [
+              _c("tr", [
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("type")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("entryTime")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("comments")))
+                ])
+              ])
+            ]),
             _vm._v(" "),
             _c(
               "tbody",
@@ -54033,9 +56808,28 @@ var render = function() {
     _c("br"),
     _vm._v(" "),
     _c("form", [
-      _vm._m(1),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          {
+            staticClass: "col-sm-2 col-form-label rcorners1",
+            attrs: { for: "totalDuration" }
+          },
+          [_vm._v(_vm._s(_vm.$t("duration(Minutes)")))]
+        ),
+        _vm._v(" "),
+        _vm._m(0)
+      ]),
       _vm._v(" "),
-      _vm._m(2),
+      _c("div", { staticClass: "form-group row" }, [
+        _c(
+          "label",
+          { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
+          [_vm._v(_vm._s(_vm.$t("comments")))]
+        ),
+        _vm._v(" "),
+        _vm._m(1)
+      ]),
       _vm._v(" "),
       _c("div", { attrs: { align: "right" } }, [
         _c(
@@ -54051,7 +56845,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n                Annuler\n            ")]
+          [
+            _vm._v(
+              "\n                " + _vm._s(_vm.$t("cancel")) + "\n            "
+            )
+          ]
         )
       ]),
       _vm._v(" "),
@@ -54075,7 +56873,11 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("\n                Retour\n            ")]
+            [
+              _vm._v(
+                "\n                " + _vm._s(_vm.$t("back")) + "\n            "
+              )
+            ]
           ),
           _vm._v(" "),
           _c(
@@ -54091,7 +56893,13 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("\n                Ajouter une raison\n            ")]
+            [
+              _vm._v(
+                "\n                " +
+                  _vm._s(_vm.$t("addAReason")) +
+                  "\n            "
+              )
+            ]
           ),
           _vm._v(" "),
           _c(
@@ -54119,54 +56927,19 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Type")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Date de saisie")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Durée (minutes)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Commentaire")])
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "number", id: "totalDuration", required: "" }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "totalDuration" }
-        },
-        [_vm._v("Durée (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "number", id: "totalDuration", required: "" }
-        })
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-        [_vm._v("Commentaires")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("textarea", { attrs: { id: "comments" } })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", { attrs: { id: "comments" } })
     ])
   }
 ]
@@ -54253,7 +57026,7 @@ var render = function() {
         _c("div", { staticClass: "d-flex" }, [
           _c("form", [
             _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v("Ligne de production : ")
+              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
             ]),
             _vm._v(" "),
             _c(
@@ -54337,7 +57110,9 @@ var render = function() {
           ? [
               _c("h1", [
                 _vm._v(
-                  "\n                Répartition des formulations\n            "
+                  "\n                " +
+                    _vm._s(_vm.$t("formulationSplit")) +
+                    "\n            "
                 )
               ]),
               _vm._v(" "),
@@ -54495,7 +57270,9 @@ var render = function() {
           ? [
               _c("h1", [
                 _vm._v(
-                  "\n                Répartition des tailles de packs\n            "
+                  "\n                " +
+                    _vm._s(_vm.$t("packSizeSplit")) +
+                    "\n            "
                 )
               ]),
               _vm._v(" "),
@@ -54642,12 +57419,20 @@ var render = function() {
       "div",
       { staticClass: "col" },
       [
-        _c("h1", [_vm._v("\n            Fenetre de production\n\n        ")]),
+        _c("h1", [
+          _vm._v(
+            "\n            " +
+              _vm._s(_vm.$t("productionShift")) +
+              "\n\n        "
+          )
+        ]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "startingPO" } }, [_vm._v("De")]),
+          _c("label", { attrs: { for: "startingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("from")))
+          ]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -54671,7 +57456,9 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _c("label", { attrs: { for: "endingPO" } }, [_vm._v("A")]),
+          _c("label", { attrs: { for: "endingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("to")))
+          ]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -54703,7 +57490,9 @@ var render = function() {
           ? [
               _c("h1", [
                 _vm._v(
-                  "\n                Répartition des formulations (%)\n            "
+                  "\n                " +
+                    _vm._s(_vm.$t("formulationSplit")) +
+                    " (%)\n            "
                 )
               ])
             ]
@@ -55003,7 +57792,7 @@ var render = function() {
               staticClass: "col-sm-2 col-form-label rcorners1",
               attrs: { for: "site" }
             },
-            [_vm._v("Site")]
+            [_vm._v(_vm._s(_vm.$t("site")))]
           ),
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-10" }, [
@@ -55019,7 +57808,7 @@ var render = function() {
           _c(
             "label",
             { staticClass: "col-sm-2 rcorners1", attrs: { for: "crewLeader" } },
-            [_vm._v("Chef d'équipe")]
+            [_vm._v(_vm._s(_vm.$t("crewLeader")))]
           ),
           _vm._v(" "),
           _c(
@@ -55061,7 +57850,7 @@ var render = function() {
           _c(
             "label",
             { staticClass: "col-sm-2 rcorners1", attrs: { for: "typeTeam" } },
-            [_vm._v("Type d'équipe")]
+            [_vm._v(_vm._s(_vm.$t("typeTeam")))]
           ),
           _vm._v(" "),
           _c(
@@ -55119,7 +57908,7 @@ var render = function() {
               staticClass: "col-sm-2 rcorners1",
               attrs: { for: "workingDebut" }
             },
-            [_vm._v("Heure de début")]
+            [_vm._v(_vm._s(_vm.$t("startTime")))]
           ),
           _vm._v(" "),
           _c(
@@ -55150,7 +57939,7 @@ var render = function() {
           _c(
             "label",
             { staticClass: "col-sm-2 rcorners1", attrs: { for: "workingEnd" } },
-            [_vm._v("Heure de fin")]
+            [_vm._v(_vm._s(_vm.$t("endTime")))]
           ),
           _vm._v(" "),
           _c(
@@ -55187,7 +57976,9 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n                            Production " +
+                            "\n                            " +
+                              _vm._s(_vm.$t("line")) +
+                              "  " +
                               _vm._s(productionLine.productionline_name) +
                               "\n                        "
                           )
@@ -55308,31 +58099,41 @@ var render = function() {
               _c("div", { staticClass: "rcorners2" }, [
                 _c("p", [
                   _vm._v(
-                    "\n                         Site : " +
+                    "\n                         " +
+                      _vm._s(_vm.$t("site")) +
+                      " : " +
                       _vm._s(_vm.site) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         Crew Leader : " +
+                    "\n                         " +
+                      _vm._s(_vm.$t("crewLeader")) +
+                      " : " +
                       _vm._s(_vm.crewLeader) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         Type : " +
+                    "\n                         " +
+                      _vm._s(_vm.$t("typeTeam")) +
+                      " : " +
                       _vm._s(_vm.typeTeam) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         Début : " +
+                    "\n                         " +
+                      _vm._s(_vm.$t("startTime")) +
+                      " : " +
                       _vm._s(_vm.workingDebut) +
                       " "
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         Fin : " +
+                    "\n                         " +
+                      _vm._s(_vm.$t("endTime")) +
+                      " : " +
                       _vm._s(_vm.workingEnd) +
                       " "
                   ),
@@ -55350,7 +58151,25 @@ var render = function() {
                 },
                 [
                   _c("table", { staticClass: "table" }, [
-                    _vm._m(0, true),
+                    _c("thead", { staticClass: "thead-dark" }, [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("type")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("entryTime")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("comments")))
+                        ])
+                      ])
+                    ]),
                     _vm._v(" "),
                     _c(
                       "tbody",
@@ -55424,24 +58243,7 @@ var render = function() {
     _c("br")
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", { staticClass: "thead-dark" }, [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Type")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Heure de saisie")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Durée (minutes)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Commentaire")])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -56021,8 +58823,20 @@ var render = function() {
       { staticClass: "productionName rcorners2", attrs: { align: "center" } },
       [
         _vm.downtimeType === "unplannedDowntime"
-          ? [_vm._v("\n            Arrêt de production non planifié\n        ")]
-          : [_vm._v("\n            Arrêt de production planifié\n        ")]
+          ? [
+              _vm._v(
+                "\n            " +
+                  _vm._s(_vm.$t("unplannedDowntime")) +
+                  "\n        "
+              )
+            ]
+          : [
+              _vm._v(
+                "\n            " +
+                  _vm._s(_vm.$t("plannedDowntime")) +
+                  "\n        "
+              )
+            ]
       ],
       2
     ),
@@ -56075,7 +58889,7 @@ var render = function() {
             }
           }
         },
-        [_vm._v("\n            Retour\n        ")]
+        [_vm._v("\n            " + _vm._s(_vm.$t("back")) + "\n        ")]
       )
     ])
   ])
@@ -56202,7 +59016,13 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                Retour\n            ")]
+                [
+                  _vm._v(
+                    "\n                " +
+                      _vm._s(_vm.$t("back")) +
+                      "\n            "
+                  )
+                ]
               )
             ])
           ]
@@ -56211,9 +59031,31 @@ var render = function() {
       _vm.printedStep === 2
         ? [
             _c("form", [
-              _vm._m(0),
+              _c("div", { staticClass: "form-group row" }, [
+                _c(
+                  "label",
+                  {
+                    staticClass: "col-sm-2 col-form-label rcorners1",
+                    attrs: { for: "time" }
+                  },
+                  [_vm._v(_vm._s(_vm.$t("duration(Minutes)")))]
+                ),
+                _vm._v(" "),
+                _vm._m(0)
+              ]),
               _vm._v(" "),
-              _vm._m(1),
+              _c("div", { staticClass: "form-group row" }, [
+                _c(
+                  "label",
+                  {
+                    staticClass: "col-sm-2 rcorners1",
+                    attrs: { for: "comments" }
+                  },
+                  [_vm._v(_vm._s(_vm.$t("comments")))]
+                ),
+                _vm._v(" "),
+                _vm._m(1)
+              ]),
               _vm._v(" "),
               _c("div", { attrs: { align: "right" } }, [
                 _c(
@@ -56229,7 +59071,13 @@ var render = function() {
                       }
                     }
                   },
-                  [_vm._v("\n                    Annuler\n                ")]
+                  [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.$t("cancel")) +
+                        "\n                "
+                    )
+                  ]
                 )
               ]),
               _vm._v(" "),
@@ -56253,7 +59101,13 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n                    Retour\n                ")]
+                    [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.$t("back")) +
+                          "\n                "
+                      )
+                    ]
                   ),
                   _vm._v(" "),
                   _c(
@@ -56289,41 +59143,22 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        {
-          staticClass: "col-sm-2 col-form-label rcorners1",
-          attrs: { for: "time" }
-        },
-        [_vm._v("Durée (minutes)")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("input", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "number", id: "time" }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("input", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "number", id: "time" }
+      })
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row" }, [
-      _c(
-        "label",
-        { staticClass: "col-sm-2 rcorners1", attrs: { for: "comments" } },
-        [_vm._v("Commentaires")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-sm-10" }, [
-        _c("textarea", {
-          staticClass: "form-control-plaintext rcorners2",
-          attrs: { type: "text", id: "comments" }
-        })
-      ])
+    return _c("div", { staticClass: "col-sm-10" }, [
+      _c("textarea", {
+        staticClass: "form-control-plaintext rcorners2",
+        attrs: { type: "text", id: "comments" }
+      })
     ])
   }
 ]
@@ -69753,6 +72588,61 @@ var index = {
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (index);
 
 
+
+/***/ }),
+
+/***/ "./resources/lang/en.json":
+/*!********************************!*\
+  !*** ./resources/lang/en.json ***!
+  \********************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year"}');
+
+/***/ }),
+
+/***/ "./resources/lang/fr.json":
+/*!********************************!*\
+  !*** ./resources/lang/fr.json ***!
+  \********************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente"}');
+
+/***/ }),
+
+/***/ "./resources/lang sync recursive [A-Za-z0-9-_,\\s]+\\.json$/":
+/*!********************************************************!*\
+  !*** ./resources/lang/ sync [A-Za-z0-9-_,\s]+\.json$/ ***!
+  \********************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var map = {
+	"./en.json": "./resources/lang/en.json",
+	"./fr.json": "./resources/lang/fr.json"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./resources/lang sync recursive [A-Za-z0-9-_,\\s]+\\.json$/";
 
 /***/ })
 

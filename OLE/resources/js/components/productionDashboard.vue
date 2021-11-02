@@ -27,7 +27,7 @@
 
             <div class="d-flex">
                 <form>
-                    <label class="" for="productionline">Ligne de production : </label>
+                    <label class="" for="productionline">{{$t("productionLine")}} : </label>
                     <select name="productionline" id="productionline" class="form-select" v-model="productionline">
                         <template v-for="productionline in sites[1]">
                             <template v-if="productionline.name === site">
@@ -53,7 +53,7 @@
 
             <template v-if="show===1">
                 <h1>
-                    Répartition des formulations
+                    {{$t("formulationSplit")}}
                 </h1>
 
                 <!--{{formulations}}
@@ -138,7 +138,7 @@
 
 
                 <h1>
-                    Répartition des tailles de packs
+                    {{$t("packSizeSplit")}}
                 </h1>
 
                 <div class="table-info-data">
@@ -215,16 +215,16 @@
 
         <div class="col">
             <h1>
-                Fenetre de production
+                {{$t("productionShift")}}
 
             </h1>
             <br/>
             <div class="d-flex">
-                <label class="" for="startingPO">De</label>
+                <label class="" for="startingPO">{{$t("from")}}</label>
                 <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
 
-                <label class="" for="endingPO">A</label>
+                <label class="" for="endingPO">{{$t("to")}}</label>
                 <input type="date" id="endingPO" class=""
                        required v-model="endingDate">
 
@@ -234,7 +234,7 @@
             <br/>
             <template v-if="show===1">
                 <h1>
-                    Répartition des formulations (%)
+                    {{$t("formulationSplit")}} (%)
                 </h1>
             </template>
 

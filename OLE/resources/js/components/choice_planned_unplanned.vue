@@ -11,7 +11,7 @@
                 <button
                     class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info"
                     type="button" @click.prevent="setDowntimeType('plannedDowntime')">
-                    Arrêt de production planifié
+                    {{$t("plannedDowntime")}}
                 </button>
             </div>
 
@@ -20,7 +20,7 @@
                 <button
                     class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info"
                     type="button" @click.prevent="setDowntimeType('unplannedDowntime')">
-                    Arrêt de production non planifié
+                    {{$t("unplannedDowntime")}}
                 </button>
 
             </div>
@@ -32,10 +32,10 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Date de saisie</th>
-                    <th scope="col">Durée (minutes)</th>
-                    <th scope="col">Commentaire</th>
+                    <th scope="col">{{$t("type")}}</th>
+                    <th scope="col">{{$t("entryTime")}}</th>
+                    <th scope="col">{{$t("duration(Minutes)")}}</th>
+                    <th scope="col">{{$t("comments")}}</th>
 
                 </tr>
                 </thead>
@@ -66,7 +66,7 @@
 
 
         <div align="left">
-            <button type="button" class="btn btn-danger" @click.prevent="backPage()">Retour</button>
+            <button type="button" class="btn btn-danger" @click.prevent="backPage()">{{$t("back")}}</button>
         </div>
     </div>
 

@@ -17,11 +17,11 @@
                      <br/>
                      <div class="rcorners2">
                          <p>
-                             Site : {{site}} <br/>
-                             Crew Leader : {{crewLeader}} <br/>
-                             Type : {{typeTeam}} <br/>
-                             Début : {{workingDebut}} <br/>
-                             Fin : {{workingEnd}} <br/>
+                             {{$t("site")}} : {{site}} <br/>
+                             {{$t("crewLeader")}} : {{crewLeader}} <br/>
+                             {{$t("typeTeam")}} : {{typeTeam}} <br/>
+                             {{$t("startTime")}} : {{workingDebut}} <br/>
+                             {{$t("endTime")}} : {{workingEnd}} <br/>
                          </p>
                      </div>
 
@@ -38,10 +38,10 @@
                         <table class="table">
                             <thead class="thead-dark">
                             <tr>
-                                <th scope="col">Type</th>
-                                <th scope="col">Heure de saisie</th>
-                                <th scope="col">Durée (minutes)</th>
-                                <th scope="col">Commentaire</th>
+                                <th scope="col">{{$t("type")}}</th>
+                                <th scope="col">{{$t("entryTime")}}</th>
+                                <th scope="col">{{$t("duration(Minutes)")}}</th>
+                                <th scope="col">{{$t("comments")}}</th>
 
                             </tr>
                             </thead>
