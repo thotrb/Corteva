@@ -142,16 +142,17 @@
             },
             
             productionLineSelected: function() {
-                if (document.getElementById("pl-selection").value) this.chargeData(this.currentYear + '-01-01', this.currentYear + '-12-31');
-             
+                if (document.getElementById("pl-selection").value) this.chargeData();
             },
 
             createDowntimeObject: function() {
             
             }, 
 
-            chargeData: function(dateFrom, dateTo) {
+            chargeData: function() {
                 const selectedPL = document.getElementById('pl-selection').value;
+                const dateFrom = this.currentYear + '-01-01';
+                const dateTo = this.currentYear + '-12-31';
                 const params = [selectedPL, dateFrom, dateTo];
 
                 this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
@@ -355,24 +356,7 @@
         padding: 15px 30px;
     }
 
-    div.table-container th {
-        text-align: center;
-        border: none;
-    }
-
-    div.table-container th:first-of-type{
-        border-top-left-radius: 7px;
-        border-bottom-left-radius: 7px;
-    }
-
-    div.table-container th:last-of-type{
-        border-top-right-radius: 7px;
-        border-bottom-right-radius: 7px;
-    }
-
-    div.table-container td {
-        text-align: center;
-    }
+     
 
 
     div.downtime-percent-container {

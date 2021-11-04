@@ -5049,6 +5049,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbar",
   data: function data() {
@@ -8913,13 +8925,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       });
     },
     productionLineSelected: function productionLineSelected() {
-      if (document.getElementById("pl-selection").value) this.chargeData(this.currentYear + '-01-01', this.currentYear + '-12-31');
+      if (document.getElementById("pl-selection").value) this.chargeData();
     },
     createDowntimeObject: function createDowntimeObject() {},
-    chargeData: function chargeData(dateFrom, dateTo) {
+    chargeData: function chargeData() {
       var _this = this;
 
       var selectedPL = document.getElementById('pl-selection').value;
+      var dateFrom = this.currentYear + '-01-01';
+      var dateTo = this.currentYear + '-12-31';
       var params = [selectedPL, dateFrom, dateTo];
       this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
         _this.resolveAfter(1000).then(function () {
@@ -9228,11 +9242,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       chartObjects: {
         'own-stop': {
           chart: undefined,
-          labels: ['Filler Own Stop']
+          labels: ['Filler Own Stoppage', 'Reduced Rate At Filler']
         },
         'other-machine': {
           chart: undefined,
-          labels: ['Filler Stop by Other Machine']
+          labels: ['Filler Stop by Other Machine', 'Reduced Rate At And Other Machine']
         },
         created: false
       },
@@ -9299,26 +9313,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               "Filler Stop By Other Machine": {
                 duration: 0,
                 freq: 0
+              },
+              "Reduced Rate At Filler": {
+                duration: 0,
+                freq: 0
+              },
+              "Reduced Rate At An Other Machine": {
+                duration: 0,
+                freq: 0
               }
             }; //Add fetched events to the slEvents variable
             //Creates charts' data
 
-            _this.slEvents = _this.allEvents.SLEVENTS.reduce(function (acc, slEvent) {
-              if (acc[slEvent.reason]) {
-                //If event is concerned by a chart, create its data
-                if (chartData[slEvent.reason]) {
-                  chartData[slEvent.reason].duration += slEvent.duration;
-                  chartData[slEvent.reason].freq++;
+            if (_this.allEvents.SLEVENTS) {
+              _this.slEvents = _this.allEvents.SLEVENTS.reduce(function (acc, slEvent) {
+                if (acc[slEvent.reason]) {
+                  //If event is concerned by a chart, create its data
+                  if (chartData[slEvent.reason]) {
+                    chartData[slEvent.reason].duration += slEvent.duration;
+                    chartData[slEvent.reason].freq++;
+                  }
+
+                  acc[slEvent.reason].totalDuration += slEvent.duration;
+                  var reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
+                  slEvent.reducedRate = reducedRate || 0;
+                  acc[slEvent.reason].events.push(slEvent);
                 }
 
-                acc[slEvent.reason].totalDuration += slEvent.duration;
-                var reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
-                slEvent.reducedRate = reducedRate || 0;
-                acc[slEvent.reason].events.push(slEvent);
-              }
+                return acc;
+              }, _this.slEvents);
+            } //Total speed loss duration as the sum of all categorie's durations
 
-              return acc;
-            }, _this.slEvents); //Total speed loss duration as the sum of all categorie's durations
 
             var totalSpeedLossDuration = Object.values(_this.slEvents).reduce(function (acc, slCat) {
               return acc + slCat.totalDuration;
@@ -9328,13 +9353,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               slCat.percentage = (slCat.totalDuration / totalSpeedLossDuration * 100).toFixed(2);
             });
             var map = {
-              "Filler Own Stoppage": 'own-stop',
-              "Filler Stop By Other Machine": 'other-machine'
-            }; //Update charts' data 
+              'Filler Own Stoppage': 'own-stop',
+              'Filler Stop By Other Machine': 'other-machine',
+              'Reduced Rate At Filler': 'own-stop',
+              'Reduced Rate At An Other Machine': 'other-machine'
+            }; //Update charts' data
 
             Object.keys(map).forEach(function (key) {
-              _this.chartObjects[map[key]].chart.data.datasets[0].data[0] = chartData[key].duration;
-              _this.chartObjects[map[key]].chart.data.datasets[1].data[0] = chartData[key].freq;
+              _this.chartObjects[map[key]].chart.data.datasets[0].data = [];
+              _this.chartObjects[map[key]].chart.data.datasets[1].data = [];
+            });
+            Object.keys(map).forEach(function (key) {
+              _this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
+
+              _this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
 
               _this.chartObjects[map[key]].chart.update();
             });
@@ -9354,11 +9386,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             datasets: [{
               label: 'Time in minutes',
               backgroundColor: 'rgb(245, 194, 67)',
-              data: [0]
+              data: []
             }, {
               label: 'Number',
               backgroundColor: 'rgb(90, 90, 90)',
-              data: [0],
+              data: [],
               yAxisID: "freq"
             }]
           },
@@ -15454,7 +15486,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-4aef8324] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-4aef8324] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-4aef8324] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-4aef8324]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-4aef8324] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-4aef8324] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-4aef8324] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-4aef8324] {\n    font-size: 20px;\n    font-weight: bold;\n}\ndiv.content-panel > div[data-v-4aef8324] {\n    display: flex;\n    flex-direction: column;\n    width: 50%;\n}\ndiv.chart-container[data-v-4aef8324] {\n    padding: 15px;\n    height: 300px;\n}\ndiv.table-container[data-v-4aef8324] {\n    justify-content: center;\n    padding: 15px 30px;\n}\ndiv.table-container th[data-v-4aef8324] {\n    text-align: center;\n    border: none;\n}\ndiv.table-container th[data-v-4aef8324]:first-of-type{\n    border-top-left-radius: 7px;\n    border-bottom-left-radius: 7px;\n}\ndiv.table-container th[data-v-4aef8324]:last-of-type{\n    border-top-right-radius: 7px;\n    border-bottom-right-radius: 7px;\n}\ndiv.table-container td[data-v-4aef8324] {\n    text-align: center;\n}\ndiv.downtime-percent-container[data-v-4aef8324] {\n    justify-content: center;\n}\np.downtime-percent[data-v-4aef8324] {\n    font-size: 16px;\n}\nthead[data-v-4aef8324] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-4aef8324] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-4aef8324] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-4aef8324] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-4aef8324]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-4aef8324] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-4aef8324] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-4aef8324] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-4aef8324] {\n    font-size: 20px;\n    font-weight: bold;\n}\ndiv.content-panel > div[data-v-4aef8324] {\n    display: flex;\n    flex-direction: column;\n    width: 50%;\n}\ndiv.chart-container[data-v-4aef8324] {\n    padding: 15px;\n    height: 300px;\n}\ndiv.table-container[data-v-4aef8324] {\n    justify-content: center;\n    padding: 15px 30px;\n}\ndiv.downtime-percent-container[data-v-4aef8324] {\n    justify-content: center;\n}\np.downtime-percent[data-v-4aef8324] {\n    font-size: 16px;\n}\nthead[data-v-4aef8324] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -56806,6 +56838,24 @@ var render = function() {
               _vm._v(
                 "\n                    Overall Line Effectivness\n                "
               )
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "unplannedDowntimeDashboard" } }, [
+              _vm._v(
+                "\n                    Unplanned Downtime Dashboard\n                "
+              )
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "unplannedDowntimeShutdowns" } }, [
+              _vm._v(
+                "\n                    Unplanned Downtime Shutdowns\n                "
+              )
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "unplannedDowntimeSpeedLosses" } }, [
+              _vm._v(
+                "\n                    Unplanned Downtime Speed Losses\n                "
+              )
             ])
           ]
         ),
@@ -57004,7 +57054,9 @@ var render = function() {
         _c("br"),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "startYear" } }, [_vm._v("Year")]),
+          _c("label", { attrs: { for: "startYear" } }, [
+            _vm._v(_vm._s(_vm.$t("year")))
+          ]),
           _vm._v(" "),
           _c(
             "select",

@@ -190,14 +190,16 @@ class FormController extends Controller
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear.'-'.$beginningMonth.'-'.$beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
 
-
+            
             $speedLossesEvents =  DB::table('ole_speed_losses')
                 ->select('ole_speed_losses.duration', 'ole_speed_losses.reason', 'ole_speed_losses.comment', 'ole_pos.id', 'ole_pos.qtyProduced', 'ole_pos.workingDuration', 'ole_products.size', 'ole_products.idealRate')
+                ->where('ole_speed_losses.productionline', '=', $productionLine)
                 ->whereDate('ole_speed_losses.created_at', '>=', $beginningDate)
                 ->whereDate('ole_speed_losses.created_at', '<=', $endingDate)
                 ->join('ole_pos','ole_pos.number','=','ole_speed_losses.OLE')
                 ->join('ole_products', 'ole_products.GMID', '=', 'ole_pos.GMIDCode')
                 ->get();
+            
 
 
             $BM = DB::table('ole_planned_events')
