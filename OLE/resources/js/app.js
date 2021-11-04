@@ -21,8 +21,8 @@ function loadLocaleMessages () {
     locales.keys().forEach(key => {
         const matched = key.match(/([A-Za-z0-9-_]+)\./i);
         if (matched && matched.length > 1) {
-            const locale = matched[1]
-            messages[locale] = locales(key)
+            const locale = matched[1];
+            messages[locale] = locales(key);
         }
     });
     return messages
@@ -70,6 +70,8 @@ Vue.component('choice_planned_unplanned', require('./components/choice_planned_u
 Vue.component('unplanned_pannel1', require('./components/unplanned_pannel1.vue').default);
 
 Vue.component('unplanned_pannel_unplanned2', require('./components/unplanned_pannel_unplanned2.vue').default);
+
+Vue.component('navbarSaisie', require('./components/navbarSaisie.vue').default);
 
 
 Vue.component('CIP_Declaration', require('./components/CIP_Declaration.vue').default);

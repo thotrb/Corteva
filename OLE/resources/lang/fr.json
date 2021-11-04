@@ -106,7 +106,26 @@
     "productionDashboard" : "Rapport de Production",
     "peakSeason" : "Pic de Saison",
     "allYear" : "Toute l'année",
-    "trendVersusPreviousYear" : "Tendance actuelle par rapport à l'année précédente"
+    "trendVersusPreviousYear" : "Tendance actuelle par rapport à l'année précédente",
+    "break" : "Pause",
+    "lunch" : "Repas",
+    "emergency" : "Urgence",
+    "meeting" : "Réunion",
+    "maintenance" : "Maintenance",
+    "projectImplementation" : "Implementation de projet",
+    "formatChanging" : "Changement de format",
+    "packNumberChanging" : "Changement de numéro de lot",
+    "CIP" : "CIP",
+    "errorInput" :  "Champs incomplets",
+    "other" : "Autre",
+    "bowlStopper" : "Bol Bouchon",
+    "missingBottle" : "Manque Bouteille",
+    "downstreamSaturation" : "Saturation Aval",
+    "dosingTurret" : "Tourelle de Dosage",
+    "screwingTurret" : "Tourelle de Vissage",
+    "year" : "Année"
+
+
 
 
 

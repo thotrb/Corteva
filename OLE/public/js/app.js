@@ -1923,7 +1923,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "CIP_Declaration",
   data: function data() {
@@ -1940,7 +1939,7 @@ __webpack_require__.r(__webpack_exports__);
         productionline: sessionStorage.getItem("productionName"),
         previous_bulk: '',
         predicted_duration: 5,
-        total_duration: 10,
+        total_duration: 0,
         //commentaire
         comment: ''
       }
@@ -1949,13 +1948,36 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     validateInformations: function validateInformations() {
       this.CIP_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
-      this.CIP_Event.previous_bulk = document.getElementById('previousBulk').value;
-      this.CIP_Event.predicted_duration = document.getElementById('expectedDuration').value;
-      this.CIP_Event.total_duration = document.getElementById('totalDuration').value;
-      this.CIP_Event.comment = document.getElementById('comments').value;
+      /**
+                      this.CIP_Event.previous_bulk = document.getElementById('previousBulk').value;
+                      this.CIP_Event.predicted_duration = document.getElementById('expectedDuration').value;
+                      this.CIP_Event.total_duration = document.getElementById('totalDuration').value;
+                      this.CIP_Event.comment = document.getElementById('comments').value;
+                 **/
+
       console.log(this.CIP_Event);
-      this.$store.dispatch('create_UnplannedEvent_CIP', this.CIP_Event);
-      this.backOrigin();
+
+      if (this.CIP_Event.previous_bulk !== null && this.CIP_Event.total_duration > 0) {
+        this.$store.dispatch('create_UnplannedEvent_CIP', this.CIP_Event);
+        this.backOrigin();
+      } else {
+        this.errorMessage();
+      }
+    },
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
     },
     backOrigin: function backOrigin() {
       window.location.href = this.url + 'summary';
@@ -1971,7 +1993,11 @@ __webpack_require__.r(__webpack_exports__);
       window.location.href = this.url + 'summary/' + this.productionName + '/' + this.downtimeType;
     }
   },
-  mounted: function mounted() {}
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+  }
 });
 
 /***/ }),
@@ -2140,10 +2166,29 @@ __webpack_require__.r(__webpack_exports__);
       this.ChangingFormat_Event.total_duration = document.getElementById('totalDuration').value;
       this.ChangingFormat_Event.comment = document.getElementById('comments').value;
       this.ChangingFormat_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
-      console.log(this.ChangingFormat_Event); //this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
 
-      this.$store.dispatch('create_UnplannedEvent_Changingformat', this.ChangingFormat_Event);
-      this.backOrigin();
+      if (this.ChangingFormat_Event.predicted_duration > 0 && this.ChangingFormat_Event.total_duration > 0) {
+        this.$store.dispatch('create_UnplannedEvent_Changingformat', this.ChangingFormat_Event); //this.backOrigin();
+      } else {
+        this.errorMessage();
+      }
+
+      console.log(this.ChangingFormat_Event); //this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
+    },
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
     },
     backOrigin: function backOrigin() {
       window.location.href = this.url + 'summary';
@@ -2159,7 +2204,11 @@ __webpack_require__.r(__webpack_exports__);
       window.location.href = this.url + 'summary/' + this.productionName + '/' + this.downtimeType;
     }
   },
-  mounted: function mounted() {}
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+  }
 });
 
 /***/ }),
@@ -2263,21 +2312,40 @@ __webpack_require__.r(__webpack_exports__);
         productionline: sessionStorage.getItem("productionName"),
         predicted_duration: 5,
         total_duration: 10,
-        lot_number: 'ABCD',
+        lot_number: 'lot_Number',
         comment: ''
       }
     };
   },
   methods: {
     validateInformations: function validateInformations() {
-      this.ChangingClient_Event.predicted_duration = document.getElementById('expectedDuration').value;
-      this.ChangingClient_Event.lot_number = document.getElementById('lotNumber').value;
+      this.ChangingClient_Event.predicted_duration = document.getElementById('expectedDuration').value; //this.ChangingClient_Event.lot_number = document.getElementById('lotNumber').value;
+
       this.ChangingClient_Event.total_duration = document.getElementById('totalDuration').value;
       this.ChangingClient_Event.comment = document.getElementById('comments').value;
       this.ChangingClient_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
-      console.log(this.ChangingClient_Event);
-      this.$store.dispatch('create_UnplannedEvent_Clientchanging', this.ChangingClient_Event);
-      this.backOrigin();
+
+      if (this.ChangingClient_Event.total_duration > 0) {
+        this.$store.dispatch('create_UnplannedEvent_Clientchanging', this.ChangingClient_Event);
+        this.backOrigin();
+      } else {
+        this.errorMessage();
+      }
+    },
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
     },
     backOrigin: function backOrigin() {
       window.location.href = this.url + 'summary';
@@ -2293,7 +2361,11 @@ __webpack_require__.r(__webpack_exports__);
       window.location.href = this.url + 'summary/' + this.productionName + '/' + this.downtimeType;
     }
   },
-  mounted: function mounted() {}
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+  }
 });
 
 /***/ }),
@@ -2474,6 +2546,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     console.log("POS : ");
     console.log(sessionStorage.getItem("pos").split(','));
 
@@ -2526,6 +2602,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "choiceLogin",
   data: function data() {
@@ -2557,6 +2637,11 @@ __webpack_require__.r(__webpack_exports__);
         case 'sup':
           window.location.href = currentLink + 'login/supervisor';
           break;
+      }
+    },
+    mounted: function mounted() {
+      if (sessionStorage.getItem("language") !== null) {
+        this.$i18n.locale = sessionStorage.getItem("language");
       }
     }
   },
@@ -2686,6 +2771,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     console.log(this.prodlines);
     console.log(this.productionName);
     console.log('PO');
@@ -3705,6 +3794,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites');
     var today = new Date();
     var dd = today.getDate();
@@ -4191,10 +4284,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+
+
 
 var today = new Date();
-
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "endPO_Declaration",
   components: {
@@ -4255,6 +4351,36 @@ var today = new Date();
     };
   },
   methods: {
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
+    },
+    errorMessage2: function errorMessage2() {
+      var h1 = document.getElementsByClassName("errorS");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "errorS");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center"); //let br = document.createElement('br');
+
+        var form = document.getElementById("formSpeedLoss"); //form.insertBefore(br, form.firstChild);
+
+        form.appendChild(error); //form.insertBefore(error, form.firstChild);
+      }
+    },
     validateCalculation: function () {
       var _validateCalculation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
         var splitted1, splitted2, time1, time2;
@@ -4282,18 +4408,28 @@ var today = new Date();
                   this.totalDuration = time2 - time1;
                 }
 
+                if (!(isNaN(time1) || isNaN(time2))) {
+                  _context.next = 10;
+                  break;
+                }
+
+                this.errorMessage();
+                _context.next = 24;
+                break;
+
+              case 10:
                 this.totalProductionTime -= this.totalPlannedDowtimes;
                 this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
                 this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2); //this.$store.dispatch('getNetOPTime', this.parameters);
 
-                _context.next = 11;
+                _context.next = 15;
                 return this.$store.dispatch('getNetOPTime', this.GMID);
 
-              case 11:
-                _context.next = 13;
+              case 15:
+                _context.next = 17;
                 return this.resolveAfter1Second();
 
-              case 13:
+              case 17:
                 console.log(this.netOP);
                 this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
                 this.totalNetOperatingTime = this.finalQuantityProduced * this.netOP.bottlesPerCase / this.netOP.idealRate;
@@ -4302,7 +4438,7 @@ var today = new Date();
                 console.log('Perf : ' + this.performance);
                 this.valider = 1;
 
-              case 20:
+              case 24:
               case "end":
                 return _context.stop();
             }
@@ -4348,9 +4484,9 @@ var today = new Date();
               case 0:
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
                 /**
-                var pos = sessionStorage.getItem("pos").split(',');
-                pos.splice(this.indice, 1);
-                 if (sessionStorage.getItem("pos") === null) {
+                 var pos = sessionStorage.getItem("pos").split(',');
+                 pos.splice(this.indice, 1);
+                  if (sessionStorage.getItem("pos") === null) {
                     sessionStorage.pos = pos;
                 } else {
                     sessionStorage.setItem("pos", pos);
@@ -4509,7 +4645,7 @@ var today = new Date();
     }(),
     confirmSpeedloss: function () {
       var _confirmSpeedloss = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
-        var responses, reason, i, comment;
+        var responses, reason, i;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -4525,19 +4661,29 @@ var today = new Date();
                   responses[i].setAttribute('disabled', 'disabled');
                 }
 
-                comment = document.getElementById('comments').value;
-                this.speedLossEvent.comment = comment;
+                this.speedLossEvent.comment = document.getElementById('comments').value;
                 this.speedLossEvent.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
                 this.speedLossEvent.reason = reason;
                 console.log(this.speedLossEvent);
-                this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
-                _context4.next = 11;
-                return this.resolveAfter1Second();
+
+                if (!(this.speedLossEvent.reason === "")) {
+                  _context4.next = 11;
+                  break;
+                }
+
+                this.errorMessage2();
+                _context4.next = 15;
+                break;
 
               case 11:
+                this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
+                _context4.next = 14;
+                return this.resolveAfter1Second();
+
+              case 14:
                 window.location.reload();
 
-              case 12:
+              case 15:
               case "end":
                 return _context4.stop();
             }
@@ -4553,6 +4699,10 @@ var today = new Date();
     }()
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     var tab = [];
     tab.push(this.productionName);
 
@@ -4637,6 +4787,11 @@ __webpack_require__.r(__webpack_exports__);
         window.location.replace(this.url + "teamInfo");
       } else if (sessionStorage.getItem("loginType") === "sup") {
         window.location.replace(this.url + "packagingLineID");
+      }
+    },
+    mounted: function mounted() {
+      if (sessionStorage.getItem("language") !== null) {
+        this.$i18n.locale = sessionStorage.getItem("language");
       }
     }
   },
@@ -4977,6 +5132,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites');
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
@@ -5076,6 +5235,67 @@ __webpack_require__.r(__webpack_exports__);
     },
     swapLanguage: function swapLanguage(language) {
       this.$i18n.locale = language;
+
+      if (sessionStorage.getItem("language") === null) {
+        sessionStorage.language = language;
+      } else {
+        sessionStorage.setItem("language", language);
+      }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "navbarSaisie",
+  data: function data() {
+    return {};
+  },
+  methods: {
+    swapLanguage: function swapLanguage(language) {
+      this.$i18n.locale = language;
+
+      if (sessionStorage.getItem("language") === null) {
+        sessionStorage.language = language;
+      } else {
+        sessionStorage.setItem("language", language);
+      }
     }
   }
 });
@@ -5964,6 +6184,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites');
     var chartJs = document.createElement('script');
     chartJs.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
@@ -6183,6 +6407,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites');
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'machines']))
@@ -6346,8 +6574,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.Planned_Event.comment = document.getElementById('comments').value; //console.log(sessionStorage.getItem("pos").split(','));
 
       console.log(this.Planned_Event);
-      this.$store.dispatch('create_plannedEvent', this.Planned_Event);
-      this.backOrigin();
+
+      if (this.Planned_Event.duration > 0) {
+        this.$store.dispatch('create_plannedEvent', this.Planned_Event);
+        this.backOrigin();
+      } else {
+        this.errorMessage();
+      }
+    },
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
     },
     addReason: function addReason() {
       this.Planned_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
@@ -6375,6 +6623,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     var tab = [];
 
     for (var i = 0; i < this.prodlines.length; i++) {
@@ -7146,6 +7398,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites');
     var chartJs = document.createElement('script');
     chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
@@ -7229,6 +7485,10 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     document.getElementById("select-date-from").setAttribute("min", this.firstDate);
     document.getElementById("select-date-from").setAttribute("max", this.endDate);
     document.getElementById("select-date-to").setAttribute("min", this.firstDate);
@@ -7579,6 +7839,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites'); //Load chart.js into vue component
 
     var chartJs = document.createElement('script');
@@ -7834,7 +8098,7 @@ var selectElem = document.getElementById('typeTeam');
     },
     nextPage: function () {
       var _nextPage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var DCODES, dcodesTab, i, POs, poTab, POElement, _i, po, nbProd, productionlinesTab, _i2, selectCrewLeader, valueCrewLeader, typeTeam, valueTypeTeam;
+        var DCODES, dcodesTab, i, POs, poTab, POElement, POToAdd, _i, po, PO, element, nbProd, productionlinesTab, _i2, selectCrewLeader, valueCrewLeader, typeTeam, valueTypeTeam;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
@@ -7857,16 +8121,50 @@ var selectElem = document.getElementById('typeTeam');
                 POs = document.getElementsByClassName('PO');
                 poTab = [];
                 POElement = [];
+                POToAdd = [];
+                _i = 0;
 
-                for (_i = 0; _i < POs.length; _i++) {
-                  poTab.push(POs[_i].value);
-                  po = {
-                    number: POs[_i].value,
-                    GMIDCode: dcodesTab[_i]
-                  };
-                  POElement.push(po);
+              case 9:
+                if (!(_i < POs.length)) {
+                  _context.next = 22;
+                  break;
                 }
 
+                poTab.push(POs[_i].value);
+                po = {
+                  number: POs[_i].value,
+                  GMIDCode: dcodesTab[_i]
+                };
+                POElement.push(po);
+                PO = POs[_i].value;
+                _context.next = 16;
+                return this.$store.dispatch('checkPO', po);
+
+              case 16:
+                _context.next = 18;
+                return this.resolveAfter05Second();
+
+              case 18:
+                if (this.checkPO === 0) {
+                  element = {
+                    number: po,
+                    GMIDCode: this.GMID[_i],
+                    productionline_name: this.productionlines[_i]
+                  };
+                  POToAdd.push(element);
+                }
+
+              case 19:
+                _i++;
+                _context.next = 9;
+                break;
+
+              case 22:
+                this.$store.dispatch('create_PO', POToAdd);
+                _context.next = 25;
+                return this.resolveAfter05Second();
+
+              case 25:
                 if (sessionStorage.getItem("pos") === null) {
                   sessionStorage.pos = poTab;
                 } else {
@@ -7933,7 +8231,7 @@ var selectElem = document.getElementById('typeTeam');
 
                 window.location.href = this.url + 'summary';
 
-              case 24:
+              case 41:
               case "end":
                 return _context.stop();
             }
@@ -8100,6 +8398,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "topSecondPage",
@@ -8116,7 +8416,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       //productionB :  sessionStorage.getItem("productionB"),
       crewLeader: sessionStorage.getItem("crewLeader"),
       typeTeam: sessionStorage.getItem("typeTeam"),
-      url: sessionStorage.getItem("url")
+      url: sessionStorage.getItem("url"),
+      showSpinner: 0
     };
   },
   methods: {
@@ -8169,34 +8470,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var POElement, i, tab, assignation, po, element;
+      var spinner, spinner2, POElement, i, tab, assignation;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              if (sessionStorage.getItem("language") !== null) {
+                _this.$i18n.locale = sessionStorage.getItem("language");
+              }
+
+              _this.$store.dispatch('fetchSites');
+
+              spinner = document.createElement('script');
+              spinner.setAttribute('src', 'https://unpkg.com/vue');
+              document.head.appendChild(spinner);
+              spinner2 = document.createElement('script');
+              spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
+              spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
+              document.head.appendChild(spinner2);
               console.log("POS : ");
               console.log(sessionStorage.getItem("pos").split(','));
-              _context.next = 4;
+              _context.next = 13;
               return _this.$store.dispatch('getWorksiteID', sessionStorage.getItem("site"));
 
-            case 4:
-              _context.next = 6;
+            case 13:
+              _context.next = 15;
               return _this.resolveAfter05Second();
 
-            case 6:
+            case 15:
               POElement = [];
               console.log(_this.PO);
 
               if (!(_this.PO.length > 0 && _this.PO[0] !== "")) {
-                _context.next = 39;
+                _context.next = 41;
                 break;
               }
 
               i = 0;
 
-            case 10:
+            case 19:
               if (!(i < _this.PO.length)) {
-                _context.next = 38;
+                _context.next = 41;
                 break;
               }
 
@@ -8204,18 +8518,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               tab.push(i + 1);
               tab.push(_this.PO[i]);
               tab.push(_this.productionlines[i]);
-              _context.next = 17;
+              _context.next = 26;
               return _this.$store.dispatch('fetchEvents', tab);
 
-            case 17:
-              _context.next = 19;
+            case 26:
+              _context.next = 28;
               return _this.$store.dispatch('getProductionlineID', _this.productionlines[i]);
 
-            case 19:
-              _context.next = 21;
+            case 28:
+              _context.next = 30;
               return _this.resolveAfter15Second();
 
-            case 21:
+            case 30:
               assignation = {
                 username: _this.username,
                 productionline: _this.productionlineID[0].id,
@@ -8223,50 +8537,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 shift: sessionStorage.getItem("typeTeam"),
                 worksite: _this.worksiteID[0].id
               };
-              _context.next = 24;
+              _context.next = 33;
               return _this.$store.dispatch('checkAssignation', assignation);
 
-            case 24:
-              _context.next = 26;
+            case 33:
+              _context.next = 35;
               return _this.resolveAfter05Second();
 
-            case 26:
+            case 35:
               if (!(_this.assignation[i] === 0)) {
-                _context.next = 29;
+                _context.next = 38;
                 break;
               }
 
-              _context.next = 29;
+              _context.next = 38;
               return _this.$store.dispatch('storeAssignation', assignation);
 
-            case 29:
-              po = _this.PO[i];
-              _context.next = 32;
-              return _this.$store.dispatch('checkPO', po);
-
-            case 32:
-              _context.next = 34;
-              return _this.resolveAfter05Second();
-
-            case 34:
-              if (_this.checkPO === 0) {
-                element = {
-                  number: po,
-                  GMIDCode: _this.GMID[i],
-                  productionline_name: _this.productionlines[i]
-                };
-                POElement.push(element);
-              }
-
-            case 35:
+            case 38:
               i++;
-              _context.next = 10;
+              _context.next = 19;
               break;
 
-            case 38:
-              _this.$store.dispatch('create_PO', POElement);
+            case 41:
+              _this.showSpinner = 1;
 
-            case 39:
+            case 42:
             case "end":
               return _context.stop();
           }
@@ -8747,6 +9042,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.$store.dispatch('fetchSites'); //Load chart.js into vue component
 
     var chartJs = document.createElement('script');
@@ -8765,332 +9064,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 /*!*********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeShutdowns.vue?vue&type=script&lang=js& ***!
   \*********************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "unplannedDowntimeShutdowns",
-  data: function data() {
-    var data = {
-      chartObjects: {
-        external: undefined,
-        machines: undefined,
-        created: false
-      },
-      downtimes: {
-        external: {},
-        machines: {}
-      },
-      downtimePercentages: {
-        external: undefined,
-        machines: undefined
-      },
-      startYear: 2000,
-      currentYear: new Date().getFullYear(),
-      site: '',
-      productionLine: ''
-    };
-    return data;
-  },
-  methods: {
-    resolveAfter: function resolveAfter(milliseconds) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
-          return resolve();
-        }, milliseconds);
-      });
-    },
-    productionLineSelected: function productionLineSelected() {
-      if (document.getElementById("pl-selection").value) this.chargeData();
-    },
-    createDowntimeObject: function createDowntimeObject() {},
-    chargeData: function chargeData() {
-      var _this = this;
-
-      var selectedPL = document.getElementById('pl-selection').value;
-      var dateFrom = this.currentYear + '-01-01';
-      var dateTo = this.currentYear + '-12-31';
-      var params = [selectedPL, dateFrom, dateTo];
-      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
-        _this.resolveAfter(1000).then(function () {
-          _this.createDowntimeObject();
-
-          if (!_this.chartObjects.created) _this.createCharts(); //Structure data
-
-          var allShutdowns = {
-            external: _this.unplannedDowntimeEvents[0].external,
-            machines: _this.unplannedDowntimeEvents[0].machines
-          };
-          _this.downtimes = {
-            machines: {},
-            external: {}
-          };
-
-          for (var _i = 0, _arr = ['external', 'machines']; _i < _arr.length; _i++) {
-            var shtdCat = _arr[_i];
-
-            var _iterator = _createForOfIteratorHelper(allShutdowns[shtdCat]),
-                _step;
-
-            try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                var shtdEvent = _step.value;
-
-                //Shutdown type exists already
-                if (!_this.downtimes[shtdCat][shtdEvent.type]) {
-                  _this.downtimes[shtdCat][shtdEvent.type] = {
-                    events: [],
-                    totalDuration: 0,
-                    totalNb: 0,
-                    avgDuration: 0
-                  };
-                }
-
-                _this.downtimes[shtdCat][shtdEvent.type].events.push(shtdEvent);
-
-                _this.downtimes[shtdCat][shtdEvent.type].totalDuration += shtdEvent.total_duration;
-                _this.downtimes[shtdCat][shtdEvent.type].totalNb++;
-              } //Calculate average durations
-
-            } catch (err) {
-              _iterator.e(err);
-            } finally {
-              _iterator.f();
-            }
-
-            for (var _i2 = 0, _Object$keys = Object.keys(_this.downtimes[shtdCat]); _i2 < _Object$keys.length; _i2++) {
-              var shtdEventType = _Object$keys[_i2];
-              var eventTypeAvgDuration = Math.round(_this.downtimes[shtdCat][shtdEventType].totalDuration / _this.downtimes[shtdCat][shtdEventType].totalNb);
-              _this.downtimes[shtdCat][shtdEventType].avgDuration = eventTypeAvgDuration;
-            } //Create charts' datasets
-
-
-            _this.chartObjects[shtdCat].data.labels = Object.keys(_this.downtimes[shtdCat]);
-            _this.chartObjects[shtdCat].data.datasets[0].data = [];
-            _this.chartObjects[shtdCat].data.datasets[1].data = [];
-
-            for (var _i3 = 0, _Object$keys2 = Object.keys(_this.downtimes[shtdCat]); _i3 < _Object$keys2.length; _i3++) {
-              var shtdType = _Object$keys2[_i3];
-
-              _this.chartObjects[shtdCat].data.datasets[0].data.push(_this.downtimes[shtdCat][shtdType].totalDuration);
-
-              _this.chartObjects[shtdCat].data.datasets[1].data.push(_this.downtimes[shtdCat][shtdType].totalNb);
-            }
-
-            _this.chartObjects[shtdCat].update();
-          } //Calculate unplanned downtime percentages
-
-
-          var categoryTotalDowntime = {
-            machines: 0,
-            external: 0,
-            total: 0
-          };
-
-          for (var _i4 = 0, _arr2 = ['external', 'machines']; _i4 < _arr2.length; _i4++) {
-            var _shtdCat = _arr2[_i4];
-
-            for (var _i5 = 0, _Object$values = Object.values(_this.downtimes[_shtdCat]); _i5 < _Object$values.length; _i5++) {
-              var event = _Object$values[_i5];
-              categoryTotalDowntime[_shtdCat] += event.totalDuration;
-              categoryTotalDowntime.total += event.totalDuration;
-            }
-          }
-
-          for (var _i6 = 0, _arr3 = ['external', 'machines']; _i6 < _arr3.length; _i6++) {
-            var _shtdCat2 = _arr3[_i6];
-            _this.downtimePercentages[_shtdCat2] = Math.round(categoryTotalDowntime[_shtdCat2] / categoryTotalDowntime.total * 100);
-          }
-        });
-      });
-    },
-    createCharts: function createCharts() {
-      this.chartObjects.created = true;
-
-      for (var _i7 = 0, _arr4 = ['external', 'machines']; _i7 < _arr4.length; _i7++) {
-        var ch = _arr4[_i7];
-        this.chartObjects[ch] = new Chart(ch + '-shutdown-chart', {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Time in minutes',
-              backgroundColor: 'rgb(112, 184, 232)',
-              data: []
-            }, {
-              label: 'Number',
-              backgroundColor: 'rgb(246, 184, 192)',
-              data: [],
-              yAxisID: "freq"
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              time: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Time in minutes'
-                },
-                position: 'left'
-              },
-              freq: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Number'
-                },
-                position: 'right'
-              }
-            },
-            plugins: {
-              legend: {
-                display: true
-              }
-            }
-          }
-        });
-      }
-    }
-  },
-  mounted: function mounted() {
-    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
-
-    var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
-    document.head.appendChild(chartJs);
-  },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents'])),
-  components: {
-    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
-  }
-});
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/resources/js/components/unplannedDowntimeShutdowns.vue: Unexpected token (145:0)\n\n\u001b[0m \u001b[90m 143 |\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 144 |\u001b[39m             productionLineSelected\u001b[33m:\u001b[39m \u001b[36mfunction\u001b[39m() {\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 145 |\u001b[39m \u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<\u001b[39m \u001b[33mHEAD\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m     |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 146 |\u001b[39m                 \u001b[36mif\u001b[39m (document\u001b[33m.\u001b[39mgetElementById(\u001b[32m\"pl-selection\"\u001b[39m)\u001b[33m.\u001b[39mvalue) \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mchargeData()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 147 |\u001b[39m \u001b[33m===\u001b[39m\u001b[33m===\u001b[39m\u001b[33m=\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 148 |\u001b[39m                 \u001b[36mif\u001b[39m (document\u001b[33m.\u001b[39mgetElementById(\u001b[32m\"pl-selection\"\u001b[39m)\u001b[33m.\u001b[39mvalue) \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mchargeData(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcurrentYear \u001b[33m+\u001b[39m \u001b[32m'-01-01'\u001b[39m\u001b[33m,\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mcurrentYear \u001b[33m+\u001b[39m \u001b[32m'-12-31'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n    at Parser._raise (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:788:17)\n    at Parser.raiseWithData (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:781:17)\n    at Parser.raise (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.unexpected (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:9929:16)\n    at Parser.parseExprAtom (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11349:20)\n    at Parser.parseExprSubscripts (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10914:23)\n    at Parser.parseUpdate (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10894:21)\n    at Parser.parseMaybeUnary (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10872:23)\n    at Parser.parseExprOps (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10733:23)\n    at Parser.parseMaybeConditional (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10707:23)\n    at Parser.parseMaybeAssign (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10670:21)\n    at Parser.parseExpressionBase (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10610:23)\n    at /Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10604:39\n    at Parser.allowInAnd (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12372:16)\n    at Parser.parseExpression (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10604:17)\n    at Parser.parseStatementContent (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12711:23)");
 
 /***/ }),
 
@@ -9098,345 +9074,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 /*!***********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeSpeedLosses.vue?vue&type=script&lang=js& ***!
   \***********************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "unplannedDowntimeSpeedLosses",
-  data: function data() {
-    var data = {
-      currentYear: new Date().getFullYear(),
-      site: '',
-      productionLine: '',
-      chartObjects: {
-        'own-stop': {
-          chart: undefined,
-          labels: ['Filler Own Stoppage', 'Reduced Rate At Filler']
-        },
-        'other-machine': {
-          chart: undefined,
-          labels: ['Filler Stop by Other Machine', 'Reduced Rate At And Other Machine']
-        },
-        created: false
-      },
-      slEvents: {
-        'Reduced Rate At Filler': {
-          events: [],
-          totalDuration: 0,
-          percentage: 0
-        },
-        'Reduced Rate At An Other Machine': {
-          events: [],
-          totalDuration: 0,
-          percentage: 0
-        },
-        'Filler Own Stoppage': {
-          events: [],
-          totalDuration: 0,
-          percentage: 0
-        },
-        'Filler Stop By Other Machine': {
-          events: [],
-          totalDuration: 0,
-          percentage: 0
-        }
-      }
-    };
-    return data;
-  },
-  methods: {
-    resolveAfter: function resolveAfter(milliseconds) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
-          return resolve();
-        }, milliseconds);
-      });
-    },
-    productionLineSelected: function productionLineSelected() {
-      if (document.getElementById("pl-selection").value) {}
-    },
-    createDowntimeObject: function createDowntimeObject() {},
-    chargeData: function chargeData() {
-      var _this = this;
-
-      var site = document.getElementById('site-selection').value;
-      var selectedPL = document.getElementById('pl-selection').value;
-      var begDate = document.getElementById('select-date-from').value;
-      var endDate = document.getElementById('select-date-to').value;
-
-      if (site && selectedPL && begDate && endDate) {
-        var params = [site, selectedPL, begDate, endDate];
-        console.log(params);
-        this.$store.dispatch('fetchAllEvents', params).then(function () {
-          _this.resolveAfter(1000).then(function () {
-            if (!_this.chartObjects.created) _this.createCharts(); //Reinitialize slEvents as empty arrays
-
-            Object.keys(_this.slEvents).forEach(function (key) {
-              return _this.slEvents[key].events = [];
-            });
-            var chartData = {
-              "Filler Own Stoppage": {
-                duration: 0,
-                freq: 0
-              },
-              "Filler Stop By Other Machine": {
-                duration: 0,
-                freq: 0
-              },
-              "Reduced Rate At Filler": {
-                duration: 0,
-                freq: 0
-              },
-              "Reduced Rate At An Other Machine": {
-                duration: 0,
-                freq: 0
-              }
-            }; //Add fetched events to the slEvents variable
-            //Creates charts' data
-
-            if (_this.allEvents.SLEVENTS) {
-              _this.slEvents = _this.allEvents.SLEVENTS.reduce(function (acc, slEvent) {
-                if (acc[slEvent.reason]) {
-                  //If event is concerned by a chart, create its data
-                  if (chartData[slEvent.reason]) {
-                    chartData[slEvent.reason].duration += slEvent.duration;
-                    chartData[slEvent.reason].freq++;
-                  }
-
-                  acc[slEvent.reason].totalDuration += slEvent.duration;
-                  var reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
-                  slEvent.reducedRate = reducedRate || 0;
-                  acc[slEvent.reason].events.push(slEvent);
-                }
-
-                return acc;
-              }, _this.slEvents);
-            } //Total speed loss duration as the sum of all categorie's durations
-
-
-            var totalSpeedLossDuration = Object.values(_this.slEvents).reduce(function (acc, slCat) {
-              return acc + slCat.totalDuration;
-            }, 0); //Calculate Speed Losses Percentage by Category
-
-            Object.values(_this.slEvents).forEach(function (slCat) {
-              slCat.percentage = (slCat.totalDuration / totalSpeedLossDuration * 100).toFixed(2);
-            });
-            var map = {
-              'Filler Own Stoppage': 'own-stop',
-              'Filler Stop By Other Machine': 'other-machine',
-              'Reduced Rate At Filler': 'own-stop',
-              'Reduced Rate At An Other Machine': 'other-machine'
-            }; //Update charts' data
-
-            Object.keys(map).forEach(function (key) {
-              _this.chartObjects[map[key]].chart.data.datasets[0].data = [];
-              _this.chartObjects[map[key]].chart.data.datasets[1].data = [];
-            });
-            Object.keys(map).forEach(function (key) {
-              _this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
-
-              _this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
-
-              _this.chartObjects[map[key]].chart.update();
-            });
-          });
-        });
-      }
-    },
-    createCharts: function createCharts() {
-      this.chartObjects.created = true;
-
-      for (var _i = 0, _arr = ['own-stop', 'other-machine']; _i < _arr.length; _i++) {
-        var slCat = _arr[_i];
-        this.chartObjects[slCat].chart = new Chart(slCat + '-sl-chart', {
-          type: 'bar',
-          data: {
-            labels: this.chartObjects[slCat].labels,
-            datasets: [{
-              label: 'Time in minutes',
-              backgroundColor: 'rgb(245, 194, 67)',
-              data: []
-            }, {
-              label: 'Number',
-              backgroundColor: 'rgb(90, 90, 90)',
-              data: [],
-              yAxisID: "freq"
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              time: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Time in minutes'
-                },
-                position: 'left'
-              },
-              freq: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Number'
-                },
-                position: 'right'
-              }
-            },
-            plugins: {
-              legend: {
-                display: true
-              }
-            }
-          }
-        });
-      }
-    }
-  },
-  mounted: function mounted() {
-    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
-
-    var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
-    document.head.appendChild(chartJs);
-  },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss', 'allEvents'])),
-  components: {
-    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
-  }
-});
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/resources/js/components/unplannedDowntimeSpeedLosses.vue: Unexpected token (207:0)\n\n\u001b[0m \u001b[90m 205 |\u001b[39m                                         acc[slEvent\u001b[33m.\u001b[39mreason]\u001b[33m.\u001b[39mevents\u001b[33m.\u001b[39mpush(slEvent)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 206 |\u001b[39m                                     }\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 207 |\u001b[39m \u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<<\u001b[39m\u001b[33m<\u001b[39m \u001b[33mHEAD\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m     |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 208 |\u001b[39m                                     \u001b[36mreturn\u001b[39m acc\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 209 |\u001b[39m                                 }\u001b[33m,\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mslEvents)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 210 |\u001b[39m                             }\u001b[0m\n    at Parser._raise (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:788:17)\n    at Parser.raiseWithData (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:781:17)\n    at Parser.raise (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.unexpected (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:9929:16)\n    at Parser.parseExprAtom (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:11349:20)\n    at Parser.parseExprSubscripts (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10914:23)\n    at Parser.parseUpdate (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10894:21)\n    at Parser.parseMaybeUnary (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10872:23)\n    at Parser.parseExprOps (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10733:23)\n    at Parser.parseMaybeConditional (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10707:23)\n    at Parser.parseMaybeAssign (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10670:21)\n    at Parser.parseExpressionBase (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10610:23)\n    at /Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10604:39\n    at Parser.allowInAnd (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12378:12)\n    at Parser.parseExpression (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:10604:17)\n    at Parser.parseStatementContent (/Users/gustavobertoldi/Documents/Projetos/Corteva/OLE/node_modules/@babel/parser/lib/index.js:12711:23)");
 
 /***/ }),
 
@@ -9521,19 +9161,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
 
       switch (reasonDowntime) {
-        case "CIP":
+        case this.$t("CIP"):
           window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/CIP';
           break;
 
-        case "Changement de format":
+        case this.$t("formatChanging"):
           window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/changingFormat';
           break;
 
-        case "Changement de numero de lot":
+        case this.$t("packNumberChanging"):
           window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/clientChanging';
           break;
 
-        case "Arret non planifie":
+        case this.$t("unplannedDowntime"):
           window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/unplannedDowntime';
           break;
 
@@ -9547,6 +9187,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     console.log('ICI : ' + this.downtimeType);
     this.parameters.push(this.productionName);
     this.parameters.push(this.downtimeType);
@@ -9728,7 +9372,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.printedStep = 1;
       } else {
         this.previousTitle = this.title;
-        this.title = componentName;
+        this.title = this.$t(componentName);
         this.printedStep = 2;
         this.machineImplicated = componentName;
       }
@@ -9746,8 +9390,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.unplannedEvent.total_duration = document.getElementById('time').value;
       this.unplannedEvent.comment = document.getElementById('comments').value;
       console.log(this.unplannedEvent);
-      this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
-      this.backOrigin();
+
+      if (this.unplannedEvent.total_duration > 0) {
+        this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
+        this.backOrigin();
+      } else {
+        this.errorMessage();
+      }
+    },
+    errorMessage: function errorMessage() {
+      var h1 = document.getElementsByClassName("error");
+
+      if (h1.length <= 0) {
+        var error = document.createElement('h1');
+        error.setAttribute("class", "error");
+        error.innerHTML = this.$t("errorInput");
+        error.setAttribute("style", "color:red;");
+        error.setAttribute("align", "center");
+        var br = document.createElement('br');
+        var form = document.getElementById("form");
+        form.insertBefore(br, form.firstChild);
+        form.insertBefore(error, form.firstChild);
+      }
     },
     backOrigin: function backOrigin() {
       window.location.href = this.url + 'summary';
@@ -9791,14 +9455,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
     this.parameters.push(this.productionName);
     this.parameters.push(this.downtimeType);
     this.$store.dispatch('fetchDowntimeReason_2', this.parameters);
 
     if (this.downtimeType === "unplannedDowntime") {
-      this.title = " Remplisseuse";
+      this.title = this.$t("filler");
     } else {
-      this.title = " Arrêt de production planifié";
+      this.title = this.$t("unplannedDowntime");
     }
 
     this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "Remplisseuse"); //while(this.downtimeReasons_2.length === 0){
@@ -9881,6 +9549,7 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('bottomSecondPage', __webpack
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('choice_planned_unplanned', __webpack_require__(/*! ./components/choice_planned_unplanned.vue */ "./resources/js/components/choice_planned_unplanned.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel1', __webpack_require__(/*! ./components/unplanned_pannel1.vue */ "./resources/js/components/unplanned_pannel1.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel_unplanned2', __webpack_require__(/*! ./components/unplanned_pannel_unplanned2.vue */ "./resources/js/components/unplanned_pannel_unplanned2.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('navbarSaisie', __webpack_require__(/*! ./components/navbarSaisie.vue */ "./resources/js/components/navbarSaisie.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('CIP_Declaration', __webpack_require__(/*! ./components/CIP_Declaration.vue */ "./resources/js/components/CIP_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('Changingformat_Declaration', __webpack_require__(/*! ./components/Changingformat_Declaration.vue */ "./resources/js/components/Changingformat_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('ClientChanging_Declaration', __webpack_require__(/*! ./components/Clientchanging_Declaration.vue */ "./resources/js/components/Clientchanging_Declaration.vue").default);
@@ -14982,7 +14651,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-e022296c] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-e022296c] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-e022296c] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-e022296c] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-e022296c] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-e022296c] {\n    width: 40%;\n}\n#comments[data-v-e022296c] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-e022296c] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-e022296c] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-e022296c] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-e022296c] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-e022296c] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-e022296c] {\n    width: 40%;\n}\n#comments[data-v-e022296c] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\nh1[data-v-e022296c] {\n    color:red;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -15030,7 +14699,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-1394e9fe] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-1394e9fe] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-1394e9fe] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-1394e9fe] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-1394e9fe] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-1394e9fe] {\n    width: 40%;\n}\n#comments[data-v-1394e9fe] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-1394e9fe] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-1394e9fe] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-1394e9fe] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-1394e9fe] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-1394e9fe] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-1394e9fe] {\n    width: 40%;\n}\n#comments[data-v-1394e9fe] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\nh1[data-v-1394e9fe]{\n    color:red;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -15199,6 +14868,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.nv[data-v-11e733ca] {\n    background: white;\n    width: 100%;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.nv[data-v-9c674de2] {\n    background: lightblue;\n    width: 100%;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -15558,7 +15251,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-a8735dc2] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-a8735dc2] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-a8735dc2] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-a8735dc2] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-a8735dc2] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-a8735dc2] {\n    width: 40%;\n}\n#comments[data-v-a8735dc2] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-a8735dc2] {\n    left: 0;\n    top: 0;\n    min-width: 150px;\n    max-width: 250px;\n\n    margin-bottom: 50px;\n}\n.rcorners1[data-v-a8735dc2] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n    margin-bottom: 30px;\n    width: 180px;\n}\n.rcorners2[data-v-a8735dc2] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\n.wrapper[data-v-a8735dc2] {\n    display: grid;\n    grid-template-columns: 1fr 1fr 1fr;\n}\nbutton[data-v-a8735dc2] {\n    color: white;\n    margin-top: 20px;\n}\ninput[data-v-a8735dc2] {\n    width: 40%;\n}\n#comments[data-v-a8735dc2] {\n    height: 150px;\n    width: 70%;\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\nh1[data-v-a8735dc2] {\n    color: red;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -47647,6 +47340,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_style_index_0_id_9c674de2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_style_index_0_id_9c674de2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_style_index_0_id_9c674de2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css&":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=style&index=0&id=a4f0ea4a&scoped=true&lang=css& ***!
@@ -51088,6 +50811,47 @@ component.options.__file = "resources/js/components/navbar.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/navbarSaisie.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/navbarSaisie.vue ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true& */ "./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true&");
+/* harmony import */ var _navbarSaisie_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./navbarSaisie.vue?vue&type=script&lang=js& */ "./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js&");
+/* harmony import */ var _navbarSaisie_vue_vue_type_style_index_0_id_9c674de2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& */ "./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _navbarSaisie_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "9c674de2",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/navbarSaisie.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/overallLineEffectivness.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/components/overallLineEffectivness.vue ***!
@@ -51879,6 +51643,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./navbarSaisie.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/overallLineEffectivness.vue?vue&type=script&lang=js& ***!
@@ -52245,6 +52025,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_navbar_vue_vue_type_style_index_0_id_11e733ca_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./navbar.vue?vue&type=style&index=0&id=11e733ca&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbar.vue?vue&type=style&index=0&id=11e733ca&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& ***!
+  \***********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_style_index_0_id_9c674de2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=style&index=0&id=9c674de2&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -52631,6 +52424,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true& ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_navbarSaisie_vue_vue_type_template_id_9c674de2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&":
 /*!********************************************************************************************************!*\
   !*** ./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& ***!
@@ -52906,12 +52716,12 @@ var render = function() {
     _c(
       "div",
       { staticClass: "productionName rcorners2", attrs: { align: "center" } },
-      [_vm._v("\n\n        " + _vm._s(_vm.title) + "\n\n    ")]
+      [_vm._v("\n        " + _vm._s(_vm.title) + "\n\n    ")]
     ),
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c("form", [
+    _c("form", { attrs: { id: "form" } }, [
       _c("div", { staticClass: "form-group row" }, [
         _c(
           "label",
@@ -52922,7 +52732,29 @@ var render = function() {
           [_vm._v(_vm._s(_vm.$t("previousBulk")))]
         ),
         _vm._v(" "),
-        _vm._m(0)
+        _c("div", { staticClass: "col-sm-10" }, [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.CIP_Event.previous_bulk,
+                expression: "CIP_Event.previous_bulk"
+              }
+            ],
+            staticClass: "form-control-plaintext rcorners2",
+            attrs: { type: "text", id: "previousBulk" },
+            domProps: { value: _vm.CIP_Event.previous_bulk },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.CIP_Event, "previous_bulk", $event.target.value)
+              }
+            }
+          })
+        ])
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "form-group row" }, [
@@ -52935,7 +52767,7 @@ var render = function() {
           [_vm._v(_vm._s(_vm.$t("expectedDuration(Minutes)")))]
         ),
         _vm._v(" "),
-        _vm._m(1)
+        _vm._m(0)
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "form-group row" }, [
@@ -52948,7 +52780,29 @@ var render = function() {
           [_vm._v(_vm._s(_vm.$t("totalDuration(Minutes)")))]
         ),
         _vm._v(" "),
-        _vm._m(2)
+        _c("div", { staticClass: "col-sm-10" }, [
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.CIP_Event.total_duration,
+                expression: "CIP_Event.total_duration"
+              }
+            ],
+            staticClass: "form-control-plaintext rcorners2",
+            attrs: { type: "number", id: "totalDuration" },
+            domProps: { value: _vm.CIP_Event.total_duration },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.CIP_Event, "total_duration", $event.target.value)
+              }
+            }
+          })
+        ])
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "form-group row" }, [
@@ -52958,7 +52812,29 @@ var render = function() {
           [_vm._v(_vm._s(_vm.$t("comments")))]
         ),
         _vm._v(" "),
-        _vm._m(3)
+        _c("div", { staticClass: "col-sm-10" }, [
+          _c("textarea", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.CIP_Event.comment,
+                expression: "CIP_Event.comment"
+              }
+            ],
+            staticClass: "form-control-plaintext rcorners2",
+            attrs: { id: "comments" },
+            domProps: { value: _vm.CIP_Event.comment },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.CIP_Event, "comment", $event.target.value)
+              }
+            }
+          })
+        ])
       ]),
       _vm._v(" "),
       _c("div", { attrs: { align: "right" } }, [
@@ -53039,49 +52915,11 @@ var staticRenderFns = [
       _c("input", {
         staticClass: "form-control-plaintext rcorners2",
         attrs: {
-          type: "text",
-          id: "previousBulk",
-          value: "prevBulk",
-          disabled: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-sm-10" }, [
-      _c("input", {
-        staticClass: "form-control-plaintext rcorners2",
-        attrs: {
           type: "number",
           id: "expectedDuration",
           value: "5",
           disabled: ""
         }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-sm-10" }, [
-      _c("input", {
-        staticClass: "form-control-plaintext rcorners2",
-        attrs: { type: "number", id: "totalDuration" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-sm-10" }, [
-      _c("textarea", {
-        staticClass: "form-control-plaintext rcorners2",
-        attrs: { id: "comments" }
       })
     ])
   }
@@ -53117,7 +52955,7 @@ var render = function() {
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c("form", [
+    _c("form", { attrs: { id: "form" } }, [
       _c("div", { staticClass: "form-group row" }, [
         _c(
           "label",
@@ -53314,7 +53152,7 @@ var staticRenderFns = [
                 "label",
                 {
                   staticClass: "checkbox labelsAnswer",
-                  attrs: { for: "answer3" }
+                  attrs: { for: "answer5" }
                 },
                 [
                   _c("input", {
@@ -53410,7 +53248,7 @@ var render = function() {
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c("form", [
+    _c("form", { attrs: { id: "form" } }, [
       _c("div", { staticClass: "form-group row" }, [
         _c(
           "label",
@@ -53711,7 +53549,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v(_vm._s(_vm.$t("choiceLoginOperator")))]
+          [_vm._v(_vm._s(_vm.$t("choiceLoginOperator")) + "\n            ")]
         )
       ]),
       _vm._v(" "),
@@ -53726,7 +53564,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v(_vm._s(_vm.$t("choiceLoginSupervisor")))]
+          [_vm._v(_vm._s(_vm.$t("choiceLoginSupervisor")) + "\n            ")]
         )
       ]),
       _vm._v(" "),
@@ -53741,7 +53579,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v(_vm._s(_vm.$t("choiceLoginAdministrator")))]
+          [
+            _vm._v(
+              _vm._s(_vm.$t("choiceLoginAdministrator")) + "\n            "
+            )
+          ]
         )
       ])
     ])
@@ -53866,7 +53708,7 @@ var render = function() {
                 return [
                   _c("tr", [
                     _c("th", { attrs: { scope: "row" } }, [
-                      _vm._v(_vm._s(event.type))
+                      _vm._v(_vm._s(_vm.$t(event.type)))
                     ]),
                     _vm._v(" "),
                     _c("td", [_vm._v(_vm._s(event.updated_at.split(" ")[1]))]),
@@ -54972,7 +54814,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _c("form", [
+                _c("form", { attrs: { id: "form" } }, [
                   _c("div", { staticClass: "form-group row blockInput" }, [
                     _c(
                       "label",
@@ -55345,6 +55187,8 @@ var render = function() {
                 ]
               ),
               _vm._v(" "),
+              _c("div", { attrs: { id: "formSpeedLoss" } }),
+              _vm._v(" "),
               _c("br"),
               _vm._v(" "),
               _c(
@@ -55399,7 +55243,7 @@ var render = function() {
                         }),
                         _vm._v(" "),
                         _c("span", [
-                          _vm._v(_vm._s(_vm.$t("reduceRateAtAnOtherMachine")))
+                          _vm._v(_vm._s(_vm.$t("reducedRateAtAnOtherMachine")))
                         ])
                       ]
                     )
@@ -56888,6 +56732,67 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/navbarSaisie.vue?vue&type=template&id=9c674de2&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "nv" }, [
+    _c("nav", { staticClass: "navbar" }, [
+      _c("img", {
+        attrs: { src: "images/icon.png", alt: "", width: "100", height: "50" }
+      }),
+      _vm._v(" "),
+      _c("div", { staticClass: "d-flex" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-success",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.swapLanguage("fr")
+              }
+            }
+          },
+          [_vm._v("\n                FR\n            ")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-success",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                return _vm.swapLanguage("en")
+              }
+            }
+          },
+          [_vm._v("\n                EN\n            ")]
+        )
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true&":
 /*!***********************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/overallLineEffectivness.vue?vue&type=template&id=a4f0ea4a&scoped=true& ***!
@@ -57739,7 +57644,7 @@ var render = function() {
                   return [
                     _c("tr", [
                       _c("th", { attrs: { scope: "row" } }, [
-                        _vm._v(_vm._s(event.type))
+                        _vm._v(_vm._s(_vm.$t(event.type)))
                       ]),
                       _vm._v(" "),
                       _c("td", [
@@ -57757,7 +57662,7 @@ var render = function() {
                   return [
                     _c("tr", [
                       _c("th", { attrs: { scope: "row" } }, [
-                        _vm._v(_vm._s(event.type))
+                        _vm._v(_vm._s(_vm.$t(event.type)))
                       ]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(event.updated_at))]),
@@ -57780,13 +57685,13 @@ var render = function() {
       _c(
         "div",
         { staticClass: "productionName rcorners2", attrs: { align: "center" } },
-        [_vm._v("\n            " + _vm._s(_vm.title) + "\n        ")]
+        [_vm._v("\n            " + _vm._s(_vm.$t(_vm.title)) + "\n        ")]
       )
     ]),
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c("form", [
+    _c("form", { attrs: { id: "form" } }, [
       _c("div", { staticClass: "form-group row" }, [
         _c(
           "label",
@@ -59212,9 +59117,9 @@ var render = function() {
                 },
                 [
                   _vm._v(
-                    "\n                     " +
+                    "\n                    " +
                       _vm._s(productionline) +
-                      "\n                 "
+                      "\n                "
                   )
                 ]
               ),
@@ -59224,7 +59129,7 @@ var render = function() {
               _c("div", { staticClass: "rcorners2" }, [
                 _c("p", [
                   _vm._v(
-                    "\n                         " +
+                    "\n                        " +
                       _vm._s(_vm.$t("site")) +
                       " : " +
                       _vm._s(_vm.site) +
@@ -59232,7 +59137,7 @@ var render = function() {
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         " +
+                    "\n                        " +
                       _vm._s(_vm.$t("crewLeader")) +
                       " : " +
                       _vm._s(_vm.crewLeader) +
@@ -59240,7 +59145,7 @@ var render = function() {
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         " +
+                    "\n                        " +
                       _vm._s(_vm.$t("typeTeam")) +
                       " : " +
                       _vm._s(_vm.typeTeam) +
@@ -59248,7 +59153,7 @@ var render = function() {
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         " +
+                    "\n                        " +
                       _vm._s(_vm.$t("startTime")) +
                       " : " +
                       _vm._s(_vm.workingDebut) +
@@ -59256,7 +59161,7 @@ var render = function() {
                   ),
                   _c("br"),
                   _vm._v(
-                    "\n                         " +
+                    "\n                        " +
                       _vm._s(_vm.$t("endTime")) +
                       " : " +
                       _vm._s(_vm.workingEnd) +
@@ -59305,7 +59210,7 @@ var render = function() {
                               ? [
                                   _c("tr", [
                                     _c("th", { attrs: { scope: "row" } }, [
-                                      _vm._v(_vm._s(event.type))
+                                      _vm._v(_vm._s(_vm.$t(event.type)))
                                     ]),
                                     _vm._v(" "),
                                     _c("td", [
@@ -59331,7 +59236,7 @@ var render = function() {
                               ? [
                                   _c("tr", [
                                     _c("th", { attrs: { scope: "row" } }, [
-                                      _vm._v(_vm._s(event.type))
+                                      _vm._v(_vm._s(_vm.$t(event.type)))
                                     ]),
                                     _vm._v(" "),
                                     _c("td", [
@@ -60486,14 +60391,14 @@ var render = function() {
               on: {
                 click: function($event) {
                   $event.preventDefault()
-                  return _vm.setReasonDowntime(reason.reason)
+                  _vm.setReasonDowntime(_vm.$t(reason.reason))
                 }
               }
             },
             [
               _vm._v(
                 "\n                    " +
-                  _vm._s(reason.reason) +
+                  _vm._s(_vm.$t(reason.reason)) +
                   "\n                "
               )
             ]
@@ -60585,7 +60490,7 @@ var render = function() {
                           [
                             _vm._v(
                               "\n                        " +
-                                _vm._s(issue.component) +
+                                _vm._s(_vm.$t(issue.component)) +
                                 "\n                    "
                             )
                           ]
@@ -60659,7 +60564,7 @@ var render = function() {
       _vm._v(" "),
       _vm.printedStep === 2
         ? [
-            _c("form", [
+            _c("form", { attrs: { id: "form" } }, [
               _c("div", { staticClass: "form-group row" }, [
                 _c(
                   "label",
@@ -74227,7 +74132,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year"}');
 
 /***/ }),
 
@@ -74238,7 +74143,7 @@ module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choic
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année"}');
 
 /***/ }),
 

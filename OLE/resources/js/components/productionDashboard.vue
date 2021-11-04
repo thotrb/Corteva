@@ -753,6 +753,9 @@
 
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
             let chartJs = document.createElement('script');
             chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');

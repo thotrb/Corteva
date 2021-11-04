@@ -16,8 +16,8 @@
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
                         </template>
                     </select>
-                
-               
+
+
                     <label for="pl-selection">Production line: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
@@ -50,7 +50,7 @@
                                     <td scope="col">&emsp;Number</td>
                                     <td scope="col">{{generalData[cat].totalNb}}</td>
                                 </tr>
-                            
+
                             </tbody>
                         </table>
                     </template>
@@ -229,18 +229,18 @@
                       bnc: 0
                   };
                   let totalNb = {
-                      cip: 0, 
-                      cov: 0, 
-                      bnc: 0 
+                      cip: 0,
+                      cov: 0,
+                      bnc: 0
                   };
                   let labels = {
-                      cip: {}, 
-                      cov: {}, 
-                      bnc: {}  
+                      cip: {},
+                      cov: {},
+                      bnc: {}
                   };
-                  
+
                   let totalDowntimeDuration = 0;
-               
+
                   for (let type of ['cip', 'cov', 'bnc']) {
                       for (let event of this.unplannedDowntimeEvents[0][type.toUpperCase()]) {
                           const monthCreated = this.getMonth(event.created_at);
@@ -266,7 +266,7 @@
                       this.downtimes[type].general.yearlyDuration = totalDuration[type].toFixed(2);
                       this.downtimes[type].general.yearlyNb = totalNb[type].toFixed(2);
                       this.downtimes[type].general.yearlyAvg = ((totalDuration[type] / totalNb[type]) || 0).toFixed(2);
-                      
+
                       //Create charts if they dont exist already
                       if (!this.chartObjects.created) this.createCharts();
 
@@ -275,7 +275,7 @@
                           acc[key] = labels[type][key];
                           return acc;
                       }, {});
-                      
+
                       //Update chart data
                       this.chartObjects[type].data.labels = Object.keys(labels[type]);
                       this.chartObjects[type].data.datasets[0].data = [];
@@ -291,7 +291,7 @@
                           downtimePercent = downtimePercent.toFixed(2);
                           this.downtimes[type].general.downtimePercentage = downtimePercent;
                       }
-                      
+
                   }
                 }).then(() => this.chargeGeneralData());
             });
@@ -302,7 +302,7 @@
             const dateFrom = document.getElementById('select-date-from').value;
             const dateTo = document.getElementById('select-date-to').value;
             const params = [selectedPL, dateFrom, dateTo];
-        
+
             this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
                 this.resolveAfter(1000).then(() => {
                     for (let cat of ['cip', 'cov', 'bnc']) {
@@ -354,6 +354,9 @@
         },
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
 
             //Load chart.js into vue component
@@ -397,7 +400,7 @@
         border-bottom: solid 1px;
         align-items: center;
         justify-content: space-evenly;
-    } 
+    }
 
 
     div.site-pl-selection > div{
@@ -488,7 +491,7 @@
     div.pw-table-container {
         padding: 0px 10px;
     }
-        
+
     div.table-ya-container thead {
         color: white;
         background: #56baed;
@@ -520,6 +523,6 @@
         border-top-right-radius: 7px;
         border-bottom-right-radius: 7px;
     }
-    
+
 
 </style>

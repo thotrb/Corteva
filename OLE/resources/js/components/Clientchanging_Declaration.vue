@@ -8,7 +8,7 @@
 
         <br/>
 
-        <form>
+        <form id="form">
 
 
 
@@ -94,7 +94,7 @@
 
                     total_duration: 10,
 
-                    lot_number : 'ABCD',
+                    lot_number : 'lot_Number',
 
                     comment :'',
                 },
@@ -105,19 +105,39 @@
 
         methods: {
 
-            validateInformations : function(){
+            validateInformations : function() {
 
                 this.ChangingClient_Event.predicted_duration = document.getElementById('expectedDuration').value;
-                this.ChangingClient_Event.lot_number = document.getElementById('lotNumber').value;
+                //this.ChangingClient_Event.lot_number = document.getElementById('lotNumber').value;
                 this.ChangingClient_Event.total_duration = document.getElementById('totalDuration').value;
                 this.ChangingClient_Event.comment = document.getElementById('comments').value;
                 this.ChangingClient_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
 
-                console.log(this.ChangingClient_Event);
+                if (this.ChangingClient_Event.total_duration  > 0) {
+                    this.$store.dispatch('create_UnplannedEvent_Clientchanging', this.ChangingClient_Event);
+                    this.backOrigin();
+                } else {
+                    this.errorMessage();
+                }
 
 
-                this.$store.dispatch('create_UnplannedEvent_Clientchanging', this.ChangingClient_Event);
-                this.backOrigin();
+
+            },
+
+            errorMessage : function(){
+                var h1 = document.getElementsByClassName("error");
+                if(h1.length <= 0){
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "error");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    let br = document.createElement('br');
+
+                    let form = document.getElementById("form");
+                    form.insertBefore(br, form.firstChild);
+                    form.insertBefore(error, form.firstChild);
+                }
 
             },
 
@@ -152,7 +172,9 @@
 
         mounted() {
 
-
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
         },
 
 
@@ -215,6 +237,10 @@
         border: 2px solid lightblue;
         padding: 20px;
 
+    }
+
+    h1{
+        color:red;
     }
 
 </style>

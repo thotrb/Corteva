@@ -1014,6 +1014,9 @@
 
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
             var today = new Date();
             var dd = today.getDate();

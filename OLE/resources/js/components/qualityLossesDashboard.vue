@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex main-container">
-        
+
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
@@ -46,7 +46,7 @@
 
                         </div>
                         <div class="chart-panel">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -57,14 +57,14 @@
 
                         </div>
                         <div class="chart-panel">
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</template>                                                                                           
+</template>
 
 <script>
     import {mapGetters} from "vuex";
@@ -76,7 +76,7 @@
         data() {
 
             var data = {
-                
+
                 currentYear: (new Date()).getFullYear(),
                 site: '',
                 productionLine: ''
@@ -91,21 +91,21 @@
                     setTimeout(() => resolve(), milliseconds);
                 });
             },
-            
+
             productionLineSelected: function() {
                 if (document.getElementById("pl-selection").value) {
-                    
+
                 }
-             
+
             },
 
             createDowntimeObject: function() {
-            
-            }, 
+
+            },
 
             chargeData: function(dateFrom, dateTo) {
                 const selectedPL = document.getElementById('pl-selection').value;
-               
+
             },
 
             createCharts: function() {
@@ -161,6 +161,9 @@
         },
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
 
             //Load chart.js into vue component
@@ -248,12 +251,12 @@
     div.ql-format-panel {
         width: 50%;
     }
- 
+
 
     table.table {
         margin: 10px 0px;
     }
 
 
- 
+
 </style>

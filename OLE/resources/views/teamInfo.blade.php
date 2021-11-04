@@ -76,7 +76,9 @@
 
 <div id="app">
 
-    <div class="container">
+    <div class="">
+        <navbar-saisie></navbar-saisie>
+
         <team-info></team-info>
     </div>
 

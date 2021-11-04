@@ -8,7 +8,7 @@
 
         <br/>
 
-        <form>
+        <form id="form">
 
 
             <div class="form-group row">
@@ -51,7 +51,7 @@
 
                         <div class="col-sm-4">
 
-                            <label for="answer3" class="checkbox labelsAnswer">
+                            <label for="answer5" class="checkbox labelsAnswer">
                                 <input type="radio"
                                        id="answer5" name="reponseQuestion"
                                        value="45" class="response">
@@ -161,16 +161,38 @@
                 this.ChangingFormat_Event.predicted_duration = duration;
                 this.ChangingFormat_Event.total_duration = document.getElementById('totalDuration').value;
                 this.ChangingFormat_Event.comment = document.getElementById('comments').value;
-
                 this.ChangingFormat_Event.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
+
+                if(this.ChangingFormat_Event.predicted_duration > 0 &&this.ChangingFormat_Event.total_duration > 0){
+                    this.$store.dispatch('create_UnplannedEvent_Changingformat', this.ChangingFormat_Event);
+                    //this.backOrigin();
+
+                }else{
+                    this.errorMessage();
+                }
 
                 console.log(this.ChangingFormat_Event);
 
 
 
                 //this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
-                this.$store.dispatch('create_UnplannedEvent_Changingformat', this.ChangingFormat_Event);
-                this.backOrigin();
+
+
+            },
+            errorMessage : function(){
+                var h1 = document.getElementsByClassName("error");
+                if(h1.length <= 0){
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "error");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    let br = document.createElement('br');
+
+                    let form = document.getElementById("form");
+                    form.insertBefore(br, form.firstChild);
+                    form.insertBefore(error, form.firstChild);
+                }
 
             },
 
@@ -203,7 +225,9 @@
 
         mounted() {
 
-
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
         },
 
 

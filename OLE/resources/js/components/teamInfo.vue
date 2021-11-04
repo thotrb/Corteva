@@ -257,6 +257,10 @@
                 var poTab = [];
                 var POElement = [];
 
+                var POToAdd = [];
+
+
+
                 for (let i = 0; i < POs.length; i++) {
                     poTab.push(POs[i].value);
                     let po = {
@@ -266,8 +270,24 @@
 
                     POElement.push(po);
 
+                    var PO = POs[i].value;
+                    await this.$store.dispatch('checkPO', po);
+                    await this.resolveAfter05Second();
 
+                    if (this.checkPO === 0) {
+                        let element = {
+                            number: po,
+                            GMIDCode: this.GMID[i],
+                            productionline_name: this.productionlines[i],
+
+                        };
+
+                        POToAdd.push(element);
+                    }
                 }
+                this.$store.dispatch('create_PO', POToAdd);
+
+                await this.resolveAfter05Second();
 
 
                 if (sessionStorage.getItem("pos") === null) {
@@ -341,13 +361,6 @@
                 } else {
                     sessionStorage.setItem("site", document.getElementById('site').value);
                 }
-
-
-
-
-
-
-
 
                 window.location.href = this.url + 'summary';
 

@@ -18,7 +18,7 @@
                         <button
                             class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info"
                             type="button" @click.prevent="chooseMachineImplicated(issue.component, issue.other_machine)">
-                            {{issue.component}}
+                            {{$t(issue.component)}}
                         </button>
 
                     </div>
@@ -52,7 +52,7 @@
 
 
         <template v-if="printedStep === 2">
-            <form>
+            <form id="form">
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label rcorners1" for="time">{{$t("duration(Minutes)")}}</label>
                     <div class="col-sm-10">
@@ -173,7 +173,7 @@
                     this.printedStep = 1;
                 }else{
                     this.previousTitle = this.title;
-                    this.title = componentName;
+                    this.title = this.$t(componentName);
                     this.printedStep = 2;
                     this.machineImplicated = componentName;
                 }
@@ -202,12 +202,32 @@
                 this.unplannedEvent.comment = document.getElementById('comments').value;
 
                 console.log(this.unplannedEvent);
-                this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
 
-                this.backOrigin();
+
+                if(this.unplannedEvent.total_duration  > 0){
+                    this.$store.dispatch('create_UnplannedEvent_UnplannedDowntime', this.unplannedEvent);
+                    this.backOrigin();
+                }else{
+                    this.errorMessage();
+                }
 
             },
 
+            errorMessage : function(){
+                var h1 = document.getElementsByClassName("error");
+                if(h1.length <= 0){
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "error");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    let br = document.createElement('br');
+                    let form = document.getElementById("form");
+                    form.insertBefore(br, form.firstChild);
+                    form.insertBefore(error, form.firstChild);
+                }
+
+            },
             backOrigin : function(){
 
                 window.location.href =  this.url + 'summary';
@@ -277,13 +297,17 @@
 
         mounted() {
 
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
+
             this.parameters.push(this.productionName);
             this.parameters.push(this.downtimeType);
             this.$store.dispatch('fetchDowntimeReason_2', this.parameters);
             if (this.downtimeType === "unplannedDowntime") {
-                this.title = " Remplisseuse"
+                this.title = this.$t("filler");
             } else {
-                this.title = " Arrêt de production planifié"
+                this.title = this.$t("unplannedDowntime");
             }
 
             this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "Remplisseuse");
@@ -359,6 +383,10 @@
         border: 2px solid lightblue;
         padding: 20px;
 
+    }
+
+    h1 {
+        color: red;
     }
 
 </style>

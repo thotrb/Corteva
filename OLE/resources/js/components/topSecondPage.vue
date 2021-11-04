@@ -1,122 +1,124 @@
 <template>
-    <div class="container">
 
-        <!--{{assignation}}-->
-        <!-- {{events1}}
-         {{events2}}-->
-         <div class="row">
-             <template v-for="productionline in productionlines">
+
+        <div class="container">
+
+            <!--{{assignation}}-->
+            <!-- {{events1}}
+             {{events2}}-->
+            <div class="row">
+                <template v-for="productionline in productionlines">
+                    <div class="col">
+                        <button
+                            class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info rcorners1"
+                            type="button" @click.prevent="setProductionline(productionline)">
+                            {{productionline}}
+                        </button>
+
+
+                        <br/>
+                        <div class="rcorners2">
+                            <p>
+                                {{$t("site")}} : {{site}} <br/>
+                                {{$t("crewLeader")}} : {{crewLeader}} <br/>
+                                {{$t("typeTeam")}} : {{typeTeam}} <br/>
+                                {{$t("startTime")}} : {{workingDebut}} <br/>
+                                {{$t("endTime")}} : {{workingEnd}} <br/>
+                            </p>
+                        </div>
+
+                        <br/>
+
+                        <div class="rcorners1 table-info-data" align="center">
+                            <!--
+                                        <template v-if="events1.length ===0 && events2.length ===0">
+
+                                            <h4 align="center">AUCUN INCIDENT DECLARE</h4>
+
+                                        </template>
+                                        -->
+                            <table class="table">
+                                <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">{{$t("type")}}</th>
+                                    <th scope="col">{{$t("entryTime")}}</th>
+                                    <th scope="col">{{$t("duration(Minutes)")}}</th>
+                                    <th scope="col">{{$t("comments")}}</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="event in events1">
+                                    <template v-if="event.productionline === productionline">
+                                        <tr>
+                                            <th scope="row">{{$t(event.type)}}</th>
+                                            <td>{{event.updated_at.split(' ')[1]}}</td>
+                                            <td>{{event.total_duration}}</td>
+                                            <td>{{event.comment}}</td>
+                                        </tr>
+                                    </template>
+                                </template>
+
+                                <template v-for="event in events2">
+                                    <template v-if="event.productionline === productionline">
+                                        <tr>
+                                            <th scope="row">{{$t(event.type)}}</th>
+                                            <td>{{event.updated_at.split(' ')[1]}}</td>
+                                            <td>{{event.total_duration}}</td>
+                                            <td>{{event.comment}}</td>
+                                        </tr>
+                                    </template>
+                                </template>
+                                </tbody>
+
+                            </table>
+
+
+                            <!--{{event.type}}    {{event.predicted_duration}}   {{event.total_duration}}-->
+                        </div>
+
+                        <br/>
+
+                    </div>
+
+                </template>
+                <!--
                  <div class="col">
-                     <button
-                         class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info rcorners1"
-                         type="button" @click.prevent="setProductionline(productionline)">
-                         {{productionline}}
-                     </button>
+                     <a v-bind:href="url + 'summary/' +  productionB"  id="productionB" class="link-dark">
 
+                         <div class="rcorners1"  align="center">
+                             {{productionB}}
+
+                         </div>
+                     </a>
 
                      <br/>
+
                      <div class="rcorners2">
                          <p>
-                             {{$t("site")}} : {{site}} <br/>
-                             {{$t("crewLeader")}} : {{crewLeader}} <br/>
-                             {{$t("typeTeam")}} : {{typeTeam}} <br/>
-                             {{$t("startTime")}} : {{workingDebut}} <br/>
-                             {{$t("endTime")}} : {{workingEnd}} <br/>
+                             Site : {{site}} <br/>
+                             Crew Leader : {{crewLeader}} <br/>
+                             Type : {{typeTeam}} <br/>
+                             Début : {{workingDebut}} <br/>
+                             Fin : {{workingEnd}} <br/>
                          </p>
                      </div>
 
-                     <br/>
-
-                     <div class="rcorners1 table-info-data" align="center">
-                         <!--
-                                     <template v-if="events1.length ===0 && events2.length ===0">
-
-                                         <h4 align="center">AUCUN INCIDENT DECLARE</h4>
-
-                                     </template>
-                                     -->
-                        <table class="table">
-                            <thead class="thead-dark">
-                            <tr>
-                                <th scope="col">{{$t("type")}}</th>
-                                <th scope="col">{{$t("entryTime")}}</th>
-                                <th scope="col">{{$t("duration(Minutes)")}}</th>
-                                <th scope="col">{{$t("comments")}}</th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="event in events1">
-                                <template v-if="event.productionline === productionline">
-                                    <tr>
-                                        <th scope="row">{{event.type}}</th>
-                                        <td>{{event.updated_at.split(' ')[1]}}</td>
-                                        <td>{{event.total_duration}}</td>
-                                        <td>{{event.comment}}</td>
-                                    </tr>
-                                </template>
-                            </template>
-
-                            <template v-for="event in events2">
-                                <template v-if="event.productionline === productionline">
-                                    <tr>
-                                        <th scope="row">{{event.type}}</th>
-                                        <td>{{event.updated_at.split(' ')[1]}}</td>
-                                        <td>{{event.total_duration}}</td>
-                                        <td>{{event.comment}}</td>
-                                    </tr>
-                                </template>
-                            </template>
-                            </tbody>
-
-                        </table>
-
-
-                        <!--{{event.type}}    {{event.predicted_duration}}   {{event.total_duration}}-->
-                    </div>
-
-                    <br/>
-
-                </div>
-
-            </template>
-            <!--
-             <div class="col">
-                 <a v-bind:href="url + 'summary/' +  productionB"  id="productionB" class="link-dark">
-
-                     <div class="rcorners1"  align="center">
-                         {{productionB}}
-
+                     <div class="rcorners1">
+                         <p>
+                             Rapport de production en cours
+                         </p>
                      </div>
-                 </a>
 
-                 <br/>
-
-                 <div class="rcorners2">
-                     <p>
-                         Site : {{site}} <br/>
-                         Crew Leader : {{crewLeader}} <br/>
-                         Type : {{typeTeam}} <br/>
-                         Début : {{workingDebut}} <br/>
-                         Fin : {{workingEnd}} <br/>
-                     </p>
                  </div>
 
-                 <div class="rcorners1">
-                     <p>
-                         Rapport de production en cours
-                     </p>
-                 </div>
+         -->
 
-             </div>
+            </div>
 
-     -->
+            <br/>
 
         </div>
-
-        <br/>
-
-    </div>
 </template>
 
 <script>
@@ -135,7 +137,7 @@
                 productionlines: sessionStorage.getItem("prodlines").split(','),
                 username: sessionStorage.getItem("username"),
                 PO: sessionStorage.getItem("pos").split(','),
-                GMID:sessionStorage.getItem("GMID").split(','),
+                GMID: sessionStorage.getItem("GMID").split(','),
 
                 //productionA :  sessionStorage.getItem("productionA"),
 
@@ -143,6 +145,8 @@
                 crewLeader: sessionStorage.getItem("crewLeader"),
                 typeTeam: sessionStorage.getItem("typeTeam"),
                 url: sessionStorage.getItem("url"),
+
+                showSpinner: 0,
 
 
             };
@@ -214,6 +218,20 @@
         },
 
         async mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
+
+            this.$store.dispatch('fetchSites');
+            let spinner = document.createElement('script');
+            spinner.setAttribute('src', 'https://unpkg.com/vue');
+            document.head.appendChild(spinner);
+
+            let spinner2 = document.createElement('script');
+            spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
+            spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
+            document.head.appendChild(spinner2);
+
 
             console.log("POS : ");
 
@@ -252,11 +270,12 @@
                         await this.$store.dispatch('storeAssignation', assignation);
                     }
 
-                    var po = this.PO[i];
-                    await this.$store.dispatch('checkPO', po);
-                    await this.resolveAfter05Second();
+                    /**
+                     var po = this.PO[i];
+                     await this.$store.dispatch('checkPO', po);
+                     await this.resolveAfter05Second();
 
-                    if (this.checkPO === 0) {
+                     if (this.checkPO === 0) {
                         let element = {
                             number: po,
                             GMIDCode: this.GMID[i],
@@ -267,12 +286,15 @@
                         POElement.push(element);
 
                     }
+                     **/
 
                 }
 
-                this.$store.dispatch('create_PO', POElement);
+                //this.$store.dispatch('create_PO', POElement);
 
             }
+
+            this.showSpinner =1;
 
         },
 

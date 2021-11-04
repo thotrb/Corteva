@@ -76,6 +76,7 @@
 <div id="app">
 
     <div class="container">
+        <navbar-saisie></navbar-saisie>
 
         <choice-login></choice-login>
     </div>

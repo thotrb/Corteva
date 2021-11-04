@@ -866,6 +866,9 @@
 
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
             let chartJs = document.createElement('script');
             chartJs.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');

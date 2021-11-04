@@ -75,8 +75,8 @@
 
 <div id="app">
 
-    <div class="container">
 
+    <div class="">
         <login></login>
     </div>
 
