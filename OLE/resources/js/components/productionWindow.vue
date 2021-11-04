@@ -38,7 +38,7 @@ export default {
             yearsAfterFrom: [],
             endDate: finalEndDate,
             startDate: defaultStartDate,
-            firstDate: '2000-01-01' 
+            firstDate: '2000-01-01'
         }
 
         //Populate years array
@@ -68,6 +68,9 @@ export default {
     },
 
     mounted() {
+        if(sessionStorage.getItem("language") !== null){
+            this.$i18n.locale = sessionStorage.getItem("language");
+        }
         document.getElementById("select-date-from").setAttribute("min",this.firstDate);
         document.getElementById("select-date-from").setAttribute("max",this.endDate);
         document.getElementById("select-date-to").setAttribute("min",this.firstDate);

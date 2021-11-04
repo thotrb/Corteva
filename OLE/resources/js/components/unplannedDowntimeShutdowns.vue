@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex main-container">
-        
+
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
@@ -100,7 +100,7 @@
             </div>
         </div>
     </div>
-</template>                                                                                           
+</template>
 
 <script>
     import {mapGetters} from "vuex";
@@ -140,15 +140,15 @@
                     setTimeout(() => resolve(), milliseconds);
                 });
             },
-            
+
             productionLineSelected: function() {
                 if (document.getElementById("pl-selection").value) this.chargeData(this.currentYear + '-01-01', this.currentYear + '-12-31');
-             
+
             },
 
             createDowntimeObject: function() {
-            
-            }, 
+
+            },
 
             chargeData: function(dateFrom, dateTo) {
                 const selectedPL = document.getElementById('pl-selection').value;
@@ -164,12 +164,12 @@
                             external: this.unplannedDowntimeEvents[0].external,
                             machines: this.unplannedDowntimeEvents[0].machines
                         }
-                    
+
                         this.downtimes = {
                             machines: {},
                             external: {}
                         }
-                        
+
                         for (let shtdCat of ['external', 'machines']) {
                             for (let shtdEvent of allShutdowns[shtdCat]) {
                                 //Shutdown type exists already
@@ -213,7 +213,7 @@
                         for (let shtdCat of ['external', 'machines']) {
                             for (let event of Object.values(this.downtimes[shtdCat])) {
                                 categoryTotalDowntime[shtdCat] += event.totalDuration;
-                                categoryTotalDowntime.total += event.totalDuration; 
+                                categoryTotalDowntime.total += event.totalDuration;
                             }
                         }
                         for (let shtdCat of ['external', 'machines']) {
@@ -276,6 +276,9 @@
         },
 
         mounted() {
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
 
             //Load chart.js into vue component
@@ -387,5 +390,5 @@
         color: white;
         background: #56baed;
     }
- 
+
 </style>

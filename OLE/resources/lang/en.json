@@ -107,5 +107,24 @@
     "productionDashboard" : "Production Dashboard",
     "peakSeason" : "Peak Season",
     "allYear" : "All Year",
-    "trendVersusPreviousYear" : "Trend versus previous year"
+    "trendVersusPreviousYear" : "Trend versus previous year",
+    "break" : "Break",
+    "lunch" : "Lunch",
+    "emergency" : "Emergency",
+    "meeting" : "Meeting",
+    "maintenance" : "Maintenance",
+    "projectImplementation" : "Project Implementation",
+    "formatChanging" : "Format Changing",
+    "packNumberChanging" : "Pack Number Changing",
+    "CIP" : "CIP",
+    "errorInput" :  "Inputs requiered",
+    "other" : "Other",
+    "bowlStopper" : "Bowl Stopper",
+    "missingBottle" : "Missing Bottle",
+    "downstreamSaturation" : "Downstream Saturation",
+    "dosingTurret" : "Dosing Turret",
+    "screwingTurret" : "Screwing Tuerret",
+    "year" : "Year"
+
+
 }

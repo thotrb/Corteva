@@ -17,8 +17,8 @@
                 <div class="col-sm-4" v-for="reason in downtimeReasons">
                     <button
                         class="btn btn-primary border-info btn-lg btn-block align-items-center btn-info"
-                        type="button" @click.prevent="setReasonDowntime(reason.reason)">
-                        {{reason.reason}}
+                        type="button" @click.prevent="setReasonDowntime($t(reason.reason))">
+                        {{$t(reason.reason)}}
                     </button>
 
                 </div>
@@ -69,19 +69,19 @@
 
                 switch (reasonDowntime) {
 
-                    case "CIP":
+                    case this.$t("CIP"):
                         window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/CIP';
                         break;
 
-                    case "Changement de format":
+                    case this.$t("formatChanging"):
                         window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/changingFormat';
                         break;
 
-                    case "Changement de numero de lot":
+                    case this.$t("packNumberChanging"):
                         window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/clientChanging';
                         break;
 
-                    case "Arret non planifie":
+                    case this.$t("unplannedDowntime"):
                         window.location.href = this.url + this.productionName + '/' + this.downtimeType + '/unplannedDowntime';
                         break;
 
@@ -107,6 +107,9 @@
 
         mounted() {
 
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             console.log('ICI : ' + this.downtimeType);
             this.parameters.push(this.productionName);
             this.parameters.push(this.downtimeType);

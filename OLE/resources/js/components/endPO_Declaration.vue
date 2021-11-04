@@ -10,7 +10,7 @@
                     {{$t("performance")}}
                 </div>
 
-                <form>
+                <form id="form">
                     <div class="form-group row blockInput">
                         <label class="col-sm-2 col-form-label rcorners1" for="startingPO">{{$t("POStartTime")}}</label>
                         <div class="col-sm-10">
@@ -35,7 +35,8 @@
                     </div>
 
                     <div class="form-group row blockInput">
-                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">{{$t("finalQuantityProduced(Cases)")}}<br> </label>
+                        <label for="finalQuantityProduced" class="col-sm-2 rcorners1">{{$t("finalQuantityProduced(Cases)")}}<br>
+                        </label>
                         <div class="col-sm-10">
                             <input type="number" id="finalQuantityProduced" class="form-control-plaintext rcorners2"
                                    v-model="finalQuantityProduced">
@@ -136,8 +137,9 @@
                     {{$t("speedLoss")}} {{nbSpeedLosses + 1}}
                 </div>
 
-                <br/>
+                <div id="formSpeedLoss"></div>
 
+                <br/>
 
                 <div class="row" align="center" style="margin-bottom: 30px;">
 
@@ -156,7 +158,7 @@
                             <input type="radio"
                                    id="answer2" name="reponseQuestion"
                                    value="Reduce Rate At An Other Machine" class="response">
-                            <span>{{$t("reduceRateAtAnOtherMachine")}}</span>
+                            <span>{{$t("reducedRateAtAnOtherMachine")}}</span>
                         </label>
 
 
@@ -185,6 +187,7 @@
                     </div>
 
                 </div>
+
 
                 <br>
 
@@ -432,10 +435,10 @@
 <script>
 
     import {mapGetters} from "vuex";
-
-    var today = new Date();
     import qualityDeclaration from './qualityDeclaration';
     import qualityIndicators from './qualityIndicators'
+
+    var today = new Date();
 
 
     export default {
@@ -527,12 +530,45 @@
                 totalDuration: 0,
 
 
-
-
             };
         },
 
         methods: {
+
+            errorMessage: function () {
+                var h1 = document.getElementsByClassName("error");
+                if (h1.length <= 0) {
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "error");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    let br = document.createElement('br');
+
+                    let form = document.getElementById("form");
+                    form.insertBefore(br, form.firstChild);
+                    form.insertBefore(error, form.firstChild);
+                }
+
+            },
+
+            errorMessage2: function () {
+                var h1 = document.getElementsByClassName("errorS");
+                if (h1.length <= 0) {
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "errorS");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    //let br = document.createElement('br');
+
+                    let form = document.getElementById("formSpeedLoss");
+                    //form.insertBefore(br, form.firstChild);
+                    form.appendChild(error);
+                    //form.insertBefore(error, form.firstChild);
+                }
+
+            },
 
             validateCalculation: async function () {
                 console.log(document.getElementById('endingPO').value);
@@ -543,7 +579,9 @@
 
                 var time1 = 0;
                 var time2 = 0;
-                if (splitted1[0] <= splitted2[0] ) {
+
+
+                if (splitted1[0] <= splitted2[0]) {
 
                     time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
 
@@ -571,30 +609,33 @@
 
                 }
 
+                if (isNaN(time1) || isNaN(time2)) {
+                    this.errorMessage();
+                } else {
+                    this.totalProductionTime -= (this.totalPlannedDowtimes);
+                    this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
+                    this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2);
 
-                this.totalProductionTime -= (this.totalPlannedDowtimes);
-                this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
-                this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2);
+
+                    //this.$store.dispatch('getNetOPTime', this.parameters);
 
 
-                //this.$store.dispatch('getNetOPTime', this.parameters);
+                    await this.$store.dispatch('getNetOPTime', this.GMID);
+                    await this.resolveAfter1Second();
+                    console.log(this.netOP);
 
+                    this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
 
-                await this.$store.dispatch('getNetOPTime', this.GMID);
-                await this.resolveAfter1Second();
-                console.log(this.netOP);
+                    this.totalNetOperatingTime = (this.finalQuantityProduced * this.netOP.bottlesPerCase) / this.netOP.idealRate;
 
-                this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+                    console.log('NET OP : ' + this.totalNetOperatingTime);
 
-                this.totalNetOperatingTime = (this.finalQuantityProduced * this.netOP.bottlesPerCase) / this.netOP.idealRate;
+                    this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
 
-                console.log('NET OP : ' + this.totalNetOperatingTime);
+                    console.log('Perf : ' + this.performance);
 
-                this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
-
-                console.log('Perf : ' + this.performance);
-
-                this.valider = 1;
+                    this.valider = 1;
+                }
 
 
             },
@@ -630,7 +671,6 @@
                         + (this.EtiqueteuseRejection - parseInt(this.finalQuantityProduced, 10)) + (this.WieghtBoxRejection - parseInt(this.finalQuantityProduced, 10)));
 
 
-
                 this.displayNumber = 3;
 
             },
@@ -639,10 +679,10 @@
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
 
                 /**
-                var pos = sessionStorage.getItem("pos").split(',');
-                pos.splice(this.indice, 1);
+                 var pos = sessionStorage.getItem("pos").split(',');
+                 pos.splice(this.indice, 1);
 
-                if (sessionStorage.getItem("pos") === null) {
+                 if (sessionStorage.getItem("pos") === null) {
                     sessionStorage.pos = pos;
                 } else {
                     sessionStorage.setItem("pos", pos);
@@ -652,7 +692,7 @@
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
 
 
-                var array  = [];
+                var array = [];
                 array.push(this.endPO);
                 array.push(this.availability);
                 array.push(this.performance);
@@ -660,7 +700,6 @@
                 array.push(this.OLE);
                 array.push(this.finalQuantityProduced);
                 array.push(this.totalDuration);
-
 
 
                 this.$store.dispatch('stop_PO', array);
@@ -682,8 +721,6 @@
                 this.$store.dispatch('store_Rejection', array2);
 
                 await this.resolveAfter1Second();
-
-
 
 
                 this.parameters.push(this.username);
@@ -820,18 +857,22 @@
                     responses[i].setAttribute('disabled', 'disabled');
                 }
 
-                var comment = document.getElementById('comments').value;
-                this.speedLossEvent.comment = comment;
+                this.speedLossEvent.comment = document.getElementById('comments').value;
                 this.speedLossEvent.OLE = sessionStorage.getItem("pos").split(',')[this.indice];
                 this.speedLossEvent.reason = reason;
 
 
                 console.log(this.speedLossEvent);
 
-                this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
-                await this.resolveAfter1Second();
+                if (this.speedLossEvent.reason === "") {
+                    this.errorMessage2();
+                } else {
+                    this.$store.dispatch('create_SpeedLoss', this.speedLossEvent);
+                    await this.resolveAfter1Second();
+                    window.location.reload();
+                }
 
-                window.location.reload();
+
             }
 
 
@@ -840,6 +881,9 @@
 
         mounted() {
 
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
 
             var tab = [];
             tab.push(this.productionName);

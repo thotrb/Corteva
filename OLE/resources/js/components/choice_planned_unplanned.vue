@@ -42,7 +42,7 @@
                 <tbody>
                 <template v-for="event in events1">
                     <tr>
-                        <th scope="row">{{event.type}}</th>
+                        <th scope="row">{{$t(event.type)}}</th>
                         <td>{{event.updated_at.split(' ')[1]}}</td>
                         <td>{{event.total_duration}}</td>
                         <td>{{event.comment}}</td>
@@ -115,6 +115,9 @@
 
         mounted() {
 
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
 
             console.log(this.prodlines);
             console.log(this.productionName);

@@ -192,6 +192,10 @@
         },
 
         mounted() {
+
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             console.log("POS : ");
 
             console.log(sessionStorage.getItem("pos").split(','));

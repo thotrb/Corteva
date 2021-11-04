@@ -65,16 +65,16 @@ class FormController extends Controller
             ->whereDate('ole_unplanned_event_changing_formats.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_changing_formats.created_at', '<=', $endingDate)
             ->get();
-        
+
         $machineShutdowns = DB::table('ole_unplanned_event_unplanned_downtimes')
-            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '!=', "Autres")
+            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '!=', "other")
             ->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $productionLine)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
             ->get();
 
         $externalShutdowns = DB::table('ole_unplanned_event_unplanned_downtimes')
-            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '=', "Autres")
+            ->where('ole_unplanned_event_unplanned_downtimes.implicated_machine', '=', "other")
             ->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $productionLine)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
@@ -295,7 +295,7 @@ class FormController extends Controller
                 ->where(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate])
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Autres');
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'other');
                 })
                 ->select(DB::raw('SUM(total_duration) as Duration'), DB::raw('count(*) as nbEvents'))
 
@@ -306,19 +306,19 @@ class FormController extends Controller
             $USM = DB::table('ole_unplanned_event_unplanned_downtimes')
                 ->where(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Saturation aval')
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'downstreamSaturation')
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
                 })
                 ->orWhere(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Manque bouteille')
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'missingBottle')
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
                 })
                 ->orWhere(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'Autres')
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '!=', 'other')
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
                 })
@@ -332,13 +332,13 @@ class FormController extends Controller
             $FUS = DB::table('ole_unplanned_event_unplanned_downtimes')
                 ->where(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Saturation aval')
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'downstreamSaturation')
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
                 })
                 ->orWhere(function($query) use ($endDate, $startDate, $site) {
                     $query->where('ole_unplanned_event_unplanned_downtimes.productionline', '=', $site[0]->productionline_name)
-                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'Manque bouteille')
+                        ->where('ole_unplanned_event_unplanned_downtimes.component', '=', 'missingBottle')
                         -> whereBetween(DB::raw('DATE(ole_unplanned_event_unplanned_downtimes.created_at)'), [$startDate, $endDate]);
 
                 })

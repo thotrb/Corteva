@@ -85,6 +85,11 @@
             swapLanguage : function(language)
             {
                 this.$i18n.locale = language;
+                if(sessionStorage.getItem("language") === null){
+                    sessionStorage.language = language;
+                }else{
+                    sessionStorage.setItem("language",language);
+                }
             }
         },
     }

@@ -22,7 +22,7 @@
                         <tbody>
                         <template v-for="event in events1">
                             <tr>
-                                <th scope="row">{{event.type}}</th>
+                                <th scope="row">{{$t(event.type)}}</th>
                                 <td>{{event.updated_at.split(' ')[1]}}</td>
                                 <td>{{event.total_duration}}</td>
                                 <td>{{event.comment}}</td>
@@ -31,7 +31,7 @@
 
                         <template v-for="event in events2">
                             <tr>
-                                <th scope="row">{{event.type}}</th>
+                                <th scope="row">{{$t(event.type)}}</th>
                                 <td>{{event.updated_at}}</td>
                                 <td>{{event.total_duration}}</td>
                                 <td>{{event.comment}}</td>
@@ -46,7 +46,7 @@
             <br>
 
             <div align="center" class="productionName rcorners2">
-                {{title}}
+                {{$t(title)}}
             </div>
 
         </div>
@@ -54,7 +54,7 @@
 
         <br/>
 
-        <form>
+        <form id="form">
 
 
             <div class="form-group row">
@@ -152,11 +152,32 @@
 
                 console.log(this.Planned_Event);
 
+                if ( this.Planned_Event.duration  > 0) {
+                    this.$store.dispatch('create_plannedEvent', this.Planned_Event);
+                    this.backOrigin();
 
-                this.$store.dispatch('create_plannedEvent', this.Planned_Event);
+                } else {
+                    this.errorMessage();
+                }
 
-                this.backOrigin();
 
+
+            },
+
+            errorMessage : function(){
+                var h1 = document.getElementsByClassName("error");
+                if(h1.length <= 0){
+                    let error = document.createElement('h1');
+                    error.setAttribute("class", "error");
+                    error.innerHTML = this.$t("errorInput");
+                    error.setAttribute("style", "color:red;")
+                    error.setAttribute("align", "center");
+                    let br = document.createElement('br');
+
+                    let form = document.getElementById("form");
+                    form.insertBefore(br, form.firstChild);
+                    form.insertBefore(error, form.firstChild);
+                }
             },
 
             addReason : function(){
@@ -203,6 +224,10 @@
         },
 
         mounted() {
+
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
 
             var tab = [];
             for (let i = 0; i < this.prodlines.length; i++) {

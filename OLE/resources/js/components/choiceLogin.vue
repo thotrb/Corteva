@@ -4,15 +4,19 @@
         <br>
         <div class="row">
             <div class="col">
-                <button v-on:click="displayLoginPage('op')" class="btn btn-primary">{{ $t("choiceLoginOperator") }}</button>
+                <button v-on:click="displayLoginPage('op')" class="btn btn-primary">{{ $t("choiceLoginOperator") }}
+                </button>
             </div>
 
             <div class="col">
-                <button v-on:click="displayLoginPage('sup')" class="btn btn-primary">{{ $t("choiceLoginSupervisor") }}</button>
+                <button v-on:click="displayLoginPage('sup')" class="btn btn-primary">{{ $t("choiceLoginSupervisor") }}
+                </button>
             </div>
 
             <div class="col">
-                <button v-on:click="displayLoginPage('admin')" class="btn btn-primary">{{ $t("choiceLoginAdministrator") }}</button>
+                <button v-on:click="displayLoginPage('admin')" class="btn btn-primary">{{ $t("choiceLoginAdministrator")
+                    }}
+                </button>
             </div>
         </div>
     </div>
@@ -24,23 +28,22 @@
     export default {
         name: "choiceLogin",
         data() {
-            return {
-            }
+            return {}
         },
         methods: {
-            displayLoginPage : function(loginPage){
+            displayLoginPage: function (loginPage) {
 
-                if(sessionStorage.getItem("loginType") === null){
+                if (sessionStorage.getItem("loginType") === null) {
                     sessionStorage.loginType = loginPage;
-                }else{
-                    sessionStorage.setItem("loginType",loginPage);
+                } else {
+                    sessionStorage.setItem("loginType", loginPage);
                 }
 
-                if(sessionStorage.getItem("url") === null){
+                if (sessionStorage.getItem("url") === null) {
                     sessionStorage.url = 'http://127.0.0.1:8000/';
                 }
 
-                let currentLink =  window.location.href;
+                let currentLink = window.location.href;
 
                 switch (loginPage) {
                     case 'op' :
@@ -57,6 +60,13 @@
 
                 }
             },
+
+            mounted() {
+                if(sessionStorage.getItem("language") !== null){
+                    this.$i18n.locale = sessionStorage.getItem("language");
+                }
+            },
+
         },
         computed: {
 

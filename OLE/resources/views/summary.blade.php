@@ -77,6 +77,8 @@
 
     <div class="container">
 
+        <navbar-saisie></navbar-saisie>
+        <br/>
         <top-second-page></top-second-page>
         <bottom-second-page></bottom-second-page>
     </div>
@@ -87,6 +89,7 @@
 {{--</div>--}}
 
 <script async src="{{mix('js/app.js')}}"></script>
+
 </body>
 </html>
 

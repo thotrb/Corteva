@@ -68,6 +68,13 @@
 
 
             },
+
+            mounted: function () {
+                if(sessionStorage.getItem("language") !== null){
+                    this.$i18n.locale = sessionStorage.getItem("language");
+                }
+
+            }
         },
         computed: {
 

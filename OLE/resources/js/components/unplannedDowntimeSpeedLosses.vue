@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex main-container">
-        
+
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
@@ -27,7 +27,7 @@
 
                     <button id="pl-selection-load" type="button" class="btn btn-primary" v-on:click="chargeData();">Load</button>
             </div>
-            
+
             <div class="production-window-container">
                 <production-window />
             </div>
@@ -109,11 +109,11 @@
                     <div class="chart-container">
                         <canvas class="chart" id="other-machine-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage || '--'}}% of Speed Losses</span> 
+                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage || '--'}}% of Speed Losses</span>
                 </div>
             </div>
     </div>
-</template>                                                                                           
+</template>
 
 <script>
     import {mapGetters} from "vuex";
@@ -125,7 +125,7 @@
         data() {
 
             var data = {
-                
+
                 currentYear: (new Date()).getFullYear(),
                 site: '',
                 productionLine: '',
@@ -151,17 +151,17 @@
                     setTimeout(() => resolve(), milliseconds);
                 });
             },
-            
+
             productionLineSelected: function() {
                 if (document.getElementById("pl-selection").value) {
 
                 }
-             
+
             },
 
             createDowntimeObject: function() {
-            
-            }, 
+
+            },
 
             chargeData: function() {
                 const site = document.getElementById('site-selection').value;
@@ -176,15 +176,15 @@
                         this.resolveAfter(1000).then(() => {
 
                             if (!this.chartObjects.created) this.createCharts();
-                            
+
                             //Reinitialize slEvents as empty arrays
                             Object.keys(this.slEvents).forEach(key => this.slEvents[key].events = []);
-        
+
                             let chartData = {
                                 "Filler Own Stoppage": {duration: 0, freq: 0},
                                 "Filler Stop By Other Machine": {duration: 0, freq: 0}
                             };
-        
+
                             //Add fetched events to the slEvents variable
                             //Creates charts' data
                             this.slEvents = this.allEvents.SLEVENTS.reduce((acc, slEvent) => {
@@ -202,7 +202,7 @@
                                 }
                                 return acc;
                             }, this.slEvents);
-                            
+
                             //Total speed loss duration as the sum of all categorie's durations
                             const totalSpeedLossDuration = Object.values(this.slEvents).reduce((acc, slCat) => {
                                 return acc + slCat.totalDuration;
@@ -217,8 +217,8 @@
                                 "Filler Own Stoppage": 'own-stop',
                                 "Filler Stop By Other Machine": 'other-machine'
                             }
-                            
-                            //Update charts' data 
+
+                            //Update charts' data
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data[0] = chartData[key].duration;
                                 this.chartObjects[map[key]].chart.data.datasets[1].data[0] = chartData[key].freq;
@@ -226,7 +226,7 @@
                             });
                         });
                     });
-                }               
+                }
             },
 
             createCharts: function() {
@@ -282,6 +282,10 @@
         },
 
         mounted() {
+
+            if(sessionStorage.getItem("language") !== null){
+                this.$i18n.locale = sessionStorage.getItem("language");
+            }
             this.$store.dispatch('fetchSites');
 
             //Load chart.js into vue component
@@ -289,7 +293,7 @@
             chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
             document.head.appendChild(chartJs);
 
-            
+
         },
 
         computed: {
