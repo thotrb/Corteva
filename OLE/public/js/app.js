@@ -3268,13 +3268,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "downtimesReport",
@@ -3307,7 +3300,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       performance: 0,
       availability: 0,
       quality: 0,
-      OLE: 0
+      OLE: 0,
+      speedLosses: 0
     };
   },
   methods: {
@@ -3327,7 +3321,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
-                  _context.next = 18;
+                  _context.next = 19;
                   break;
                 }
 
@@ -3336,27 +3330,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(this.productionline);
                 tab.push(this.beginningDate);
                 tab.push(this.endingDate);
+                console.log(this.beginningDate);
                 this.$store.dispatch('fetchAllEvents', tab);
-                _context.next = 11;
+                _context.next = 12;
                 return this.resolveAfter15Second();
 
-              case 11:
+              case 12:
                 this.show = 1;
-                _context.next = 14;
+                _context.next = 15;
                 return this.resolveAfter15Second();
 
-              case 14:
+              case 15:
                 this.loadArray();
                 this.loadProductionTime();
                 this.circle();
                 this.pieCharts();
 
-              case 18:
+              case 19:
                 console.log(this.productionline);
                 console.log(this.beginningDate);
                 console.log(this.endingDate);
 
-              case 21:
+              case 22:
               case "end":
                 return _context.stop();
             }
@@ -3371,6 +3366,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return load;
     }(),
     loadArray: function loadArray() {
+      this.formulationArray = [];
+      this.formatArray = [];
+      this.quantityArray = [];
+      this.quantityPerArray = [];
+      this.qtyProduced = 0;
+      this.littersProduced = 0;
+      this.productsName = [];
+
       for (var i = 0; i < this.allEvents['SITE'].length; i++) {
         this.quantityArray[i] = 0;
         this.quantityPerArray[i] = 0;
@@ -3380,11 +3383,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var nbBottles = this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase;
         this.qtyProduced += nbBottles * 1;
 
-        if (!this.formulationArray.includes(this.allEvents['SITE'][_i].formulationType)) {
-          this.formulationArray.push(this.allEvents['SITE'][_i].formulationType);
+        if (!this.formulationArray.includes(this.allEvents['SITE'][_i].GIFAP)) {
+          this.formulationArray.push(this.allEvents['SITE'][_i].GIFAP);
         }
 
-        var indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][_i].formulationType);
+        var indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][_i].GIFAP);
         this.quantityPerArray[indexFormulation] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * this.allEvents['SITE'][_i].size;
 
         if (!this.formatArray.includes(this.allEvents['SITE'][_i].size)) {
@@ -3408,6 +3411,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log(this.quantityArray);
       console.log(this.formatArray);
       console.log(this.quantityPerArray);
+      console.log("formulations : ");
       console.log(this.formulationArray);
     },
     resolveAfter15Second: function resolveAfter15Second() {
@@ -3428,9 +3432,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var wieghtBoxCounter = 0;
       this.netOperatingTime = 0;
       var sommeWorkingTime = 0;
+      this.speedLosses = 0;
+
+      if (this.allEvents['RRF'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['RRF'][0].Duration * 1;
+      }
+
+      if (this.allEvents['RRM'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['RRM'][0].Duration * 1;
+      }
+
+      if (this.allEvents['FOS'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['FOS'][0].Duration * 1;
+      }
+
+      if (this.allEvents['FSM'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['FSM'][0].Duration * 1;
+      }
 
       for (var i = 0; i < this.allEvents['SITE'].length; i++) {
-        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration;
         var PO = this.allEvents['SITE'][i];
         sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
         sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
@@ -3457,6 +3478,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.unplannedDowntimes = sommeUnplannedEvents;
       this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
       this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+      this.netOperatingTime = this.operatingTime - this.speedLosses;
+      console.log('working TIME : ');
+      console.log(sommeWorkingTime);
+      console.log('planned TIME : ');
+      console.log(sommePlannedEvents);
+      console.log('unplanned TIME : ');
+      console.log(sommeUnplannedEvents);
+      console.log('speedLosses TIME : ');
+      console.log(this.speedLosses);
       this.availability = this.operatingTime / this.plannedProductionTime;
       this.performance = this.netOperatingTime / this.operatingTime;
       console.log('net OP TIME : ');
@@ -3475,7 +3505,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.availability = 0;
       }
 
-      if (this.netOperatingTime === 0) {
+      if (this.operatingTime === 0) {
         this.performance = 0;
         this.unplannedDowntimes = 1;
       }
@@ -3497,6 +3527,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     pieCharts: function pieCharts() {
       var obj;
       var data = [];
+      var totalPieChart1 = 0;
 
       for (var j = 0; j < this.formulationArray.length; j++) {
         obj = {
@@ -3504,10 +3535,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           nbr: this.quantityPerArray[j]
         };
         data.push(obj);
+        totalPieChart1 += this.quantityPerArray[j];
       }
 
       console.log('DATA');
       console.log(data);
+
+      if (data.length === 0) {
+        obj = {
+          name: this.$t("nothingProduced"),
+          nbr: 1
+        };
+        data.push(obj);
+        totalPieChart1 = 1;
+      }
 
       var randomHexColorCode = function randomHexColorCode() {
         return "#" + Math.random().toString(16).slice(2, 8);
@@ -3521,7 +3562,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return ttl + house.nbr;
       }, 0);
       var startAngle = 0;
-      var radius = 100;
+      var radius = 70;
       var cx = canvas.width / 2;
       var cy = canvas.height / 2;
 
@@ -3543,7 +3584,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         ctx.closePath(); // add the labels
 
         ctx.beginPath();
-        ctx.font = '20px Helvetica, Calibri';
+        ctx.font = '15px Helvetica, Calibri';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
         // 1.5 * radius is the length of the Hypotenuse
@@ -3560,12 +3601,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           ***/
 
         var txt = item.name + '\n';
+        var pct = item.nbr / totalPieChart1 * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
         ctx.fillText(txt, deltaX + cx, deltaY + cy);
         ctx.closePath();
         startAngle = endAngle;
       }
 
       data = [];
+      var totalPieChart2 = 0;
 
       for (var _j2 = 0; _j2 < this.formatArray.length; _j2++) {
         obj = {
@@ -3573,6 +3617,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           nbr: this.quantityArray[_j2]
         };
         data.push(obj);
+        totalPieChart2 += this.quantityArray[_j2];
+      }
+
+      if (data.length === 0) {
+        obj = {
+          name: this.$t("nothingProduced"),
+          nbr: 1
+        };
+        data.push(obj);
+        totalPieChart2 = 1;
       }
 
       console.log('DATA');
@@ -3585,7 +3639,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return ttl + house.nbr;
       }, 0);
       startAngle = 0;
-      radius = 100;
+      radius = 70;
       cx = canvas.width / 2;
       cy = canvas.height / 2;
 
@@ -3608,7 +3662,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         ctx.closePath(); // add the labels
 
         ctx.beginPath();
-        ctx.font = '20px Helvetica, Calibri';
+        ctx.font = '15px Helvetica, Calibri';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
         // 1.5 * radius is the length of the Hypotenuse
@@ -3618,98 +3672,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var _deltaY = Math.sin(_theta) * 1.5 * radius;
 
         var _deltaX = Math.cos(_theta) * 1.5 * radius;
-        /***
-         SOH  - sin(angle) = opposite / hypotenuse
-         = opposite / 1px
-         CAH  - cos(angle) = adjacent / hypotenuse
-         = adjacent / 1px
-         TOA
-          ***/
 
+        if (_item.name !== this.$t("nothingProduced")) {
+          txt = _item.name + 'L\n';
+          pct = _item.nbr / totalPieChart2 * 100;
+          txt = txt + ' ' + pct.toFixed(2) + '%';
+        } else {
+          txt = _item.name + '\n';
+        }
 
-        txt = _item.name + '\n';
-        txt = txt + ' L';
+        startAngle = _endAngle;
         ctx.fillText(txt, _deltaX + cx, _deltaY + cy);
         ctx.closePath();
         startAngle = _endAngle;
       }
-      /**
-       var data = [];
-       for(let i=0; i<this.productsName.length; i++){
-          let item = {
-            y:  this.quantityArray[i],
-              label: this.productsName[i]
-          };
-          data.push(item);
-      }
-          var chart = new CanvasJS.Chart("can", {
-          animationEnabled: true,
-          title: {
-              text: "Desktop Search Engine Market Share - 2016"
-          },
-          data: [{
-              type: "pie",
-              startAngle: 240,
-              yValueFormatString: "##0.00\"%\"",
-              indexLabel: "{label} {y}",
-              dataPoints: data,
-          }]
-      });
-        chart.render();
-       **/
-
-      /**
-                      data = [];
-                      for (let i = 0; i < this.productsName.length; i++) {
-                          data.push(this.quantityArray[i]);
-                      }
-                      var canvas = document.getElementById("can");
-                      var ctx = canvas.getContext("2d");
-                      var lastend = 0;
-      
-      
-                      var myTotal = 0; // Automatically calculated so don't touch
-                      var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
-      
-                      for (var e = 0; e < data.length; e++) {
-                          myTotal += data[e];
-                      }
-      
-                      for (var i = 0; i < data.length; i++) {
-                          ctx.fillStyle = myColor[i];
-                          ctx.beginPath();
-                          ctx.moveTo(canvas.width / 2, canvas.height / 2);
-                          // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-                          ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
-                          ctx.lineTo(canvas.width / 2, canvas.height / 2);
-                          ctx.fill();
-                          lastend += Math.PI * 2 * (data[i] / myTotal);
-                      }
-      
-      
-                      canvas = document.getElementById("can2");
-                      ctx = canvas.getContext("2d");
-                      lastend = 0;
-                      data = [60, 60, 20, 50]; // If you add more data values make sure you add more colors
-                      myTotal = 0; // Automatically calculated so don't touch
-                      myColor = ['pink', 'green', 'blue', 'purple']; // Colors of each slice
-      
-                      for (e = 0; e < data.length; e++) {
-                          myTotal += data[e];
-                      }
-      
-                      for (i = 0; i < data.length; i++) {
-                          ctx.fillStyle = myColor[i];
-                          ctx.beginPath();
-                          ctx.moveTo(canvas.width / 2, canvas.height / 2);
-                          // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-                          ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
-                          ctx.lineTo(canvas.width / 2, canvas.height / 2);
-                          ctx.fill();
-                          lastend += Math.PI * 2 * (data[i] / myTotal);
-                      }
-      **/
-
     },
     resolveAfter05Second: function resolveAfter05Second() {
       return new Promise(function (resolve) {
@@ -3730,13 +3706,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         context.fillStyle = "#71FA23";
       }
 
-      context.arc(80, 80, 62, 0, 2 * Math.PI);
+      context.arc(80, 80, 40, 0, 2 * Math.PI);
       context.stroke();
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
       var ava = this.availability * 100;
-      context.fillText(ava.toFixed(2), 70, 90);
+      context.fillText(ava.toFixed(2), 65, 90);
       canvas = document.getElementById("Performance");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
@@ -3748,13 +3724,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         context.fillStyle = "#71FA23";
       }
 
-      context.arc(80, 80, 62, 0, 2 * Math.PI);
+      context.arc(80, 80, 40, 0, 2 * Math.PI);
       context.stroke();
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
       var perf = this.performance * 100;
-      context.fillText(perf.toFixed(2), 70, 90);
+      context.fillText(perf.toFixed(2), 65, 90);
       canvas = document.getElementById("Quality");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
@@ -3766,13 +3742,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         context.fillStyle = "#71FA23";
       }
 
-      context.arc(80, 80, 62, 0, 2 * Math.PI);
+      context.arc(80, 80, 40, 0, 2 * Math.PI);
       context.stroke();
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
       var qua = this.quality * 100;
-      context.fillText(qua.toFixed(2), 70, 90);
+      context.fillText(qua.toFixed(2), 65, 90);
       canvas = document.getElementById("OLE");
       context = canvas.getContext("2d");
       context.lineWidth = "2";
@@ -3780,17 +3756,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       if (this.OLE >= 0.70 && this.OLE < 0.95) {
         context.fillStyle = "#FF8700";
-      } else if (this.OLE >= 95) {
+      } else if (this.OLE >= 0.95) {
         context.fillStyle = "#71FA23";
       }
 
-      context.arc(80, 80, 62, 0, 2 * Math.PI);
+      context.arc(80, 80, 40, 0, 2 * Math.PI);
       context.stroke();
       context.fill();
       context.fillStyle = "#FFF";
       context.font = '20px serif';
       var o = this.OLE * 100;
-      context.fillText(o.toFixed(2), 70, 90);
+      context.fillText(o.toFixed(2), 65, 90);
     }
   },
   mounted: function mounted() {
@@ -5508,6 +5484,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "overallLineEffectivness",
@@ -5531,6 +5539,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       unplannedDowntimesPerMonth: [],
       plannedProductionTimePerMonth: [],
       operatingTimePerMonth: [],
+      speedLossesPerMonth: [],
       OLEPerMonth2: [],
       AvailabilityPerMonth2: [],
       PerformancePerMonth2: [],
@@ -5540,6 +5549,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       unplannedDowntimesPerMonth2: [],
       plannedProductionTimePerMonth2: [],
       operatingTimePerMonth2: [],
+      speedLossesPerMonth2: [],
       peakSeason: 0,
       plannedDowntimes: 0,
       unplannedDowntimes: 0,
@@ -5571,7 +5581,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 if (!(this.productionline !== '' && this.year !== '')) {
-                  _context.next = 27;
+                  _context.next = 24;
                   break;
                 }
 
@@ -5583,10 +5593,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(firstDayYear);
                 tab.push(lastDayYear);
                 this.$store.dispatch('fetchAllEvents', tab);
-                _context.next = 11;
+                console.log("ooooooooo");
+                console.log(tab);
+                _context.next = 13;
                 return this.resolveAfter15Second();
 
-              case 11:
+              case 13:
                 this.loadProductionTime();
                 this.loadProductionTimeThisYear();
                 firstDayYear = this.year - 1 + '-01-01';
@@ -5595,18 +5607,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 tab.push(this.site);
                 tab.push(this.productionline);
                 tab.push(firstDayYear);
-                tab.push(lastDayYear);
-                this.$store.dispatch('fetchAllEvents', tab);
-                _context.next = 23;
-                return this.resolveAfter15Second();
+                tab.push(lastDayYear); //this.$store.dispatch('fetchAllEvents', tab);
+                //await this.resolveAfter15Second();
+                //this.loadProductionTime2();
+                //this.loadProductionTimePreviousYear();
 
-              case 23:
-                this.loadProductionTime2();
-                this.loadProductionTimePreviousYear();
                 this.show = 1;
                 this.graph2();
 
-              case 27:
+              case 24:
               case "end":
                 return _context.stop();
             }
@@ -5700,9 +5709,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var wieghtBoxCounter = 0;
       this.netOperatingTime = 0;
       var sommeWorkingTime = 0;
+      this.speedLosses = 0;
+
+      if (this.allEvents['RRF'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['RRF'][0].Duration * 1;
+      }
+
+      if (this.allEvents['RRM'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['RRM'][0].Duration * 1;
+      }
+
+      if (this.allEvents['FOS'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['FOS'][0].Duration * 1;
+      }
+
+      if (this.allEvents['FSM'][0].nbEvents > 0) {
+        this.speedLosses += this.allEvents['FSM'][0].Duration * 1;
+      }
 
       for (var i = 0; i < this.allEvents['SITE'].length; i++) {
-        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+        sommeWorkingTime += this.allEvents['SITE'][i].workingDuration;
         var PO = this.allEvents['SITE'][i];
         sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
         sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
@@ -5729,6 +5755,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.unplannedDowntimes = sommeUnplannedEvents;
       this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
       this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+      this.netOperatingTime = this.operatingTime - this.speedLosses;
+      console.log('working TIME : ');
+      console.log(sommeWorkingTime);
+      console.log('planned TIME : ');
+      console.log(sommePlannedEvents);
+      console.log('unplanned TIME : ');
+      console.log(sommeUnplannedEvents);
+      console.log('speedLosses TIME : ');
+      console.log(this.speedLosses);
       this.availability = this.operatingTime / this.plannedProductionTime;
       this.performance = this.netOperatingTime / this.operatingTime;
       console.log('net OP TIME : ');
@@ -5747,7 +5782,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.availability = 0;
       }
 
-      if (this.netOperatingTime === 0) {
+      if (this.operatingTime === 0) {
         this.performance = 0;
         this.unplannedDowntimes = 1;
       }
@@ -5757,6 +5792,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       this.OLE = this.availability * this.performance * this.quality;
+      console.log('Planned Downtime : ' + sommePlannedEvents);
+      console.log('Unplanned Downtime : ' + sommeUnplannedEvents);
+      console.log('Planned Production Time : ' + this.plannedProductionTime);
+      console.log('Operating Time : ' + this.operatingTime);
+      console.log('NOT : ' + sommePlannedEvents);
+      console.log('Availability : ' + this.availability);
+      console.log('Performance : ' + this.performance);
+      console.log('Operating Time : ' + this.operatingTime);
     },
     resolveAfter15Second: function resolveAfter15Second() {
       return new Promise(function (resolve) {
@@ -5795,40 +5838,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.unplannedDowntimesPerMonth[i] = 0;
         this.plannedProductionTimePerMonth[i] = 0;
         this.operatingTimePerMonth[i] = 0;
+        this.speedLossesPerMonth[i] = 0;
       }
 
       var month = 0;
 
       for (var _i = 0; _i < this.allEvents['SITE'].length; _i++) {
         month = this.allEvents['SITE'][_i].created_at.split('-')[1] - 1;
-        sommeWorkingTimePerMonth[month] += this.allEvents['SITE'][_i].workingDuration * 1;
         var PO = this.allEvents['SITE'][_i];
-        sommeQtyProducedPerMonth[month] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * 1;
+        console.log("MOIS : " + month);
+        sommeWorkingTimePerMonth[month] += PO.workingDuration * 1;
+        sommeQtyProducedPerMonth[month] += PO.qtyProduced * PO.bottlesPerCase * 1;
         sommeRejectionPerMonth[month] += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
         fillerCounterPerMonth[month] += PO.fillerCounter * 1;
         caperCounterPerMonth[month] += PO.caperCounter * 1;
         labelerCounterPerMonth[month] += PO.labelerCounter * 1;
         weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
-        this.netOperatingTimePerMonth[month] += this.allEvents['SITE'][_i].qtyProduced * this.allEvents['SITE'][_i].bottlesPerCase * 1 / this.allEvents['SITE'][_i].idealRate * 1;
-
-        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
-          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
-            sumUnplannedEventsPerMonth[month] += this.allEvents['EVENTS'][j].total_duration * 1;
-          }
-        }
-
-        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
-          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
-            sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
-          }
-        }
-
         var max = -1;
 
-        for (var _i2 = 0; _i2 < sommeWorkingTimePerMonth.length; _i2++) {
-          if (sommeWorkingTimePerMonth[_i2] > max) {
-            max = sommeWorkingTimePerMonth[_i2];
-            this.peakSeason = _i2;
+        for (var l = 0; l < sommeWorkingTimePerMonth.length; l++) {
+          if (sommeWorkingTimePerMonth[l] > max) {
+            max = sommeWorkingTimePerMonth[l];
+            this.peakSeason = l;
           }
         }
       }
@@ -5836,54 +5867,112 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.plannedDowntimesPerMonth = sumPlannedEventsPerMonth;
       this.unplannedDowntimesPerMonth = sumUnplannedEventsPerMonth;
 
-      for (var _i3 = 0; _i3 < this.plannedProductionTimePerMonth.length; _i3++) {
-        this.plannedProductionTimePerMonth[_i3] = sommeWorkingTimePerMonth[_i3] - sumPlannedEventsPerMonth[_i3];
+      for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+        var currentMonth = this.allEvents['EVENTS'][j].created_at.split('-')[1] - 1;
+        sumUnplannedEventsPerMonth[currentMonth] += this.allEvents['EVENTS'][j].total_duration * 1;
       }
 
-      for (var _i4 = 0; _i4 < this.operatingTimePerMonth.length; _i4++) {
-        this.operatingTimePerMonth[_i4] = sommeWorkingTimePerMonth[_i4] - sumPlannedEventsPerMonth[_i4] - sumUnplannedEventsPerMonth[_i4];
+      for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+        var currentMonth = this.allEvents['PLANNEDEVENTS'][k].created_at.split('-')[1] - 1;
+        sumPlannedEventsPerMonth[currentMonth] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
       }
-      /**
-       console.log('indice :');
-        console.log(sommeWorkingTimePerMonth);
-       console.log(sumPlannedEventsPerMonth);
-       console.log(sumUnplannedEventsPerMonth);
-       **/
 
+      for (var _k = 0; _k < this.allEvents['RRFMonth'].length; _k++) {
+        currentMonth = this.allEvents['RRFMonth'][_k].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth[currentMonth] += this.allEvents['RRFMonth'][_k].duration;
+      }
 
-      for (var _i5 = 0; _i5 < this.AvailabilityPerMonth.length; _i5++) {
-        if (this.operatingTimePerMonth[_i5] === 0) {
-          this.AvailabilityPerMonth[_i5] = 0;
+      for (var _k2 = 0; _k2 < this.allEvents['RRMMonth'].length; _k2++) {
+        currentMonth = this.allEvents['RRMMonth'][_k2].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth[currentMonth] += this.allEvents['RRMMonth'][_k2].duration;
+      }
+
+      for (var _k3 = 0; _k3 < this.allEvents['FOSMonth'].length; _k3++) {
+        currentMonth = this.allEvents['FOSMonth'][_k3].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth[currentMonth] += this.allEvents['FOSMonth'][_k3].duration;
+      }
+
+      for (var _k4 = 0; _k4 < this.allEvents['FSMMonth'].length; _k4++) {
+        currentMonth = this.allEvents['FSMMonth'][_k4].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth[currentMonth] += this.allEvents['FSMMonth'][_k4].duration;
+      }
+
+      for (var m = 0; m < this.plannedProductionTimePerMonth.length; m++) {
+        this.plannedProductionTimePerMonth[m] = sommeWorkingTimePerMonth[m] - sumPlannedEventsPerMonth[m];
+      }
+
+      for (var n = 0; n < this.operatingTimePerMonth.length; n++) {
+        this.operatingTimePerMonth[n] = sommeWorkingTimePerMonth[n] - sumPlannedEventsPerMonth[n] - sumUnplannedEventsPerMonth[n];
+      }
+
+      for (var _n = 0; _n < this.netOperatingTimePerMonth.length; _n++) {
+        this.netOperatingTimePerMonth[_n] = this.operatingTimePerMonth[_n] - this.speedLossesPerMonth[_n];
+      }
+
+      for (var _j = 0; _j < this.AvailabilityPerMonth.length; _j++) {
+        if (this.operatingTimePerMonth[_j] === 0 || this.plannedProductionTimePerMonth[_j] === 0) {
+          this.AvailabilityPerMonth[_j] = 0;
         } else {
-          this.AvailabilityPerMonth[_i5] = this.operatingTimePerMonth[_i5] / this.plannedProductionTimePerMonth[_i5];
+          this.AvailabilityPerMonth[_j] = this.operatingTimePerMonth[_j] / this.plannedProductionTimePerMonth[_j];
         }
       }
 
-      for (var _i6 = 0; _i6 < this.PerformancePerMonth.length; _i6++) {
-        if (this.netOperatingTimePerMonth[_i6] === 0) {
-          this.PerformancePerMonth[_i6] = 0;
+      for (var _j2 = 0; _j2 < this.PerformancePerMonth.length; _j2++) {
+        if (this.netOperatingTimePerMonth[_j2] === 0 || this.operatingTimePerMonth[_j2] === 0) {
+          this.PerformancePerMonth[_j2] = 0;
         } else {
-          this.PerformancePerMonth[_i6] = this.netOperatingTimePerMonth[_i6] / this.operatingTimePerMonth[_i6];
+          this.PerformancePerMonth[_j2] = this.netOperatingTimePerMonth[_j2] / this.operatingTimePerMonth[_j2];
         }
       }
 
-      for (var _i7 = 0; _i7 < this.QualityPerMonth.length; _i7++) {
-        if (sommeRejectionPerMonth[_i7] === 0 && fillerCounterPerMonth[_i7] === 0 && caperCounterPerMonth[_i7] === 0 && labelerCounterPerMonth[_i7] === 0 && weightBoxCounterPerMonth[_i7] === 0) {
-          this.QualityPerMonth[_i7] = 1;
+      for (var _j3 = 0; _j3 < this.QualityPerMonth.length; _j3++) {
+        if (sommeRejectionPerMonth[_j3] === 0 && fillerCounterPerMonth[_j3] === 0 && caperCounterPerMonth[_j3] === 0 && labelerCounterPerMonth[_j3] === 0 && weightBoxCounterPerMonth[_j3] === 0) {
+          this.QualityPerMonth[_j3] = 1;
         } else {
-          var s = fillerCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7] + (caperCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]) + (labelerCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]) + (weightBoxCounterPerMonth[_i7] - sommeQtyProducedPerMonth[_i7]);
-          this.QualityPerMonth[_i7] = sommeQtyProducedPerMonth[_i7] / (sommeQtyProducedPerMonth[_i7] + sommeRejectionPerMonth[_i7] + s);
+          var s = fillerCounterPerMonth[_j3] - sommeQtyProducedPerMonth[_j3] + (caperCounterPerMonth[_j3] - sommeQtyProducedPerMonth[_j3]) + (labelerCounterPerMonth[_j3] - sommeQtyProducedPerMonth[_j3]) + (weightBoxCounterPerMonth[_j3] - sommeQtyProducedPerMonth[_j3]);
+          this.QualityPerMonth[_j3] = sommeQtyProducedPerMonth[_j3] / (sommeQtyProducedPerMonth[_j3] + sommeRejectionPerMonth[_j3] + s);
         }
       }
 
-      for (var _i8 = 0; _i8 < this.OLEPerMonth.length; _i8++) {
-        this.OLEPerMonth[_i8] = this.AvailabilityPerMonth[_i8] * this.PerformancePerMonth[_i8] * this.QualityPerMonth[_i8];
+      for (var _j4 = 0; _j4 < this.OLEPerMonth.length; _j4++) {
+        this.OLEPerMonth[_j4] = this.AvailabilityPerMonth[_j4] * this.PerformancePerMonth[_j4] * this.QualityPerMonth[_j4];
       }
 
+      console.log("QTY PER MONTH");
       console.log(sommeQtyProducedPerMonth);
+      console.log("PERF PER MONTH");
       console.log(this.PerformancePerMonth);
+      console.log("QUALITY PER MONTH");
       console.log(this.QualityPerMonth);
+      console.log("AVAILABILITY PER MONTH");
       console.log(this.AvailabilityPerMonth);
+      console.log("WORKING PER MONTH");
+      console.log(sommeWorkingTimePerMonth);
+      console.log("NET OPETATING PER MONTH");
+      console.log(this.netOperatingTimePerMonth);
+      console.log("PLANNED DOWNTIME  PER MONTH");
+      console.log(this.plannedDowntimesPerMonth);
+      console.log("UNPLANNED DOWNTIME PER MONTH");
+      console.log(this.unplannedDowntimesPerMonth);
+      console.log("PLannedProduction PER MONTH");
+      console.log(this.plannedProductionTimePerMonth);
+      console.log("OPERATING TIME PER MONTH");
+      console.log(this.operatingTimePerMonth);
+      console.log("SPEEDLOSS PER MONTH");
+      console.log(this.speedLossesPerMonth);
+      /**
+      * QTY : 1800 ok
+       * SPEEDLOSS : 10 ok
+      * PERF : 0.928
+       * QUALITY : 1
+       * A
+      * WORKING : 230 ok
+      * NET OPERATING : 75 - 130 ko
+      * PLANNED DOWNTIME : 90 ok
+      * UNPANNED : 0 - 0 ok
+      * PLANNED PRODUCTION : 140 ok
+      * OPERATING TIME : 140 - 140 ok
+      * **/
     },
     loadProductionTime2: function loadProductionTime2() {
       var sommeWorkingTimePerMonth = [];
@@ -5915,31 +6004,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.unplannedDowntimesPerMonth2[i] = 0;
         this.plannedProductionTimePerMonth2[i] = 0;
         this.operatingTimePerMonth2[i] = 0;
+        this.speedLossesPerMonth2[i] = 0;
       }
 
       var month = 0;
 
-      for (var _i9 = 0; _i9 < this.allEvents['SITE'].length; _i9++) {
-        month = this.allEvents['SITE'][_i9].created_at.split('-')[1] - 1;
-        sommeWorkingTimePerMonth[month] += this.allEvents['SITE'][_i9].workingDuration * 1;
-        var PO = this.allEvents['SITE'][_i9];
-        sommeQtyProducedPerMonth[month] += this.allEvents['SITE'][_i9].qtyProduced * this.allEvents['SITE'][_i9].bottlesPerCase * 1;
+      for (var _i2 = 0; _i2 < this.allEvents['SITE'].length; _i2++) {
+        month = this.allEvents['SITE'][_i2].created_at.split('-')[1] - 1;
+        var PO = this.allEvents['SITE'][_i2];
+        console.log("MOIS : " + month);
+        sommeWorkingTimePerMonth[month] += PO.workingDuration * 1;
+        sommeQtyProducedPerMonth[month] += PO.qtyProduced * PO.bottlesPerCase * 1;
         sommeRejectionPerMonth[month] += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
         fillerCounterPerMonth[month] += PO.fillerCounter * 1;
         caperCounterPerMonth[month] += PO.caperCounter * 1;
         labelerCounterPerMonth[month] += PO.labelerCounter * 1;
         weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
-        this.netOperatingTimePerMonth2[month] += this.allEvents['SITE'][_i9].qtyProduced * this.allEvents['SITE'][_i9].bottlesPerCase * 1 / this.allEvents['SITE'][_i9].idealRate * 1;
+        var max = -1;
 
-        for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
-          if (this.allEvents['EVENTS'][j].OLE === PO.number) {
-            sumUnplannedEventsPerMonth[month] += this.allEvents['EVENTS'][j].total_duration * 1;
-          }
-        }
-
-        for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
-          if (this.allEvents['PLANNEDEVENTS'][k].OLE === PO.number) {
-            sumPlannedEventsPerMonth[month] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
+        for (var l = 0; l < sommeWorkingTimePerMonth.length; l++) {
+          if (sommeWorkingTimePerMonth[l] > max) {
+            max = sommeWorkingTimePerMonth[l];
+            this.peakSeason = l;
           }
         }
       }
@@ -5947,48 +6033,75 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.plannedDowntimesPerMonth2 = sumPlannedEventsPerMonth;
       this.unplannedDowntimesPerMonth2 = sumUnplannedEventsPerMonth;
 
-      for (var _i10 = 0; _i10 < this.plannedProductionTimePerMonth2.length; _i10++) {
-        this.plannedProductionTimePerMonth2[_i10] = sommeWorkingTimePerMonth[_i10] - sumPlannedEventsPerMonth[_i10];
+      for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
+        var currentMonth = this.allEvents['EVENTS'][j].created_at.split('-')[1] - 1;
+        sumUnplannedEventsPerMonth[currentMonth] += this.allEvents['EVENTS'][j].total_duration * 1;
       }
 
-      for (var _i11 = 0; _i11 < this.operatingTimePerMonth2.length; _i11++) {
-        this.operatingTimePerMonth2[_i11] = sommeWorkingTimePerMonth[_i11] - sumPlannedEventsPerMonth[_i11] - sumUnplannedEventsPerMonth[_i11];
+      for (var k = 0; k < this.allEvents['PLANNEDEVENTS'].length; k++) {
+        var currentMonth = this.allEvents['PLANNEDEVENTS'][k].created_at.split('-')[1] - 1;
+        sumPlannedEventsPerMonth[currentMonth] += this.allEvents['PLANNEDEVENTS'][k].duration * 1;
       }
-      /**
-       console.log('indice :');
-        console.log(sommeWorkingTimePerMonth);
-       console.log(sumPlannedEventsPerMonth);
-       console.log(sumUnplannedEventsPerMonth);
-       **/
 
+      for (var _k5 = 0; _k5 < this.allEvents['RRFMonth'].length; _k5++) {
+        currentMonth = this.allEvents['RRFMonth'][_k5].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth2[currentMonth] += this.allEvents['RRFMonth'][_k5].duration;
+      }
 
-      for (var _i12 = 0; _i12 < this.AvailabilityPerMonth2.length; _i12++) {
-        if (this.operatingTimePerMonth2[_i12] === 0) {
-          this.AvailabilityPerMonth2[_i12] = 0;
+      for (var _k6 = 0; _k6 < this.allEvents['RRMMonth'].length; _k6++) {
+        currentMonth = this.allEvents['RRMMonth'][_k6].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth2[currentMonth] += this.allEvents['RRMMonth'][_k6].duration;
+      }
+
+      for (var _k7 = 0; _k7 < this.allEvents['FOSMonth'].length; _k7++) {
+        currentMonth = this.allEvents['FOSMonth'][_k7].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth2[currentMonth] += this.allEvents['FOSMonth'][_k7].duration;
+      }
+
+      for (var _k8 = 0; _k8 < this.allEvents['FSMMonth'].length; _k8++) {
+        currentMonth = this.allEvents['FSMMonth'][_k8].created_at.split('-')[1] - 1;
+        this.speedLossesPerMonth2[currentMonth] += this.allEvents['FSMMonth'][_k8].duration;
+      }
+
+      for (var m = 0; m < this.plannedProductionTimePerMonth2.length; m++) {
+        this.plannedProductionTimePerMonth2[m] = sommeWorkingTimePerMonth[m] - sumPlannedEventsPerMonth[m];
+      }
+
+      for (var n = 0; n < this.operatingTimePerMonth2.length; n++) {
+        this.operatingTimePerMonth2[n] = sommeWorkingTimePerMonth[n] - sumPlannedEventsPerMonth[n] - sumUnplannedEventsPerMonth[n];
+      }
+
+      for (var _n2 = 0; _n2 < this.netOperatingTimePerMonth2.length; _n2++) {
+        this.netOperatingTimePerMonth2[_n2] = this.operatingTimePerMonth2[_n2] - this.speedLossesPerMonth2[_n2];
+      }
+
+      for (var _j5 = 0; _j5 < this.AvailabilityPerMonth2.length; _j5++) {
+        if (this.operatingTimePerMonth2[_j5] === 0 || this.plannedProductionTimePerMonth2[_j5] === 0) {
+          this.AvailabilityPerMonth2[_j5] = 0;
         } else {
-          this.AvailabilityPerMonth2[_i12] = this.operatingTimePerMonth2[_i12] / this.plannedProductionTimePerMonth2[_i12];
+          this.AvailabilityPerMonth2[_j5] = this.operatingTimePerMonth2[_j5] / this.plannedProductionTimePerMonth2[_j5];
         }
       }
 
-      for (var _i13 = 0; _i13 < this.PerformancePerMonth2.length; _i13++) {
-        if (this.netOperatingTimePerMonth2[_i13] === 0) {
-          this.PerformancePerMonth2[_i13] = 0;
+      for (var _j6 = 0; _j6 < this.PerformancePerMonth2.length; _j6++) {
+        if (this.netOperatingTimePerMonth2[_j6] === 0 || this.operatingTimePerMonth2[_j6] === 0) {
+          this.PerformancePerMonth2[_j6] = 0;
         } else {
-          this.PerformancePerMonth2[_i13] = this.netOperatingTimePerMonth2[_i13] / this.operatingTimePerMonth2[_i13];
+          this.PerformancePerMonth2[_j6] = this.netOperatingTimePerMonth2[_j6] / this.operatingTimePerMonth2[_j6];
         }
       }
 
-      for (var _i14 = 0; _i14 < this.QualityPerMonth2.length; _i14++) {
-        if (sommeRejectionPerMonth[_i14] === 0 && fillerCounterPerMonth[_i14] === 0 && caperCounterPerMonth[_i14] === 0 && labelerCounterPerMonth[_i14] === 0 && weightBoxCounterPerMonth[_i14] === 0) {
-          this.QualityPerMonth2[_i14] = 1;
+      for (var _j7 = 0; _j7 < this.QualityPerMonth2.length; _j7++) {
+        if (sommeRejectionPerMonth[_j7] === 0 && fillerCounterPerMonth[_j7] === 0 && caperCounterPerMonth[_j7] === 0 && labelerCounterPerMonth[_j7] === 0 && weightBoxCounterPerMonth[_j7] === 0) {
+          this.QualityPerMonth2[_j7] = 1;
         } else {
-          var s = fillerCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14] + (caperCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]) + (labelerCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]) + (weightBoxCounterPerMonth[_i14] - sommeQtyProducedPerMonth[_i14]);
-          this.QualityPerMonth2[_i14] = sommeQtyProducedPerMonth[_i14] / (sommeQtyProducedPerMonth[_i14] + sommeRejectionPerMonth[_i14] + s);
+          var s = fillerCounterPerMonth[_j7] - sommeQtyProducedPerMonth[_j7] + (caperCounterPerMonth[_j7] - sommeQtyProducedPerMonth[_j7]) + (labelerCounterPerMonth[_j7] - sommeQtyProducedPerMonth[_j7]) + (weightBoxCounterPerMonth[_j7] - sommeQtyProducedPerMonth[_j7]);
+          this.QualityPerMonth2[_j7] = sommeQtyProducedPerMonth[_j7] / (sommeQtyProducedPerMonth[_j7] + sommeRejectionPerMonth[_j7] + s);
         }
       }
 
-      for (var _i15 = 0; _i15 < this.OLEPerMonth2.length; _i15++) {
-        this.OLEPerMonth2[_i15] = this.AvailabilityPerMonth2[_i15] * this.PerformancePerMonth2[_i15] * this.QualityPerMonth2[_i15];
+      for (var _j8 = 0; _j8 < this.OLEPerMonth2.length; _j8++) {
+        this.OLEPerMonth2[_j8] = this.AvailabilityPerMonth2[_j8] * this.PerformancePerMonth2[_j8] * this.QualityPerMonth2[_j8];
       }
     },
     graph2: function graph2() {
@@ -6017,40 +6130,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           yValueFormatString: "#,##0",
           dataPoints: [{
             x: new Date(this.year, 0),
-            y: this.OLEPerMonth[0]
+            y: this.OLEPerMonth[0] * 100
           }, {
             x: new Date(this.year, 1),
-            y: this.OLEPerMonth[1]
+            y: this.OLEPerMonth[1] * 100
           }, {
             x: new Date(this.year, 2),
-            y: this.OLEPerMonth[2]
+            y: this.OLEPerMonth[2] * 100
           }, {
             x: new Date(this.year, 3),
-            y: this.OLEPerMonth[3]
+            y: this.OLEPerMonth[3] * 100
           }, {
             x: new Date(this.year, 4),
-            y: this.OLEPerMonth[4]
+            y: this.OLEPerMonth[4] * 100
           }, {
             x: new Date(this.year, 5),
-            y: this.OLEPerMonth[5]
+            y: this.OLEPerMonth[5] * 100
           }, {
             x: new Date(this.year, 6),
-            y: this.OLEPerMonth[6]
+            y: this.OLEPerMonth[6] * 100
           }, {
             x: new Date(this.year, 7),
-            y: this.OLEPerMonth[7]
+            y: this.OLEPerMonth[7] * 100
           }, {
             x: new Date(this.year, 8),
-            y: this.OLEPerMonth[8]
+            y: this.OLEPerMonth[8] * 100
           }, {
             x: new Date(this.year, 9),
-            y: this.OLEPerMonth[9]
+            y: this.OLEPerMonth[9] * 100
           }, {
             x: new Date(this.year, 10),
-            y: this.OLEPerMonth[10]
+            y: this.OLEPerMonth[10] * 100
           }, {
             x: new Date(this.year, 11),
-            y: this.OLEPerMonth[11]
+            y: this.OLEPerMonth[11] * 100
           }]
         }, {
           type: "line",
@@ -6059,40 +6172,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           yValueFormatString: "#,##0",
           dataPoints: [{
             x: new Date(this.year, 0),
-            y: this.PerformancePerMonth[0]
+            y: this.PerformancePerMonth[0] * 100
           }, {
             x: new Date(this.year, 1),
-            y: this.PerformancePerMonth[1]
+            y: this.PerformancePerMonth[1] * 100
           }, {
             x: new Date(this.year, 2),
-            y: this.PerformancePerMonth[2]
+            y: this.PerformancePerMonth[2] * 100
           }, {
             x: new Date(this.year, 3),
-            y: this.PerformancePerMonth[3]
+            y: this.PerformancePerMonth[3] * 100
           }, {
             x: new Date(this.year, 4),
-            y: this.PerformancePerMonth[4]
+            y: this.PerformancePerMonth[4] * 100
           }, {
             x: new Date(this.year, 5),
-            y: this.PerformancePerMonth[5]
+            y: this.PerformancePerMonth[5] * 100
           }, {
             x: new Date(this.year, 6),
-            y: this.PerformancePerMonth[6]
+            y: this.PerformancePerMonth[6] * 100
           }, {
             x: new Date(this.year, 7),
-            y: this.PerformancePerMonth[7]
+            y: this.PerformancePerMonth[7] * 100
           }, {
             x: new Date(this.year, 8),
-            y: this.PerformancePerMonth[8]
+            y: this.PerformancePerMonth[8] * 100
           }, {
             x: new Date(this.year, 9),
-            y: this.PerformancePerMonth[9]
+            y: this.PerformancePerMonth[9] * 100
           }, {
             x: new Date(this.year, 10),
-            y: this.PerformancePerMonth[10]
+            y: this.PerformancePerMonth[10] * 100
           }, {
             x: new Date(this.year, 11),
-            y: this.PerformancePerMonth[11]
+            y: this.PerformancePerMonth[11] * 100
           }]
         }, {
           type: "line",
@@ -6101,40 +6214,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           yValueFormatString: "#,##0",
           dataPoints: [{
             x: new Date(this.year, 0),
-            y: this.AvailabilityPerMonth[0]
+            y: this.AvailabilityPerMonth[0] * 100
           }, {
             x: new Date(this.year, 1),
-            y: this.AvailabilityPerMonth[1]
+            y: this.AvailabilityPerMonth[1] * 100
           }, {
             x: new Date(this.year, 2),
-            y: this.AvailabilityPerMonth[2]
+            y: this.AvailabilityPerMonth[2] * 100
           }, {
             x: new Date(this.year, 3),
-            y: this.AvailabilityPerMonth[3]
+            y: this.AvailabilityPerMonth[3] * 100
           }, {
             x: new Date(this.year, 4),
-            y: this.AvailabilityPerMonth[4]
+            y: this.AvailabilityPerMonth[4] * 100
           }, {
             x: new Date(this.year, 5),
-            y: this.AvailabilityPerMonth[5]
+            y: this.AvailabilityPerMonth[5] * 100
           }, {
             x: new Date(this.year, 6),
-            y: this.AvailabilityPerMonth[6]
+            y: this.AvailabilityPerMonth[6] * 100
           }, {
             x: new Date(this.year, 7),
-            y: this.AvailabilityPerMonth[7]
+            y: this.AvailabilityPerMonth[7] * 100
           }, {
             x: new Date(this.year, 8),
-            y: this.AvailabilityPerMonth[8]
+            y: this.AvailabilityPerMonth[8] * 100
           }, {
             x: new Date(this.year, 9),
-            y: this.AvailabilityPerMonth[9]
+            y: this.AvailabilityPerMonth[9] * 100
           }, {
             x: new Date(this.year, 10),
-            y: this.AvailabilityPerMonth[10]
+            y: this.AvailabilityPerMonth[10] * 100
           }, {
             x: new Date(this.year, 11),
-            y: this.AvailabilityPerMonth[11]
+            y: this.AvailabilityPerMonth[11] * 100
           }]
         }, {
           type: "line",
@@ -6143,40 +6256,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           yValueFormatString: "#,##0",
           dataPoints: [{
             x: new Date(this.year, 0),
-            y: this.QualityPerMonth[0]
+            y: this.QualityPerMonth[0] * 100
           }, {
             x: new Date(this.year, 1),
-            y: this.QualityPerMonth[1]
+            y: this.QualityPerMonth[1] * 100
           }, {
             x: new Date(this.year, 2),
-            y: this.QualityPerMonth[2]
+            y: this.QualityPerMonth[2] * 100
           }, {
             x: new Date(this.year, 3),
-            y: this.QualityPerMonth[3]
+            y: this.QualityPerMonth[3] * 100
           }, {
             x: new Date(this.year, 4),
-            y: this.QualityPerMonth[4]
+            y: this.QualityPerMonth[4] * 100
           }, {
             x: new Date(this.year, 5),
-            y: this.QualityPerMonth[5]
+            y: this.QualityPerMonth[5] * 100
           }, {
             x: new Date(this.year, 6),
-            y: this.QualityPerMonth[6]
+            y: this.QualityPerMonth[6] * 100
           }, {
             x: new Date(this.year, 7),
-            y: this.QualityPerMonth[7]
+            y: this.QualityPerMonth[7] * 100
           }, {
             x: new Date(this.year, 8),
-            y: this.QualityPerMonth[8]
+            y: this.QualityPerMonth[8] * 100
           }, {
             x: new Date(this.year, 9),
-            y: this.QualityPerMonth[9]
+            y: this.QualityPerMonth[9] * 100
           }, {
             x: new Date(this.year, 10),
-            y: this.QualityPerMonth[10]
+            y: this.QualityPerMonth[10] * 100
           }, {
             x: new Date(this.year, 11),
-            y: this.QualityPerMonth[11]
+            y: this.QualityPerMonth[11] * 100
           }]
         }]
       });
@@ -6213,23 +6326,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 //
 //
 //
@@ -6390,21 +6501,140 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     };
   },
   methods: {
-    load: function load() {
-      var index = 0;
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, row, insert, previousMachine, div, h5, rejection, R, redArrow, _i, machine, arrow;
 
-      for (var i = 0; i < this.sites[1].length; i++) {
-        if (this.sites[1][i].productionline_name === this.productionline) {
-          index = this.sites[1][i].id;
-        }
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (this.productionline !== '') {
+                  this.$store.dispatch('fetchMachines', index);
+                  this.index = index;
+                }
+
+                _context.next = 5;
+                return this.resolveAfter15Second();
+
+              case 5:
+                row = document.createElement("div");
+                row.setAttribute("class", "row");
+                row.setAttribute("style", "margin: 30px;height: 50px; height: 50px;");
+                insert = document.getElementById("flowDiagram");
+                previousMachine = this.machines[0][0];
+                div = document.createElement("div");
+                h5 = document.createElement("h5");
+                h5.innerHTML = previousMachine.denomination_ordre;
+                h5.setAttribute("style", "padding-top:15px;");
+                h5.setAttribute("id", previousMachine.name);
+                div.appendChild(h5);
+                div.setAttribute("class", "machine");
+                div.setAttribute("style", "color:white; background-color: lightblue; height: 50px; margin-bottom: 30px;");
+                div.setAttribute("align", "center");
+
+                if (previousMachine.rejection === 1) {
+                  rejection = document.createElement("div");
+                  R = document.createElement("h5");
+                  R.innerHTML = "R";
+                  R.setAttribute("style", "padding-top:15px;");
+                  R.setAttribute("id", "rejection_" + previousMachine.name);
+                  rejection.append(R);
+                  rejection.setAttribute("id", "rejection_" + previousMachine.name);
+                  rejection.setAttribute("style", "color:red;");
+                  rejection.setAttribute("align", "center");
+                  rejection.setAttribute("class", "col-sm");
+                  row.appendChild(rejection);
+                  redArrow = document.createElement("connection");
+                  redArrow.setAttribute("from", "#" + previousMachine.name);
+                  redArrow.setAttribute("to", "#rejection_" + previousMachine.name);
+                  redArrow.setAttribute("color", "red");
+                  redArrow.setAttribute("tail", "true");
+                  redArrow.setAttribute("style", "padding-top:15px;");
+                  insert.appendChild(redArrow);
+                }
+
+                row.appendChild(div);
+                insert.appendChild(row);
+
+                for (_i = 1; _i < this.machines[0].length; _i++) {
+                  machine = this.machines[0][_i];
+                  row = document.createElement("div");
+                  row.setAttribute("class", "row");
+                  row.setAttribute("style", "margin: 30px;height: 50px; height: 50px;");
+                  div = document.createElement("div");
+                  h5 = document.createElement("h5");
+                  h5.innerHTML = machine.denomination_ordre;
+                  h5.setAttribute("style", "padding-top:15px;");
+                  div.appendChild(h5);
+                  h5.setAttribute("id", machine.name);
+                  div.setAttribute("class", "machine col-sm");
+                  div.setAttribute("style", "color:white; background-color: lightblue; ");
+                  div.setAttribute("align", "center");
+                  arrow = document.createElement("connection");
+                  arrow.setAttribute("from", "#" + previousMachine.name);
+                  arrow.setAttribute("to", "#" + machine.name);
+                  arrow.setAttribute("color", "black");
+                  arrow.setAttribute("tail", "true");
+                  arrow.setAttribute("style", "padding-top:15px;");
+                  row.appendChild(div);
+
+                  if (machine.rejection === 1) {
+                    rejection = document.createElement("div");
+                    R = document.createElement("h5");
+                    R.innerHTML = "R";
+                    R.setAttribute("style", "padding-top:15px;");
+                    rejection.append(R);
+                    rejection.setAttribute("id", "rejection_" + machine.name);
+                    rejection.setAttribute("style", "color:red;");
+                    rejection.setAttribute("align", "center");
+                    rejection.setAttribute("class", "col-sm");
+                    row.appendChild(rejection);
+                    redArrow = document.createElement("connection");
+                    redArrow.setAttribute("from", "#" + machine.name);
+                    redArrow.setAttribute("to", "#rejection_" + machine.name);
+                    redArrow.setAttribute("color", "red");
+                    redArrow.setAttribute("tail", "true");
+                    redArrow.setAttribute("style", "padding-top:15px;");
+                    insert.appendChild(redArrow);
+                  }
+
+                  insert.appendChild(row);
+                  insert.appendChild(arrow);
+                  previousMachine = machine;
+                }
+
+                this.show = 1;
+
+              case 24:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
       }
 
-      if (this.productionline !== '') {
-        this.$store.dispatch('fetchMachines', index);
-        this.index = index;
-        this.show = 1;
-      }
-    }
+      return load;
+    }()
   },
   mounted: function mounted() {
     if (sessionStorage.getItem("language") !== null) {
@@ -6413,7 +6643,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
     this.$store.dispatch('fetchSites');
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['sites', 'machines']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'machines']))
 });
 
 /***/ }),
@@ -6923,11 +7153,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "productionDashboard",
   data: function data() {
     return {
+      lo: this.$t("load"),
       site: '',
       beginningDate: '',
       endingDate: '',
@@ -7095,8 +7327,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       var canvas = document.getElementById("formulationSplit");
       var ctx = canvas.getContext("2d");
-      canvas.width = 800;
-      canvas.height = 600;
+      canvas.width = 450;
+      canvas.height = 450;
       var total = data.reduce(function (ttl, house) {
         return ttl + house.nbr;
       }, 0);
@@ -7123,7 +7355,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         ctx.closePath(); // add the labels
 
         ctx.beginPath();
-        ctx.font = '20px Helvetica, Calibri';
+        ctx.font = '15px Helvetica, Calibri';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
         // 1.5 * radius is the length of the Hypotenuse
@@ -7241,8 +7473,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       var canvas = document.getElementById("packsizeSplit");
       var ctx = canvas.getContext("2d");
-      canvas.width = 800;
-      canvas.height = 600;
+      canvas.width = 450;
+      canvas.height = 450;
       var total = data.reduce(function (ttl, house) {
         return ttl + house.nbr;
       }, 0);
@@ -7269,7 +7501,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         ctx.closePath(); // add the labels
 
         ctx.beginPath();
-        ctx.font = '20px Helvetica, Calibri';
+        ctx.font = '15px Helvetica, Calibri';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
         // 1.5 * radius is the length of the Hypotenuse
@@ -7339,7 +7571,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }
 
-      this.sumPerMonth.push(tab);
+      this.sumPerMonth = tab;
       this.formulationsPerMonth = finalValue; //Graph2
 
       var sommeQtyProduced2 = 0;
@@ -7393,8 +7625,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }
 
-      this.sumPerMonth2.push(tab);
+      this.sumPerMonth2 = tab;
       this.packsizePerMonth = finalValue2;
+      console.log(this.sumPerMonth2);
+      console.log(this.sumPerMonth);
     }
   },
   mounted: function mounted() {
@@ -8251,6 +8485,778 @@ var selectElem = document.getElementById('typeTeam');
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "test",
+  data: function data() {
+    return {
+      lo: this.$t("load"),
+      site: '',
+      beginningDate: '',
+      endingDate: '',
+      productionline: '',
+      show: 0,
+      formulations: '',
+      formulationsPerMonth: '',
+      qtyPerFormulation: [],
+      sumPerMonth: [],
+      total: 0,
+      packsizes: [],
+      total2: 0,
+      sumPerMonth2: [],
+      packsizePerMonth: []
+    };
+  },
+  methods: {
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
+                  _context.next = 17;
+                  break;
+                }
+
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(this.beginningDate);
+                tab.push(this.endingDate);
+                this.$store.dispatch('fetchVolumes', tab);
+                _context.next = 11;
+                return this.resolveAfter15Second();
+
+              case 11:
+                this.makeCalculationFormulation();
+                this.pieCharts();
+                this.pieCharts2();
+                this.graph();
+                this.graph2();
+                this.show = 1;
+
+              case 17:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    graph: function graph() {
+      var ctx = document.getElementById("myChart4").getContext('2d');
+      var tab = [];
+      var colors = [];
+      colors.push("#caf270");
+      colors.push("#45c490");
+      colors.push("#008d93");
+      colors.push("#2e5468");
+
+      for (var i = 0; i < this.formulations.length; i++) {
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var ar = [];
+
+        for (var j = 0; j < mois.length; j++) {
+          ar.push(this.formulationsPerMonth[i][mois[j]]);
+        }
+
+        var obj = {
+          label: this.formulations[i],
+          backgroundColor: colors[i],
+          data: ar
+        };
+        tab.push(obj);
+      }
+
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: tab
+        },
+        options: {
+          tooltips: {
+            displayColors: true,
+            callbacks: {
+              mode: 'x'
+            }
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              type: 'linear'
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom'
+          }
+        }
+      });
+    },
+    pieCharts: function pieCharts() {
+      var data = [];
+
+      for (var j = 0; j < this.formulations.length; j++) {
+        var formulation = this.formulations[j];
+        var sum = 0; //console.log('PER MONTH');
+        //console.log(this.formulationsPerMonth[j]);
+
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        for (var k = 0; k < mois.length; k++) {
+          var m = mois[k];
+          sum += this.formulationsPerMonth[j][m];
+        }
+
+        var obj = {
+          name: formulation,
+          nbr: sum
+        };
+        data.push(obj);
+      }
+
+      console.log('DATA');
+      console.log(data);
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
+
+      var canvas = document.getElementById("formulationSplit");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 450;
+      canvas.height = 450;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 100;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
+
+      for (var _j = 0; _j < data.length; _j++) {
+        var item = data[_j]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '15px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        /***
+         SOH  - sin(angle) = opposite / hypotenuse
+         = opposite / 1px
+         CAH  - cos(angle) = adjacent / hypotenuse
+         = adjacent / 1px
+         TOA
+          ***/
+
+        var txt = item.name + '\n';
+        var pct = item.nbr / this.total * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
+      }
+    },
+    graph2: function graph2() {
+      var ctx = document.getElementById("myChart5").getContext('2d');
+      var tab = [];
+      var colors = [];
+      colors.push("#caf270");
+      colors.push("#45c490");
+      colors.push("#008d93");
+      colors.push("#2e5468");
+
+      for (var i = 0; i < this.packsizes.length; i++) {
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var ar = [];
+
+        for (var j = 0; j < mois.length; j++) {
+          ar.push(this.packsizePerMonth[i][mois[j]]);
+        }
+
+        var obj = {
+          label: this.packsizes[i] + 'L',
+          backgroundColor: colors[i],
+          data: ar
+        };
+        tab.push(obj);
+      }
+
+      console.log('tab');
+      console.log(tab);
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          datasets: tab
+        },
+        options: {
+          tooltips: {
+            displayColors: true,
+            callbacks: {
+              mode: 'x'
+            }
+          },
+          scales: {
+            xAxes: [{
+              stacked: true,
+              gridLines: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              type: 'linear'
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom'
+          }
+        }
+      });
+    },
+    pieCharts2: function pieCharts2() {
+      var data = [];
+
+      for (var j = 0; j < this.packsizes.length; j++) {
+        var format = this.packsizes[j];
+        var sum = 0; //console.log('PER MONTH');
+        //console.log(this.formulationsPerMonth[j]);
+
+        var mois = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        for (var k = 0; k < mois.length; k++) {
+          var m = mois[k];
+          sum += this.packsizePerMonth[j][m];
+        }
+
+        var obj = {
+          name: format,
+          nbr: sum
+        };
+        data.push(obj);
+      }
+
+      console.log('DATA');
+      console.log(data);
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
+
+      var canvas = document.getElementById("packsizeSplit");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 450;
+      canvas.height = 450;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 100;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
+
+      for (var _j2 = 0; _j2 < data.length; _j2++) {
+        var item = data[_j2]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '15px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        var txt = item.name + 'L \n';
+        var pct = item.nbr / this.total2 * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
+      }
+    },
+    makeCalculationFormulation: function makeCalculationFormulation() {
+      var sommeQtyProduced = 0;
+      this.formulations = [];
+      var qtyPerFormulation = [];
+
+      for (var i = 0; i < this.volumes.length; i++) {
+        sommeQtyProduced += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+
+        if (!this.formulations.includes(this.volumes[i].BULK)) {
+          this.formulations.push(this.volumes[i].BULK);
+          qtyPerFormulation[this.volumes[i].BULK] = this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+        } else {
+          qtyPerFormulation[this.volumes[i].BULK] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * this.volumes[i].size * 1;
+        }
+      }
+
+      var finalValue = [];
+
+      for (var j = 0; j < this.formulations.length; j++) {
+        var tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var tableauFormulationValue = [];
+
+        for (var k = 0; k < tableauFormulation.length; k++) {
+          tableauFormulationValue[tableauFormulation[k]] = 0;
+        }
+
+        for (var _i = 0; _i < this.volumes.length; _i++) {
+          if (this.volumes[_i].BULK === this.formulations[j]) {
+            var month = this.volumes[_i].created_at.split('-')[1];
+
+            console.log('MOIS : ' + month);
+            var correspondingMonth = tableauFormulation[month - 1];
+            tableauFormulationValue[correspondingMonth] += this.volumes[_i].qtyProduced * this.volumes[_i].bottlesPerCase * this.volumes[_i].size * 1;
+          }
+        }
+
+        finalValue.push(tableauFormulationValue);
+      }
+
+      var l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      var tab = [];
+
+      for (var _k = 0; _k < l.length; _k++) {
+        tab[l[_k]] = 0;
+      }
+
+      for (var t = 0; t < finalValue.length; t++) {
+        for (var _k2 = 0; _k2 < l.length; _k2++) {
+          var _month = l[_k2];
+          tab[_month] += finalValue[t][_month];
+          this.total += finalValue[t][_month];
+        }
+      }
+
+      this.sumPerMonth = tab;
+      this.formulationsPerMonth = finalValue; //Graph2
+
+      var sommeQtyProduced2 = 0;
+      this.packsizes = [];
+      var qtyPerPacksize = [];
+
+      for (var _i2 = 0; _i2 < this.volumes.length; _i2++) {
+        sommeQtyProduced2 += this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+
+        if (!this.packsizes.includes(this.volumes[_i2].size)) {
+          this.packsizes.push(this.volumes[_i2].size);
+          qtyPerPacksize[this.volumes[_i2].size] = this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+        } else {
+          qtyPerPacksize[this.volumes[_i2].size] += this.volumes[_i2].qtyProduced * this.volumes[_i2].bottlesPerCase * 1;
+        }
+      }
+
+      var finalValue2 = [];
+
+      for (var _j3 = 0; _j3 < this.packsizes.length; _j3++) {
+        tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var tableauPacksizeValue = [];
+
+        for (var _k3 = 0; _k3 < tableauFormulation.length; _k3++) {
+          tableauPacksizeValue[tableauFormulation[_k3]] = 0;
+        }
+
+        for (var _i3 = 0; _i3 < this.volumes.length; _i3++) {
+          if (this.volumes[_i3].size === this.packsizes[_j3]) {
+            month = this.volumes[_i3].created_at.split('-')[1];
+            correspondingMonth = tableauFormulation[month - 1];
+            tableauPacksizeValue[correspondingMonth] += this.volumes[_i3].qtyProduced * this.volumes[_i3].bottlesPerCase * 1;
+          }
+        }
+
+        finalValue2.push(tableauPacksizeValue);
+      }
+
+      l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      tab = [];
+
+      for (var _k4 = 0; _k4 < l.length; _k4++) {
+        tab[l[_k4]] = 0;
+      }
+
+      for (var _t = 0; _t < finalValue2.length; _t++) {
+        for (var _k5 = 0; _k5 < l.length; _k5++) {
+          var _month2 = l[_k5];
+          tab[_month2] += finalValue2[_t][_month2];
+          this.total2 += finalValue2[_t][_month2];
+        }
+      }
+
+      this.sumPerMonth2 = tab;
+      this.packsizePerMonth = finalValue2;
+      console.log(this.sumPerMonth2);
+      console.log(this.sumPerMonth);
+    }
+  },
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
+    this.$store.dispatch('fetchSites');
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js');
+    document.head.appendChild(chartJs);
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'volumes']))
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/topSecondPage.vue?vue&type=script&lang=js&":
 /*!********************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/topSecondPage.vue?vue&type=script&lang=js& ***!
@@ -8470,7 +9476,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var _this = this;
 
     return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var spinner, spinner2, POElement, i, tab, assignation;
+      var POElement, i, tab, assignation;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -8481,36 +9487,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.$store.dispatch('fetchSites');
 
-              spinner = document.createElement('script');
-              spinner.setAttribute('src', 'https://unpkg.com/vue');
-              document.head.appendChild(spinner);
-              spinner2 = document.createElement('script');
-              spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
-              spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
-              document.head.appendChild(spinner2);
               console.log("POS : ");
               console.log(sessionStorage.getItem("pos").split(','));
-              _context.next = 13;
+              _context.next = 6;
               return _this.$store.dispatch('getWorksiteID', sessionStorage.getItem("site"));
 
-            case 13:
-              _context.next = 15;
+            case 6:
+              _context.next = 8;
               return _this.resolveAfter05Second();
 
-            case 15:
+            case 8:
               POElement = [];
               console.log(_this.PO);
 
               if (!(_this.PO.length > 0 && _this.PO[0] !== "")) {
-                _context.next = 41;
+                _context.next = 34;
                 break;
               }
 
               i = 0;
 
-            case 19:
+            case 12:
               if (!(i < _this.PO.length)) {
-                _context.next = 41;
+                _context.next = 34;
                 break;
               }
 
@@ -8518,18 +9517,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               tab.push(i + 1);
               tab.push(_this.PO[i]);
               tab.push(_this.productionlines[i]);
-              _context.next = 26;
+              _context.next = 19;
               return _this.$store.dispatch('fetchEvents', tab);
 
-            case 26:
-              _context.next = 28;
+            case 19:
+              _context.next = 21;
               return _this.$store.dispatch('getProductionlineID', _this.productionlines[i]);
 
-            case 28:
-              _context.next = 30;
+            case 21:
+              _context.next = 23;
               return _this.resolveAfter15Second();
 
-            case 30:
+            case 23:
               assignation = {
                 username: _this.username,
                 productionline: _this.productionlineID[0].id,
@@ -8537,31 +9536,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 shift: sessionStorage.getItem("typeTeam"),
                 worksite: _this.worksiteID[0].id
               };
-              _context.next = 33;
+              _context.next = 26;
               return _this.$store.dispatch('checkAssignation', assignation);
 
-            case 33:
-              _context.next = 35;
+            case 26:
+              _context.next = 28;
               return _this.resolveAfter05Second();
 
-            case 35:
+            case 28:
               if (!(_this.assignation[i] === 0)) {
-                _context.next = 38;
+                _context.next = 31;
                 break;
               }
 
-              _context.next = 38;
+              _context.next = 31;
               return _this.$store.dispatch('storeAssignation', assignation);
 
-            case 38:
+            case 31:
               i++;
-              _context.next = 19;
+              _context.next = 12;
               break;
 
-            case 41:
+            case 34:
               _this.showSpinner = 1;
 
-            case 42:
+            case 35:
             case "end":
               return _context.stop();
           }
@@ -10197,6 +11196,7 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('choice_planned_unplanned', _
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel1', __webpack_require__(/*! ./components/unplanned_pannel1.vue */ "./resources/js/components/unplanned_pannel1.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplanned_pannel_unplanned2', __webpack_require__(/*! ./components/unplanned_pannel_unplanned2.vue */ "./resources/js/components/unplanned_pannel_unplanned2.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('navbarSaisie', __webpack_require__(/*! ./components/navbarSaisie.vue */ "./resources/js/components/navbarSaisie.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('test', __webpack_require__(/*! ./components/test.vue */ "./resources/js/components/test.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('CIP_Declaration', __webpack_require__(/*! ./components/CIP_Declaration.vue */ "./resources/js/components/CIP_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('Changingformat_Declaration', __webpack_require__(/*! ./components/Changingformat_Declaration.vue */ "./resources/js/components/Changingformat_Declaration.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('ClientChanging_Declaration', __webpack_require__(/*! ./components/Clientchanging_Declaration.vue */ "./resources/js/components/Clientchanging_Declaration.vue").default);
@@ -15586,7 +16586,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-bac3c612] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-bac3c612] {\n    font-size: 1.2em;\n    color: #56baed;\n}\ndiv[data-v-bac3c612] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-bac3c612] {\n    color: white;\n    background: #56baed;\n}\n.table-info-data[data-v-bac3c612] {\n    overflow: scroll;\n    max-height: 200px;\n}\n.rcorners2[data-v-bac3c612] {\n    border: 2px solid lightgray;\n    padding: 20px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-bac3c612] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-bac3c612] {\n    font-size: 1.2em;\n    color: #56baed;\n}\ndiv[data-v-bac3c612] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-bac3c612] {\n    color: white;\n    background: #56baed;\n}\n.table-info-data[data-v-bac3c612] {\n    overflow: scroll;\n    max-height: 200px;\n}\n#d1[data-v-bac3c612], #d2[data-v-bac3c612] {\n    height: 50px;\n}\n#d1[data-v-bac3c612] {\n\n    background-color: green;\n}\n#d2[data-v-bac3c612] {\n    background-color: blue;\n}\n.machine[data-v-bac3c612] {\n    background-color: lightblue;\n    color: white;\n}\n.arrow[data-v-bac3c612] {\n    padding-top : 15px;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -15634,7 +16634,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-09ddfa60] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-09ddfa60] {\n    color: red;\n}\ndiv[data-v-09ddfa60] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-09ddfa60] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-09ddfa60] {\n    margin-left: 60px;\n}\nh5[data-v-09ddfa60] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-09ddfa60] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.wrapper[data-v-09ddfa60]{\n    width:60%;\n    display:block;\n    overflow:hidden;\n    margin:0 auto;\n    padding: 60px 50px;\n    background:#fff;\n    border-radius:4px;\n}\ncanvas[data-v-09ddfa60]{\n    background:#fff;\n    height:400px;\n}\n\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-09ddfa60] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-09ddfa60] {\n    color: red;\n}\ndiv[data-v-09ddfa60] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-09ddfa60] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-09ddfa60] {\n    margin-left: 60px;\n}\nh5[data-v-09ddfa60] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-09ddfa60] {\n    overflow: scroll;\n    max-height: 450px;\n    max-width: 400px;\n}\n.wrapper[data-v-09ddfa60] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-09ddfa60] {\n    background: #fff;\n    height: 400px;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -15755,6 +16755,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\nform[data-v-0a8a1876] {\n    padding: 2%;\n}\n.rcorners1[data-v-0a8a1876] {\n    border-radius: 25px;\n    background: lightblue;\n    padding: 20px;\n}\n.rcorners2[data-v-0a8a1876] {\n    border-radius: 25px;\n    border: 2px solid lightblue;\n    padding: 20px;\n}\nselect option[data-v-0a8a1876] {\n    padding-left: 20px;\n}\n.btn[data-v-0a8a1876]:focus {\n    outline: 0 !important;\n    box-shadow: none !important\n}\n.btn[data-v-0a8a1876]:active {\n    outline: 0 !important;\n    box-shadow: none !important\n}\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-5b6abe5d] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-5b6abe5d] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-5b6abe5d] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-5b6abe5d] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-5b6abe5d] {\n    color: red;\n}\ndiv[data-v-5b6abe5d] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-5b6abe5d] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-5b6abe5d] {\n    margin-left: 60px;\n}\nh5[data-v-5b6abe5d] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-5b6abe5d] {\n    overflow: scroll;\n    max-height: 450px;\n    max-width: 400px;\n}\n.wrapper[data-v-5b6abe5d] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-5b6abe5d] {\n    background: #fff;\n    height: 400px;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48287,6 +49311,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_style_index_0_id_5b6abe5d_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_style_index_0_id_5b6abe5d_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_style_index_0_id_5b6abe5d_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/topSecondPage.vue?vue&type=style&index=0&id=b01d2fc6&scoped=true&lang=css&":
 /*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/topSecondPage.vue?vue&type=style&index=0&id=b01d2fc6&scoped=true&lang=css& ***!
@@ -51868,6 +52922,47 @@ component.options.__file = "resources/js/components/teamInfo.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/test.vue":
+/*!******************************************!*\
+  !*** ./resources/js/components/test.vue ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./test.vue?vue&type=template&id=5b6abe5d&scoped=true& */ "./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true&");
+/* harmony import */ var _test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./test.vue?vue&type=script&lang=js& */ "./resources/js/components/test.vue?vue&type=script&lang=js&");
+/* harmony import */ var _test_vue_vue_type_style_index_0_id_5b6abe5d_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& */ "./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "5b6abe5d",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/test.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/topSecondPage.vue":
 /*!***************************************************!*\
   !*** ./resources/js/components/topSecondPage.vue ***!
@@ -52450,6 +53545,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/test.vue?vue&type=script&lang=js&":
+/*!*******************************************************************!*\
+  !*** ./resources/js/components/test.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./test.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/topSecondPage.vue?vue&type=script&lang=js&":
 /*!****************************************************************************!*\
   !*** ./resources/js/components/topSecondPage.vue?vue&type=script&lang=js& ***!
@@ -52802,6 +53913,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_teamInfo_vue_vue_type_style_index_0_id_0a8a1876_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./teamInfo.vue?vue&type=style&index=0&id=0a8a1876&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/teamInfo.vue?vue&type=style&index=0&id=0a8a1876&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&":
+/*!***************************************************************************************************!*\
+  !*** ./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& ***!
+  \***************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_style_index_0_id_5b6abe5d_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=style&index=0&id=5b6abe5d&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -53237,6 +54361,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_teamInfo_vue_vue_type_template_id_0a8a1876_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_teamInfo_vue_vue_type_template_id_0a8a1876_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./teamInfo.vue?vue&type=template&id=0a8a1876&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/teamInfo.vue?vue&type=template&id=0a8a1876&scoped=true&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true& ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_test_vue_vue_type_template_id_5b6abe5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./test.vue?vue&type=template&id=5b6abe5d&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true&");
 
 
 /***/ }),
@@ -54432,986 +55573,1051 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex", attrs: { id: "component" } }, [
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "site" } }, [
-              _vm._v(_vm._s(_vm.$t("site")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.site,
-                    expression: "site"
-                  }
-                ],
-                staticClass: "form-select",
-                attrs: { name: "site", id: "site" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[0], function(site) {
-                  return [
-                    _c("option", { domProps: { value: site.name } }, [
-                      _vm._v(
-                        "\n                            " +
-                          _vm._s(site.name) +
-                          "\n                        "
-                      )
-                    ])
-                  ]
-                })
-              ],
-              2
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.productionline,
-                    expression: "productionline"
-                  }
-                ],
-                staticClass: "form-select",
-                attrs: { name: "productionline", id: "productionline" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.productionline = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[1], function(productionline) {
-                  return [
-                    productionline.name === _vm.site
-                      ? [
-                          _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: productionline.productionline_name
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(productionline.productionline_name) +
-                                  "\n                            "
-                              )
-                            ]
-                          )
-                        ]
-                      : _vm._e()
-                  ]
-                })
-              ],
-              2
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: _vm.lo },
-          on: {
-            click: function($event) {
-              return _vm.load()
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1 && _vm.allEvents["PP"] !== null
-          ? [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col" }, [
-                  _c("p", [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("plantOperatingTime")) +
-                        " :"
-                    ),
-                    _vm._v(" mn "),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("plannedProductionTime")) +
-                        " : "
-                    ),
-                    _vm._v("mn "),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("loadFactor")) +
-                        " :"
-                    ),
-                    _vm._v(" % "),
-                    _c("br")
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col" }, [
-                  _c("p", [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("volumePacked")) +
-                        " : " +
-                        _vm._s(_vm.littersProduced) +
-                        " L "
-                    ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("numberOfProductionOrder")) +
-                        " : " +
-                        _vm._s(_vm.allEvents["SITE"].length) +
-                        " "
-                    ),
-                    _c("br"),
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("numberOfItemsProduced")) +
-                        " : " +
-                        _vm._s(_vm.qtyProduced) +
-                        "  " +
-                        _vm._s(_vm.$t("bottles")) +
-                        " "
-                    ),
-                    _c("br")
-                  ])
-                ])
+  return _c("div", { attrs: { id: "component" } }, [
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("div", {}, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [
+                _vm._v(_vm._s(_vm.$t("site")) + " : ")
               ]),
               _vm._v(" "),
-              _c("div", {}, [
-                _c("table", { staticClass: "table" }, [
-                  _c("thead", [
-                    _c("tr", [
-                      _c("th", { attrs: { scope: "col" } }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
                         _vm._v(
-                          " " +
-                            _vm._s(_vm.$t("plannedDowntime")) +
-                            "  (" +
-                            _vm._s(_vm.$t("prioritizeList")) +
-                            ")"
+                          "\n                                " +
+                            _vm._s(site.name) +
+                            "\n                            "
                         )
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")) + " ")
                       ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("tbody", [
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "1. " +
-                              _vm._s(_vm.$t("noProductionPlanned")) +
-                              " (PP)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["PP"][0].Duration === null
-                          ? [_c("td", [_vm._v("0 mn")])]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["PP"][0].Duration) +
-                                    " mn"
-                                )
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "2. " +
-                              _vm._s(_vm.$t("plannedMaintenanceActivites")) +
-                              " (PM)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["PM"][0].Duration === null
-                          ? [_c("td", [_vm._v("0 mn")])]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["PM"][0].Duration) +
-                                    " mn"
-                                )
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "3. " +
-                              _vm._s(_vm.$t("capitalProjectImplementation")) +
-                              " (CP)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["CP"][0].Duration === null
-                          ? [_c("td", [_vm._v("0 mn")])]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["CP"][0].Duration) +
-                                    " mn"
-                                )
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "4. " +
-                              _vm._s(_vm.$t("breaksMeetingShiftChange")) +
-                              " (BM)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["BM"][0].Duration === null
-                          ? [_c("td", [_vm._v("0 mn")])]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["BM"][0].Duration) +
-                                    " mn"
-                                )
-                              ])
-                            ]
-                      ],
-                      2
-                    )
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", {}, [
-                _c("table", { staticClass: "table" }, [
-                  _c("thead", [
-                    _c("tr", [
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("unplannedDowntime")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("numberOfEvents")))
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("tbody", [
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "1. " + _vm._s(_vm.$t("cleaningInPlace")) + " (CIP)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["CIP"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["CIP"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["CIP"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "2. " + _vm._s(_vm.$t("changeoOver")) + " (COV)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["COV"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["COV"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["COV"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "3. " +
-                              _vm._s(_vm.$t("batchNumberChange")) +
-                              " (BNC)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["BNC"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["BNC"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["BNC"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "4. " +
-                              _vm._s(_vm.$t("unplannedExternalEvents")) +
-                              " (UEE)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["UEE"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["UEE"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["UEE"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "5. " +
-                              _vm._s(_vm.$t("unplannedShutdownOfMachine")) +
-                              " (USM)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["USM"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["USM"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["USM"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "6. " +
-                              _vm._s(_vm.$t("fillerUnplannedShutdown")) +
-                              " (UEE)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["FUS"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["FUS"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["FUS"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    )
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("div", {}, [
-                _c("table", { staticClass: "table" }, [
-                  _c("thead", [
-                    _c("tr", [
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("speedl    osses")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("numberOfEvents")))
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("tbody", [
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "1. " +
-                              _vm._s(_vm.$t("reducedRateAtFiller")) +
-                              " (RRF)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["RRF"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["RRF"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["RRF"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "2. " +
-                              _vm._s(_vm.$t("reducedRateAtAnOtherMachine")) +
-                              " (RRM)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["RRM"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["RRM"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["RRM"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "3. " +
-                              _vm._s(_vm.$t("fillerOwnStoppage")) +
-                              " (FOS)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["FOS"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["FOS"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["FOS"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "tr",
-                      [
-                        _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(
-                            "4. " +
-                              _vm._s(
-                                _vm.$t("fillerOwnStoppageByAnOtherMachine")
-                              ) +
-                              "(FSM)"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.allEvents["FSM"][0].Duration === null
-                          ? [
-                              _c("td", [_vm._v("0 mn")]),
-                              _vm._v(" "),
-                              _c("td", [_vm._v("0")])
-                            ]
-                          : [
-                              _c("td", [
-                                _vm._v(
-                                  _vm._s(_vm.allEvents["FSM"][0].Duration) +
-                                    " mn"
-                                )
-                              ]),
-                              _vm._v(" "),
-                              _c("td", [
-                                _vm._v(_vm._s(_vm.allEvents["FSM"][0].nbEvents))
-                              ])
-                            ]
-                      ],
-                      2
-                    )
-                  ])
-                ])
-              ])
-            ]
-          : _vm._e()
-      ],
-      2
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
-        _c("h1", [
-          _vm._v(
-            "\n            " +
-              _vm._s(_vm.$t("productionShift")) +
-              "\n\n        "
-          )
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "startingPO" } }, [
-            _vm._v(_vm._s(_vm.$t("from")))
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
           ]),
           _vm._v(" "),
+          _c("div", {}, [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
           _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.beginningDate,
-                expression: "beginningDate"
-              }
-            ],
-            staticClass: " ",
-            attrs: { type: "date", id: "startingPO", required: "" },
-            domProps: { value: _vm.beginningDate },
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button", value: _vm.lo },
             on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.beginningDate = $event.target.value
+              click: function($event) {
+                return _vm.load()
               }
             }
           }),
           _vm._v(" "),
-          _c("label", { attrs: { for: "endingPO" } }, [
-            _vm._v(_vm._s(_vm.$t("to")))
-          ]),
+          _c("br"),
           _vm._v(" "),
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.endingDate,
-                expression: "endingDate"
-              }
-            ],
-            attrs: { type: "date", id: "endingPO", required: "" },
-            domProps: { value: _vm.endingDate },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.endingDate = $event.target.value
-              }
-            }
-          })
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("div", { attrs: { id: "squareZone" } }, [
+          _vm.show === 1
+            ? [
                 _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col" }, [
-                    _c("canvas", {
-                      attrs: { id: "can", width: "200", height: "200" }
-                    }),
-                    _vm._v(" "),
-                    _c("h5", [_vm._v(_vm._s(_vm.$t("formVolumeSplit")))])
+                  _c("div", { staticClass: "col-sm" }, [
+                    _c("p", [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("plantOperatingTime")) +
+                          " :"
+                      ),
+                      _vm._v(" mn\n                            "),
+                      _c("br"),
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("plannedProductionTime")) +
+                          " :\n                            "
+                      ),
+                      _vm._v("\n                            mn "),
+                      _c("br"),
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("loadFactor")) +
+                          " :"
+                      ),
+                      _vm._v(" % "),
+                      _c("br")
+                    ])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "col" }, [
-                    _c("canvas", {
-                      attrs: { id: "can2", width: "200", height: "200" }
-                    }),
+                  _c("div", { staticClass: "col-sm" }, [
+                    _c("p", [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("volumePacked")) +
+                          " : " +
+                          _vm._s(_vm.littersProduced) +
+                          " L "
+                      ),
+                      _c("br"),
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("numberOfProductionOrder")) +
+                          " : " +
+                          _vm._s(_vm.allEvents["SITE"].length) +
+                          " "
+                      ),
+                      _c("br"),
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.$t("numberOfItemsProduced")) +
+                          " : " +
+                          _vm._s(_vm.qtyProduced) +
+                          " " +
+                          _vm._s(_vm.$t("bottles")) +
+                          " "
+                      ),
+                      _c("br")
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", {}, [
+                  _c("table", { staticClass: "table" }, [
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(
+                            " " +
+                              _vm._s(_vm.$t("plannedDowntime")) +
+                              " (" +
+                              _vm._s(_vm.$t("prioritizeList")) +
+                              ")"
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                        ])
+                      ])
+                    ]),
                     _vm._v(" "),
-                    _c("h5", [_vm._v(_vm._s(_vm.$t("packSizeSplit")))])
+                    _c("tbody", [
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "1. " +
+                                _vm._s(_vm.$t("noProductionPlanned")) +
+                                " (PP)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["PP"] === 0 ||
+                          _vm.allEvents["PP"][0].Duration === null
+                            ? [_c("td", [_vm._v("0 mn")])]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["PP"][0].Duration) +
+                                      " mn"
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "2. " +
+                                _vm._s(_vm.$t("plannedMaintenanceActivites")) +
+                                " (PM)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["PM"] === 0 ||
+                          _vm.allEvents["PM"][0].Duration === null
+                            ? [_c("td", [_vm._v("0 mn")])]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["PM"][0].Duration) +
+                                      " mn"
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "3. " +
+                                _vm._s(_vm.$t("capitalProjectImplementation")) +
+                                " (CP)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["CP"] === 0 ||
+                          _vm.allEvents["CP"][0].Duration === null
+                            ? [_c("td", [_vm._v("0 mn")])]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["CP"][0].Duration) +
+                                      " mn"
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "4. " +
+                                _vm._s(_vm.$t("breaksMeetingShiftChange")) +
+                                " (BM)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["BM"] === 0 ||
+                          _vm.allEvents["BM"][0].Duration === null
+                            ? [_c("td", [_vm._v("0 mn")])]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["BM"][0].Duration) +
+                                      " mn"
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      )
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", {}, [
+                  _c("table", { staticClass: "table" }, [
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("unplannedDowntime")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("numberOfEvents")))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tbody", [
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "1. " +
+                                _vm._s(_vm.$t("cleaningInPlace")) +
+                                " (CIP)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["CIP"] === 0 ||
+                          _vm.allEvents["CIP"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["CIP"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["CIP"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "2. " + _vm._s(_vm.$t("changeoOver")) + " (COV)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["COV"] === 0 ||
+                          _vm.allEvents["COV"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["COV"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["COV"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "3. " +
+                                _vm._s(_vm.$t("batchNumberChange")) +
+                                " (BNC)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["BNC"] === 0 ||
+                          _vm.allEvents["BNC"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["BNC"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["BNC"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "4. " +
+                                _vm._s(_vm.$t("unplannedExternalEvents")) +
+                                " (UEE)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["UEE"] === 0 ||
+                          _vm.allEvents["UEE"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["UEE"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["UEE"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "5. " +
+                                _vm._s(_vm.$t("unplannedShutdownOfMachine")) +
+                                " (USM)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["USM"] === 0 ||
+                          _vm.allEvents["USM"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["USM"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["USM"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "6. " +
+                                _vm._s(_vm.$t("fillerUnplannedShutdown")) +
+                                " (UEE)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["FUS"] === 0 ||
+                          _vm.allEvents["FUS"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FUS"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FUS"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      )
+                    ])
                   ])
                 ]),
                 _vm._v(" "),
                 _c("br"),
                 _vm._v(" "),
-                _c("h5", [
-                  _vm._v(_vm._s(_vm.$t("plantOperatingTimeOverview")) + " ")
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row rect", attrs: { id: "rect1" } }, [
-                  _c("p", { staticClass: "blueBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("plannedProductionTime")) +
-                        " (PPT)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "greenBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("plannedDowntime")) +
-                        " (PD)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", [
-                    _vm._v(
-                      "\n\n                        " +
-                        _vm._s(
-                          (
-                            (_vm.plannedDowntimes / _vm.plannedProductionTime) *
-                            100
-                          ).toFixed(2)
-                        ) +
-                        "%\n                    "
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row rect", attrs: { id: "rect2" } }, [
-                  _c("p", { staticClass: "blueBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("operatingTime")) +
-                        " (OT)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "redBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("unplannedDowntime")) +
-                        " (UD)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", [
-                    _vm._v(
-                      "\n\n                        " +
-                        _vm._s(
-                          (
-                            (_vm.unplannedDowntimes / _vm.operatingTime) *
-                            100
-                          ).toFixed(2)
-                        ) +
-                        "%\n                    "
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row rect", attrs: { id: "rect3" } }, [
-                  _c("p", { staticClass: "blueBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("netOperatingTime")) +
-                        " (NOT)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "redBack" }, [
-                    _vm._v(
-                      "\n                       " +
-                        _vm._s(_vm.$t("speedLosses")) +
-                        " (SL)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s((_vm.performance * 100).toFixed(2)) +
-                        "%\n                    "
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row rect", attrs: { id: "rect4" } }, [
-                  _c("p", { staticClass: "blueBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("valuableOperatingTime")) +
-                        " (VOT)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "redBack" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.$t("qualityLosses")) +
-                        " (QL)\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("p", [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s((_vm.quality * 100).toFixed(2)) +
-                        "%\n                    "
-                    )
+                _c("div", {}, [
+                  _c("table", { staticClass: "table" }, [
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("speedl osses")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("duration(Minutes)")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("numberOfEvents")))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tbody", [
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "1. " +
+                                _vm._s(_vm.$t("reducedRateAtFiller")) +
+                                " (RRF)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["RRF"] === 0 ||
+                          _vm.allEvents["RRF"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["RRF"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["RRF"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "2. " +
+                                _vm._s(_vm.$t("reducedRateAtAnOtherMachine")) +
+                                " (RRM)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["RRM"] === 0 ||
+                          _vm.allEvents["RRM"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["RRM"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["RRM"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "3. " +
+                                _vm._s(_vm.$t("fillerOwnStoppage")) +
+                                " (FOS)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["FOS"] === 0 ||
+                          _vm.allEvents["FOS"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FOS"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FOS"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "tr",
+                        [
+                          _c("th", { attrs: { scope: "row" } }, [
+                            _vm._v(
+                              "4. " +
+                                _vm._s(
+                                  _vm.$t("fillerOwnStoppageByAnOtherMachine")
+                                ) +
+                                "(FSM)"
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.allEvents["FSM"] === 0 ||
+                          _vm.allEvents["FSM"][0].Duration === null
+                            ? [
+                                _c("td", [_vm._v("0 mn")]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v("0")])
+                              ]
+                            : [
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FSM"][0].Duration) +
+                                      " mn"
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(
+                                    _vm._s(_vm.allEvents["FSM"][0].nbEvents)
+                                  )
+                                ])
+                              ]
+                        ],
+                        2
+                      )
+                    ])
                   ])
                 ])
-              ])
-            ]
-          : _vm._e(),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex zoneDessin" }, [
-          _c(
-            "div",
-            { staticClass: "container" },
-            [
-              _c("canvas", { attrs: { id: "Availability" } }),
-              _vm._v(" "),
-              _vm.show === 1
-                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("availability")))])]
-                : _vm._e()
-            ],
-            2
-          ),
+              ]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("h1", [
+            _vm._v(
+              "\n                " +
+                _vm._s(_vm.$t("downtimesReport")) +
+                "\n            "
+            )
+          ]),
           _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "container" },
-            [
-              _c("canvas", { attrs: { id: "Performance" } }),
-              _vm._v(" "),
-              _vm.show === 1
-                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("performance")))])]
-                : _vm._e()
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex zoneDessin" }, [
           _c("br"),
           _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "container" },
-            [
-              _c("canvas", { attrs: { id: "Quality" } }),
-              _vm._v(" "),
-              _vm.show === 1
-                ? [_c("h5", [_vm._v(_vm._s(_vm.$t("quality")))])]
-                : _vm._e()
-            ],
-            2
-          ),
+          _c("div", {}, [
+            _c("label", { attrs: { for: "startingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("from")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.beginningDate,
+                  expression: "beginningDate"
+                }
+              ],
+              staticClass: " ",
+              attrs: { type: "date", id: "startingPO", required: "" },
+              domProps: { value: _vm.beginningDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.beginningDate = $event.target.value
+                }
+              }
+            }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "endingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("to")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.endingDate,
+                  expression: "endingDate"
+                }
+              ],
+              attrs: { type: "date", id: "endingPO", required: "" },
+              domProps: { value: _vm.endingDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.endingDate = $event.target.value
+                }
+              }
+            })
+          ]),
           _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "container" },
-            [
-              _c("canvas", { attrs: { id: "OLE" } }),
-              _vm._v(" "),
-              _vm.show === 1 ? [_c("h5", [_vm._v("OLE")])] : _vm._e()
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("br")
-      ],
-      2
-    )
+          _vm.show === 1
+            ? [
+                _c("div", { attrs: { id: "squareZone" } }, [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-sm" }, [
+                      _c("canvas", {
+                        attrs: { id: "can", width: "100", height: "100" }
+                      }),
+                      _vm._v(" "),
+                      _c("h5", [_vm._v(_vm._s(_vm.$t("formVolumeSplit")))])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-sm" }, [
+                      _c("canvas", {
+                        attrs: { id: "can2", width: "100", height: "100" }
+                      }),
+                      _vm._v(" "),
+                      _c("h5", [_vm._v(_vm._s(_vm.$t("packSizeSplit")))])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c("h5", [
+                    _vm._v(_vm._s(_vm.$t("plantOperatingTimeOverview")) + " ")
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "row rect", attrs: { id: "rect1" } },
+                    [
+                      _c("p", { staticClass: "blueBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("plannedProductionTime")) +
+                            " (PPT)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "greenBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("plannedDowntime")) +
+                            " (PD)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _vm.plannedProductionTime === 0
+                        ? _c("p", [
+                            _vm._v(
+                              "\n                            0.00%\n\n                        "
+                            )
+                          ])
+                        : _c("p", [
+                            _vm._v(
+                              "\n\n                            " +
+                                _vm._s(
+                                  (
+                                    (_vm.plannedDowntimes /
+                                      _vm.plannedProductionTime) *
+                                    100
+                                  ).toFixed(2)
+                                ) +
+                                "%\n                        "
+                            )
+                          ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "row rect", attrs: { id: "rect2" } },
+                    [
+                      _c("p", { staticClass: "blueBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("operatingTime")) +
+                            " (OT)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "redBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("unplannedDowntime")) +
+                            " (UD)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _vm.operatingTime === 0
+                        ? _c("p", [
+                            _vm._v(
+                              "\n                            0.00%\n                        "
+                            )
+                          ])
+                        : _c("p", [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(
+                                  (
+                                    (_vm.unplannedDowntimes /
+                                      _vm.operatingTime) *
+                                    100
+                                  ).toFixed(2)
+                                ) +
+                                "%\n                        "
+                            )
+                          ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "row rect", attrs: { id: "rect3" } },
+                    [
+                      _c("p", { staticClass: "blueBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("netOperatingTime")) +
+                            " (NOT)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "redBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("speedLosses")) +
+                            " (SL)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _vm.speedLosses === 0
+                        ? _c("p", [
+                            _vm._v(
+                              "\n                            0.00%\n                        "
+                            )
+                          ])
+                        : _c("p", [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(
+                                  (
+                                    (_vm.netOperatingTime / _vm.speedLosses) *
+                                    100
+                                  ).toFixed(2)
+                                ) +
+                                "%\n                        "
+                            )
+                          ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "row rect", attrs: { id: "rect4" } },
+                    [
+                      _c("p", { staticClass: "blueBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("valuableOperatingTime")) +
+                            " (VOT)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("p", { staticClass: "redBack" }, [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(_vm.$t("qualityLosses")) +
+                            " (QL)\n                        "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("p", [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s((_vm.quality * 100).toFixed(2)) +
+                            "%\n                        "
+                        )
+                      ])
+                    ]
+                  )
+                ])
+              ]
+            : _vm._e()
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row zoneDessin" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("canvas", { attrs: { id: "Availability" } }),
+          _vm._v(" "),
+          _vm.show === 1
+            ? [_c("h5", [_vm._v(_vm._s(_vm.$t("availability")))])]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("canvas", { attrs: { id: "Performance" } }),
+          _vm._v(" "),
+          _vm.show === 1
+            ? [_c("h5", [_vm._v(_vm._s(_vm.$t("performance")))])]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("canvas", { attrs: { id: "Quality" } }),
+          _vm._v(" "),
+          _vm.show === 1
+            ? [_c("h5", [_vm._v(_vm._s(_vm.$t("quality")))])]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _c("canvas", { attrs: { id: "OLE" } }),
+          _vm._v(" "),
+          _vm.show === 1 ? [_c("h5", [_vm._v("OLE")])] : _vm._e()
+        ],
+        2
+      )
+    ])
   ])
 }
 var staticRenderFns = []
@@ -57801,16 +59007,34 @@ var render = function() {
                             _vm._v(_vm._s(_vm.$t("availability")))
                           ]),
                           _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                (
-                                  (_vm.availability - _vm.availability2) *
-                                  100
-                                ).toFixed(2)
-                              ) + " %"
-                            )
-                          ])
+                          (
+                            (_vm.availability - _vm.availability2) *
+                            100
+                          ).toFixed(2) > 0
+                            ? _c("td", [
+                                _vm._v(
+                                  "\n                                    + " +
+                                    _vm._s(
+                                      (
+                                        (_vm.availability - _vm.availability2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
+                            : _c("td", [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(
+                                      (
+                                        (_vm.availability - _vm.availability2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
@@ -57818,16 +59042,33 @@ var render = function() {
                             _vm._v(_vm._s(_vm.$t("performance")))
                           ]),
                           _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                (
-                                  (_vm.performance - _vm.performance2) *
-                                  100
-                                ).toFixed(2)
-                              ) + " %"
-                            )
-                          ])
+                          ((_vm.performance - _vm.performance2) * 100).toFixed(
+                            2
+                          ) > 0
+                            ? _c("td", [
+                                _vm._v(
+                                  "\n                                    + " +
+                                    _vm._s(
+                                      (
+                                        (_vm.performance - _vm.performance2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
+                            : _c("td", [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(
+                                      (
+                                        (_vm.performance - _vm.performance2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
@@ -57835,13 +59076,31 @@ var render = function() {
                             _vm._v(_vm._s(_vm.$t("quality")))
                           ]),
                           _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                ((_vm.quality - _vm.quality2) * 100).toFixed(2)
-                              ) + " %"
-                            )
-                          ])
+                          ((_vm.quality - _vm.quality2) * 100).toFixed(2) > 0
+                            ? _c("td", [
+                                _vm._v(
+                                  "\n                                    + " +
+                                    _vm._s(
+                                      (
+                                        (_vm.quality - _vm.quality2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
+                            : _c("td", [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(
+                                      (
+                                        (_vm.quality - _vm.quality2) *
+                                        100
+                                      ).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
                         ]),
                         _vm._v(" "),
                         _c("tr", [
@@ -57849,12 +59108,25 @@ var render = function() {
                             _vm._v("OLE")
                           ]),
                           _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(((_vm.OLE - _vm.OLE2) * 100).toFixed(2)) +
-                                " %"
-                            )
-                          ])
+                          ((_vm.OLE - _vm.OLE2) * 100).toFixed(2) > 0
+                            ? _c("td", [
+                                _vm._v(
+                                  "\n                                    + " +
+                                    _vm._s(
+                                      ((_vm.OLE - _vm.OLE2) * 100).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
+                            : _c("td", [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(
+                                      ((_vm.OLE - _vm.OLE2) * 100).toFixed(2)
+                                    ) +
+                                    " %\n                                "
+                                )
+                              ])
                         ])
                       ])
                     ])
@@ -57916,314 +59188,309 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex" }, [
-    _c("br"),
+  return _c("div", [
+    _c("div", { staticClass: "d-flex" }, [
+      _c("br"),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col" },
+        [
+          _c("div", { staticClass: "d-flex" }, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [
+                _vm._v(_vm._s(_vm.$t("site")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(site.name) +
+                            "\n                            "
+                        )
+                      ])
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("div", { staticClass: "d-flex" }, [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button", value: _vm.lo },
+            on: {
+              click: function($event) {
+                return _vm.load()
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _vm.show === 1
+            ? [
+                _c("h2", { staticStyle: { "padding-bottom": "-30px" } }, [
+                  _vm._v(_vm._s(_vm.$t("flowDiagram")))
+                ])
+              ]
+            : _vm._e()
+        ],
+        2
+      )
+    ]),
     _vm._v(" "),
     _c(
       "div",
-      { staticClass: "col" },
+      { staticClass: "d-flex", staticStyle: { "margin-top": "-30px" } },
       [
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "site" } }, [
-              _vm._v(_vm._s(_vm.$t("site")) + "  : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.site,
-                    expression: "site"
-                  }
-                ],
-                staticClass: "form-select",
-                attrs: { name: "site", id: "site" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[0], function(site) {
-                  return [
-                    _c("option", { domProps: { value: site.name } }, [
-                      _vm._v(
-                        "\n                            " +
-                          _vm._s(site.name) +
-                          "\n                        "
+        _c("div", { attrs: { id: "flowDiagram" } }),
+        _vm._v(" "),
+        _c(
+          "div",
+          { attrs: { align: "center" } },
+          [
+            _vm.show === 1
+              ? [
+                  _c("h2", [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.$t("machineList")) +
+                        "\n                "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "table-info-data" }, [
+                    _c("table", { staticClass: "table" }, [
+                      _c("thead", [
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "col" } }),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("machine")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("operation")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("provider")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("model")))
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.machines[0], function(machine) {
+                            return [
+                              _c("tr", [
+                                _c("th", { attrs: { scope: "row" } }, [
+                                  _vm._v(_vm._s(machine.denomination_ordre))
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(machine.name))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(machine.operation))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(machine.fabricant))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(machine.modele))])
+                              ])
+                            ]
+                          })
+                        ],
+                        2
                       )
                     ])
-                  ]
-                })
-              ],
-              2
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v(_vm._s(_vm.$t("productionLine")) + "  : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.productionline,
-                    expression: "productionline"
-                  }
-                ],
-                staticClass: "form-select",
-                attrs: { name: "productionline", id: "productionline" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.productionline = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[1], function(productionline) {
-                  return [
-                    productionline.name === _vm.site
-                      ? [
-                          _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: productionline.productionline_name
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(productionline.productionline_name) +
-                                  "\n                            "
-                              )
+                  ]),
+                  _vm._v(" "),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c("h2", [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm.$t("formatList")) +
+                        "\n                "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "table-info-data" }, [
+                    _c("table", { staticClass: "table" }, [
+                      _c("thead", [
+                        _c("tr", [
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("format")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("form")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("mat1")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("mat2")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("mat3")))
+                          ]),
+                          _vm._v(" "),
+                          _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(_vm.$t("designRate")))
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.machines[1], function(format) {
+                            return [
+                              _c("tr", [
+                                _c("th", { attrs: { scope: "row" } }, [
+                                  _vm._v(_vm._s(format.format))
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(_vm._s(_vm.$t(format.shape)))
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(format.mat1))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(format.mat2))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(format.mat3))]),
+                                _vm._v(" "),
+                                _c("td", [_vm._v(_vm._s(format.design_rate))])
+                              ])
                             ]
-                          )
-                        ]
-                      : _vm._e()
-                  ]
-                })
-              ],
-              2
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: _vm.lo },
-          on: {
-            click: function($event) {
-              return _vm.load()
-            }
-          }
-        }),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("br"),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("h2", [_vm._v(_vm._s(_vm.$t("flowDiagram")))]),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("img", {
-                attrs: {
-                  src: "images/diagram.png",
-                  alt: "",
-                  width: "80%",
-                  height: "40%"
-                }
-              })
-            ]
-          : _vm._e()
-      ],
-      2
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
-        _c("h1", [
-          _vm._v(
-            "\n            " + _vm._s(_vm.$t("packagingLineID")) + "\n        "
-          )
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("h2", [
-                _vm._v(
-                  "\n                " +
-                    _vm._s(_vm.$t("machineList")) +
-                    "\n            "
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "table-info-data" }, [
-                _c("table", { staticClass: "table" }, [
-                  _c("thead", [
-                    _c("tr", [
-                      _c("th", { attrs: { scope: "col" } }),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("machine")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("operation")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("provider")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("model")))
-                      ])
+                          })
+                        ],
+                        2
+                      )
                     ])
                   ]),
                   _vm._v(" "),
-                  _c(
-                    "tbody",
-                    [
-                      _vm._l(_vm.machines[0], function(machine) {
-                        return [
-                          _c("tr", [
-                            _c("th", { attrs: { scope: "row" } }, [
-                              _vm._v(_vm._s(machine.denomination_ordre))
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(machine.name))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(machine.operation))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(machine.fabricant))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(machine.modele))])
-                          ])
-                        ]
-                      })
-                    ],
-                    2
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("br"),
-              _vm._v(" "),
-              _c("h2", [
-                _vm._v(
-                  "\n                " +
-                    _vm._s(_vm.$t("formatList")) +
-                    "\n            "
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "table-info-data" }, [
-                _c("table", { staticClass: "table" }, [
-                  _c("thead", [
-                    _c("tr", [
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("format")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("form")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("mat1")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("mat2")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("mat3")))
-                      ]),
-                      _vm._v(" "),
-                      _c("th", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(_vm.$t("designRate")))
-                      ])
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "tbody",
-                    [
-                      _vm._l(_vm.machines[1], function(format) {
-                        return [
-                          _c("tr", [
-                            _c("th", { attrs: { scope: "row" } }, [
-                              _vm._v(_vm._s(format.format))
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(format.shape))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(format.mat1))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(format.mat2))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(format.mat3))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(format.design_rate))])
-                          ])
-                        ]
-                      })
-                    ],
-                    2
-                  )
-                ])
-              ]),
-              _vm._v(" "),
-              _c("br")
-            ]
-          : _vm._e()
-      ],
-      2
+                  _c("br")
+                ]
+              : _vm._e()
+          ],
+          2
+        )
+      ]
     )
   ])
 }
@@ -58496,16 +59763,14 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex" }, [
-    _c("br"),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
-        _c("div", { staticClass: "d-flex" }, [
+  return _c("div", { attrs: { id: "component" } }, [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", {}, [
           _c("form", [
-            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
+            _c("label", { attrs: { for: "site" } }, [
+              _vm._v(_vm._s(_vm.$t("site")) + " : ")
+            ]),
             _vm._v(" "),
             _c(
               "select",
@@ -58541,9 +59806,9 @@ var render = function() {
                   return [
                     _c("option", { domProps: { value: site.name } }, [
                       _vm._v(
-                        "\n                            " +
+                        "\n                                " +
                           _vm._s(site.name) +
-                          "\n                        "
+                          "\n                            "
                       )
                     ])
                   ]
@@ -58554,7 +59819,7 @@ var render = function() {
           ])
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
+        _c("div", {}, [
           _c("form", [
             _c("label", { attrs: { for: "productionline" } }, [
               _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
@@ -58603,9 +59868,9 @@ var render = function() {
                             },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(productionline.productionline_name) +
-                                  "\n                            "
+                                  "\n                                "
                               )
                             ]
                           )
@@ -58623,7 +59888,7 @@ var render = function() {
         _vm._v(" "),
         _c("input", {
           staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: "Charger" },
+          attrs: { type: "button", value: _vm.lo },
           on: {
             click: function($event) {
               return _vm.load()
@@ -58631,336 +59896,21 @@ var render = function() {
           }
         }),
         _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("h1", [
-                _vm._v(
-                  "\n                " +
-                    _vm._s(_vm.$t("formulationSplit")) +
-                    "\n            "
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "table-info-data" }, [
-                _c("table", { staticClass: "table" }, [
-                  _vm._m(0),
-                  _vm._v(" "),
-                  _c(
-                    "tbody",
-                    [
-                      _vm._l(_vm.formulations, function(formulation, index) {
-                        return _c("tr", { key: index }, [
-                          _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v(_vm._s(formulation))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["January"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.formulationsPerMonth[index]["February"]
-                              )
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["March"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["April"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["May"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["June"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["July"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["August"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.formulationsPerMonth[index]["September"]
-                              )
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.formulationsPerMonth[index]["October"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.formulationsPerMonth[index]["November"]
-                              )
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(
-                                _vm.formulationsPerMonth[index]["December"]
-                              )
-                            )
-                          ])
-                        ])
-                      }),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { attrs: { scope: "row" } }),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["January"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["February"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["March"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["April"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["May"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["June"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth[0]["July"]))]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["August"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["September"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["October"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["November"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth[0]["December"]))
-                        ])
-                      ])
-                    ],
-                    2
-                  )
-                ])
-              ])
-            ]
-          : _vm._e(),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm._m(1),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("h1", [
-                _vm._v(
-                  "\n                " +
-                    _vm._s(_vm.$t("packSizeSplit")) +
-                    "\n            "
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "table-info-data" }, [
-                _c("table", { staticClass: "table" }, [
-                  _vm._m(2),
-                  _vm._v(" "),
-                  _c(
-                    "tbody",
-                    [
-                      _vm._l(_vm.packsizes, function(packsize, index) {
-                        return _c("tr", { key: index }, [
-                          _c("th", { attrs: { scope: "row" } }, [
-                            _vm._v(_vm._s(packsize) + "L")
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["January"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["February"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["March"]))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["April"]))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["May"]))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["June"]))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(_vm.packsizePerMonth[index]["July"]))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["August"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["September"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["October"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["November"])
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(_vm.packsizePerMonth[index]["December"])
-                            )
-                          ])
-                        ])
-                      }),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { attrs: { scope: "row" } }),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["January"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["February"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["March"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["April"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["May"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["June"]))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2[0]["July"]))]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["August"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["September"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["October"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["November"]))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(_vm.sumPerMonth2[0]["December"]))
-                        ])
-                      ])
-                    ],
-                    2
-                  )
-                ])
-              ])
-            ]
-          : _vm._e(),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm._m(3),
-        _vm._v(" "),
         _c("br")
-      ],
-      2
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "col" },
-      [
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
         _c("h1", [
           _vm._v(
-            "\n            " +
-              _vm._s(_vm.$t("productionShift")) +
-              "\n\n        "
+            "\n                " +
+              _vm._s(_vm.$t("productionDashboard")) +
+              "\n            "
           )
         ]),
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
+        _c("div", {}, [
           _c("label", { attrs: { for: "startingPO" } }, [
             _vm._v(_vm._s(_vm.$t("from")))
           ]),
@@ -59011,38 +59961,424 @@ var render = function() {
               }
             }
           })
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _vm.show === 1
-          ? [
-              _c("h1", [
-                _vm._v(
-                  "\n                " +
-                    _vm._s(_vm.$t("formulationSplit")) +
-                    " (%)\n            "
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formulationSplit")) +
+                      "\n                "
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  [
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(0),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.formulations, function(
+                            formulation,
+                            index
+                          ) {
+                            return _c("tr", { key: index }, [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(formulation))
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["January"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["February"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["March"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["April"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.formulationsPerMonth[index]["May"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["June"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["July"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["August"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["September"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["October"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["November"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["December"]
+                                  )
+                                )
+                              ])
+                            ])
+                          }),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("th", { attrs: { scope: "row" } }),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["January"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["February"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["March"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["April"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["May"]))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["June"]))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["July"]))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["August"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["September"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["October"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["November"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["December"]))
+                            ])
+                          ])
+                        ],
+                        2
+                      )
+                    ])
+                  ]
                 )
-              ])
-            ]
-          : _vm._e(),
-        _vm._v(" "),
-        _c("canvas", {
-          attrs: { id: "formulationSplit", width: "200", height: "200" }
-        }),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("canvas", {
-          attrs: { id: "packsizeSplit", width: "200", height: "200" }
-        })
-      ],
-      2
-    )
+              ]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formulationSplit")) +
+                      " (%)\n                "
+                  )
+                ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("canvas", {
+            attrs: { id: "formulationSplit", width: "100", height: "100" }
+          })
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _vm._m(1),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("packSizeSplit")) +
+                      "\n                "
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  [
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(2),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.packsizes, function(packsize, index) {
+                            return _c("tr", { key: index }, [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(packsize) + "L")
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["January"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["February"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["March"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["April"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["May"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["June"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["July"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["August"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["September"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["October"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["November"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["December"]
+                                  )
+                                )
+                              ])
+                            ])
+                          }),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("th", { attrs: { scope: "row" } }),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["January"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["February"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["March"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["April"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2["May"]))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["June"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["July"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["August"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["September"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["October"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["November"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["December"]))
+                            ])
+                          ])
+                        ],
+                        2
+                      )
+                    ])
+                  ]
+                )
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("br")
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formatSplit")) +
+                      " (%)\n                "
+                  )
+                ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("canvas", {
+            attrs: { id: "packsizeSplit", width: "100", height: "100" }
+          })
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _vm._m(3)
   ])
 }
 var staticRenderFns = [
@@ -59084,8 +60420,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "wrapper" }, [
-      _c("canvas", { attrs: { id: "myChart4" } })
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "wrapper" }, [
+        _c("canvas", { attrs: { id: "myChart4" } })
+      ])
     ])
   },
   function() {
@@ -59126,8 +60464,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "wrapper" }, [
-      _c("canvas", { attrs: { id: "myChart5" } })
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "wrapper" }, [
+        _c("canvas", { attrs: { id: "myChart5" } })
+      ])
     ])
   }
 ]
@@ -59716,6 +61056,736 @@ var staticRenderFns = [
         staticClass: "form-control-plaintext rcorners2 PO",
         attrs: { type: "text", name: "PO", placeholder: "PO" }
       })
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true&":
+/*!****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/test.vue?vue&type=template&id=5b6abe5d&scoped=true& ***!
+  \****************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { attrs: { id: "component" } }, [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", {}, [
+          _c("form", [
+            _c("label", { attrs: { for: "site" } }, [
+              _vm._v(_vm._s(_vm.$t("site")) + " : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.site,
+                    expression: "site"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "site", id: "site" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[0], function(site) {
+                  return [
+                    _c("option", { domProps: { value: site.name } }, [
+                      _vm._v(
+                        "\n                                " +
+                          _vm._s(site.name) +
+                          "\n                            "
+                      )
+                    ])
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", {}, [
+          _c("form", [
+            _c("label", { attrs: { for: "productionline" } }, [
+              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.productionline,
+                    expression: "productionline"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "productionline", id: "productionline" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.productionline = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[1], function(productionline) {
+                  return [
+                    productionline.name === _vm.site
+                      ? [
+                          _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: productionline.productionline_name
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                                    " +
+                                  _vm._s(productionline.productionline_name) +
+                                  "\n                                "
+                              )
+                            ]
+                          )
+                        ]
+                      : _vm._e()
+                  ]
+                })
+              ],
+              2
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("input", {
+          staticClass: "btn btn-outline-info",
+          attrs: { type: "button", value: _vm.lo },
+          on: {
+            click: function($event) {
+              return _vm.load()
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("br")
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
+        _c("h1", [
+          _vm._v(
+            "\n                " +
+              _vm._s(_vm.$t("productionDashboard")) +
+              "\n            "
+          )
+        ]),
+        _vm._v(" "),
+        _c("br"),
+        _vm._v(" "),
+        _c("div", {}, [
+          _c("label", { attrs: { for: "startingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("from")))
+          ]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.beginningDate,
+                expression: "beginningDate"
+              }
+            ],
+            staticClass: " ",
+            attrs: { type: "date", id: "startingPO", required: "" },
+            domProps: { value: _vm.beginningDate },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.beginningDate = $event.target.value
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("label", { attrs: { for: "endingPO" } }, [
+            _vm._v(_vm._s(_vm.$t("to")))
+          ]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.endingDate,
+                expression: "endingDate"
+              }
+            ],
+            attrs: { type: "date", id: "endingPO", required: "" },
+            domProps: { value: _vm.endingDate },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.endingDate = $event.target.value
+              }
+            }
+          })
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formulationSplit")) +
+                      "\n                "
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  [
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(0),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.formulations, function(
+                            formulation,
+                            index
+                          ) {
+                            return _c("tr", { key: index }, [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(formulation))
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["January"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["February"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["March"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["April"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.formulationsPerMonth[index]["May"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["June"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["July"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["August"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["September"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["October"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["November"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.formulationsPerMonth[index]["December"]
+                                  )
+                                )
+                              ])
+                            ])
+                          }),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("th", { attrs: { scope: "row" } }),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["January"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["February"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["March"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["April"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["May"]))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["June"]))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth["July"]))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["August"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["September"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["October"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["November"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth["December"]))
+                            ])
+                          ])
+                        ],
+                        2
+                      )
+                    ])
+                  ]
+                )
+              ]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formulationSplit")) +
+                      " (%)\n                "
+                  )
+                ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("canvas", {
+            attrs: { id: "formulationSplit", width: "100", height: "100" }
+          })
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _vm._m(1),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("packSizeSplit")) +
+                      "\n                "
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  [
+                    _c("table", { staticClass: "table" }, [
+                      _vm._m(2),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        [
+                          _vm._l(_vm.packsizes, function(packsize, index) {
+                            return _c("tr", { key: index }, [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(packsize) + "L")
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["January"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["February"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["March"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["April"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["May"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["June"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["July"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["August"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["September"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(_vm.packsizePerMonth[index]["October"])
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["November"]
+                                  )
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.packsizePerMonth[index]["December"]
+                                  )
+                                )
+                              ])
+                            ])
+                          }),
+                          _vm._v(" "),
+                          _c("tr", [
+                            _c("th", { attrs: { scope: "row" } }),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["January"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["February"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["March"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["April"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.sumPerMonth2["May"]))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["June"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["July"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["August"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["September"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["October"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["November"]))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.sumPerMonth2["December"]))
+                            ])
+                          ])
+                        ],
+                        2
+                      )
+                    ])
+                  ]
+                )
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("br")
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("h1", [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm.$t("formatSplit")) +
+                      " (%)\n                "
+                  )
+                ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("canvas", {
+            attrs: { id: "packsizeSplit", width: "100", height: "100" }
+          })
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _vm._m(3)
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jan")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Feb")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mar")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Apr")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("May")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jun")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jul")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Aug")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Sep")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Oct")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nov")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Dec")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "wrapper" }, [
+        _c("canvas", { attrs: { id: "myChart4" } })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jan")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Feb")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Mar")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Apr")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("May")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jun")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Jul")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Aug")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Sep")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Oct")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Nov")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Dec")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "wrapper" }, [
+        _c("canvas", { attrs: { id: "myChart5" } })
+      ])
     ])
   }
 ]
@@ -74779,7 +76849,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced"}');
 
 /***/ }),
 
@@ -74790,7 +76860,7 @@ module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choic
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production"}');
 
 /***/ }),
 

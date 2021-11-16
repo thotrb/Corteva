@@ -53,6 +53,7 @@
     "rejection" : "Rejection",
     "summary" : "Summary",
     "speedlosses" : "Speedlosses",
+    "speedLosses" : "Speedlosses",
     "indicators" : "Indicators",
     "availability" : "Availability",
     "productionLine" : "Production line",
@@ -96,7 +97,7 @@
     "model" : "Model",
     "formatList" : "Format List",
     "format" : "Format",
-    "form" : "form",
+    "form" : "Form",
     "mat1" : "Mat1",
     "mat2" : "Mat2",
     "mat3" : "Mat3",
@@ -124,7 +125,13 @@
     "downstreamSaturation" : "Downstream Saturation",
     "dosingTurret" : "Dosing Turret",
     "screwingTurret" : "Screwing Tuerret",
-    "year" : "Year"
+    "year" : "Year",
+    "square" : "Square",
+    "round" : "Round",
+    "formatSplit" : "Format split",
+    "nothingProduced" : "Nothing produced"
+
+
 
 
 }

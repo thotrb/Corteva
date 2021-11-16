@@ -1,445 +1,438 @@
 <template>
-    <div class="d-flex" id="component">
+    <div class="" id="component">
+        <!--{{allEvents['RRF']}}-->
+        <div class="row">
+            <div class="col-sm">
+                <div class="">
 
-        <!--
-
-
-                -->
-        <div class="col">
-
-            <div class="d-flex">
-
-                <form>
-                    <label class="" for="site">{{$t("site")}} : </label>
-                    <select name="site" id="site" class="form-select" v-model="site">
-                        <template v-for="site in sites[0]">
-                            <option v-bind:value="site.name">
-                                {{site.name}}
-                            </option>
-                        </template>
-                    </select>
-                </form>
-
-
-            </div>
-
-
-            <div class="d-flex">
-                <form>
-                    <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                    <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                        <template v-for="productionline in sites[1]">
-                            <template v-if="productionline.name === site">
-                                <option v-bind:value="productionline.productionline_name">
-                                    {{productionline.productionline_name}}
+                    <form>
+                        <label class="" for="site">{{$t("site")}} : </label>
+                        <select name="site" id="site" class="form-select" v-model="site">
+                            <template v-for="site in sites[0]">
+                                <option v-bind:value="site.name">
+                                    {{site.name}}
                                 </option>
                             </template>
-
-                        </template>
-
-                    </select>
-                </form>
-            </div>
+                        </select>
+                    </form>
 
 
-            <br/>
-            <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
-
-            <br/>
-            <br/>
-            <br/>
-
-            <template v-if="show===1 && allEvents['PP'] !== null">
-
-
-                <div class="row">
-
-                    <div class="col">
-                        <p>
-                            {{$t("plantOperatingTime")}} :<!-- {{ allEvents['POInfo'][0].plantOperatingTime}}--> mn <br/>
-                            {{$t("plannedProductionTime")}} : <!--{{ allEvents['POInfo'][0].plannedProductionTime}} -->mn <br/>
-                            {{$t("loadFactor")}} :<!-- {{ allEvents['POInfo'][0].loadFactor}}--> % <br/>
-                        </p>
-                    </div>
-
-                    <div class="col">
-
-                        <p>
-                            {{$t("volumePacked")}} : {{littersProduced}} L <br/>
-                            {{$t("numberOfProductionOrder")}} : {{ allEvents['SITE'].length}} <br/>
-                            {{$t("numberOfItemsProduced")}} : {{ qtyProduced }}  {{$t("bottles")}} <br/>
-
-                        </p>
-
-                    </div>
                 </div>
 
 
                 <div class="">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col"> {{$t("plannedDowntime")}}  ({{$t("prioritizeList")}})</th>
-                            <th scope="col">{{$t("duration(Minutes)")}} </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1. {{$t("noProductionPlanned")}} (PP)</th>
-                            <template v-if="allEvents['PP'][0].Duration === null">
-                                <td>0 mn</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['PP'][0].Duration}} mn</td>
+                    <form>
+                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
+                            <template v-for="productionline in sites[1]">
+                                <template v-if="productionline.name === site">
+                                    <option v-bind:value="productionline.productionline_name">
+                                        {{productionline.productionline_name}}
+                                    </option>
+                                </template>
+
                             </template>
 
-                        </tr>
-                        <tr>
-                            <th scope="row">2. {{$t("plannedMaintenanceActivites")}} (PM)</th>
-                            <template v-if="allEvents['PM'][0].Duration === null">
-                                <td>0 mn</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['PM'][0].Duration}} mn</td>
-                            </template>
-                        </tr>
-                        <tr>
-                            <th scope="row">3. {{$t("capitalProjectImplementation")}} (CP)</th>
-                            <template v-if="allEvents['CP'][0].Duration === null">
-                                <td>0 mn</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['CP'][0].Duration}} mn</td>
-                            </template>
-                        </tr>
-                        <tr>
-                            <th scope="row">4. {{$t("breaksMeetingShiftChange")}} (BM)</th>
-                            <template v-if="allEvents['BM'][0].Duration === null">
-                                <td>0 mn</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['BM'][0].Duration}} mn</td>
-                            </template>
-                        </tr>
-
-                        </tbody>
-                    </table>
+                        </select>
+                    </form>
                 </div>
 
 
-                <div class="">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">{{$t("unplannedDowntime")}}</th>
-                            <th scope="col">{{$t("duration(Minutes)")}}</th>
-                            <th scope="col">{{$t("numberOfEvents")}}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1. {{$t("cleaningInPlace")}} (CIP)</th>
-                            <template v-if="allEvents['CIP'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['CIP'][0].Duration}} mn</td>
-                                <td>{{allEvents['CIP'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">2. {{$t("changeoOver")}} (COV)</th>
-                            <template v-if="allEvents['COV'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['COV'][0].Duration}} mn</td>
-                                <td>{{allEvents['COV'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">3. {{$t("batchNumberChange")}} (BNC)</th>
-                            <template v-if="allEvents['BNC'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['BNC'][0].Duration}} mn</td>
-                                <td>{{allEvents['BNC'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">4. {{$t("unplannedExternalEvents")}} (UEE)</th>
-                            <template v-if="allEvents['UEE'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['UEE'][0].Duration}} mn</td>
-                                <td>{{allEvents['UEE'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">5. {{$t("unplannedShutdownOfMachine")}} (USM)</th>
-                            <template v-if="allEvents['USM'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['USM'][0].Duration}} mn</td>
-                                <td>{{allEvents['USM'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">6. {{$t("fillerUnplannedShutdown")}} (UEE)</th>
-                            <template v-if="allEvents['FUS'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['FUS'][0].Duration}} mn</td>
-                                <td>{{allEvents['FUS'][0].nbEvents}}</td>
-                            </template>
-
-                        </tr>
-
-                        </tbody>
-                    </table>
-                </div>
+                <br/>
+                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
 
                 <br/>
 
-                <div class="">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">{{$t("speedl    osses")}}</th>
-                            <th scope="col">{{$t("duration(Minutes)")}}</th>
-                            <th scope="col">{{$t("numberOfEvents")}}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1. {{$t("reducedRateAtFiller")}} (RRF)</th>
-                            <template v-if="allEvents['RRF'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
+                <template v-if="show===1">
 
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['RRF'][0].Duration}} mn</td>
-                                <td>{{allEvents['RRF'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">2. {{$t("reducedRateAtAnOtherMachine")}} (RRM)</th>
-                            <template v-if="allEvents['RRM'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['RRM'][0].Duration}} mn</td>
-                                <td>{{allEvents['RRM'][0].nbEvents}}</td>
-                            </template>
-
-
-                        </tr>
-                        <tr>
-                            <th scope="row">3. {{$t("fillerOwnStoppage")}} (FOS)</th>
-                            <template v-if="allEvents['FOS'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['FOS'][0].Duration}} mn</td>
-                                <td>{{allEvents['FOS'][0].nbEvents}}</td>
-                            </template>
-
-                        </tr>
-                        <tr>
-                            <th scope="row">4. {{$t("fillerOwnStoppageByAnOtherMachine")}}(FSM)</th>
-                            <template v-if="allEvents['FSM'][0].Duration === null">
-                                <td>0 mn</td>
-                                <td>0</td>
-
-                            </template>
-                            <template v-else>
-                                <td>{{allEvents['FSM'][0].Duration}} mn</td>
-                                <td>{{allEvents['FSM'][0].nbEvents}}</td>
-                            </template>
-
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </template>
-
-
-        </div>
-
-        <div class="col">
-            <h1>
-                {{$t("productionShift")}}
-
-            </h1>
-            <br/>
-            <div class="d-flex">
-                <label class="" for="startingPO">{{$t("from")}}</label>
-                <input type="date" id="startingPO" class=" " required v-model="beginningDate">
-
-
-                <label class="" for="endingPO">{{$t("to")}}</label>
-                <input type="date" id="endingPO" class=""
-                       required v-model="endingDate">
-            </div>
-
-            <br/>
-
-            <template v-if="show===1">
-
-                <div id="squareZone">
 
                     <div class="row">
-                        <div class="col">
-                            <canvas id="can" width="200" height="200"/>
-                            <h5>{{$t("formVolumeSplit")}}</h5>
+
+                        <div class="col-sm">
+                            <p>
+                                {{$t("plantOperatingTime")}} :<!-- {{ allEvents['POInfo'][0].plantOperatingTime}}--> mn
+                                <br/>
+                                {{$t("plannedProductionTime")}} :
+                                <!--{{ allEvents['POInfo'][0].plannedProductionTime}} -->
+                                mn <br/>
+                                {{$t("loadFactor")}} :<!-- {{ allEvents['POInfo'][0].loadFactor}}--> % <br/>
+                            </p>
                         </div>
 
-                        <div class="col">
-                            <canvas id="can2" width="200" height="200"/>
-                            <h5>{{$t("packSizeSplit")}}</h5>
+                        <div class="col-sm">
+
+                            <p>
+                                {{$t("volumePacked")}} : {{littersProduced}} L <br/>
+                                {{$t("numberOfProductionOrder")}} : {{ allEvents['SITE'].length}} <br/>
+                                {{$t("numberOfItemsProduced")}} : {{ qtyProduced }} {{$t("bottles")}} <br/>
+
+                            </p>
 
                         </div>
+                    </div>
 
+
+                    <div class="">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col"> {{$t("plannedDowntime")}} ({{$t("prioritizeList")}})</th>
+                                <th scope="col">{{$t("duration(Minutes)")}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr>
+                                <th scope="row">1. {{$t("noProductionPlanned")}} (PP)</th>
+                                <template v-if="allEvents['PP'] === 0 || allEvents['PP'][0].Duration === null">
+                                    <td>0 mn</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['PP'][0].Duration}} mn</td>
+                                </template>
+
+                            </tr>
+                            <tr>
+                                <th scope="row">2. {{$t("plannedMaintenanceActivites")}} (PM)</th>
+                                <template v-if="allEvents['PM'] === 0 || allEvents['PM'][0].Duration === null">
+                                    <td>0 mn</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['PM'][0].Duration}} mn</td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <th scope="row">3. {{$t("capitalProjectImplementation")}} (CP)</th>
+                                <template v-if="allEvents['CP'] === 0 || allEvents['CP'][0].Duration === null">
+                                    <td>0 mn</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['CP'][0].Duration}} mn</td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <th scope="row">4. {{$t("breaksMeetingShiftChange")}} (BM)</th>
+                                <template v-if="allEvents['BM'] === 0 || allEvents['BM'][0].Duration === null">
+                                    <td>0 mn</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['BM'][0].Duration}} mn</td>
+                                </template>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">{{$t("unplannedDowntime")}}</th>
+                                <th scope="col">{{$t("duration(Minutes)")}}</th>
+                                <th scope="col">{{$t("numberOfEvents")}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">1. {{$t("cleaningInPlace")}} (CIP)</th>
+                                <template v-if="allEvents['CIP'] === 0 || allEvents['CIP'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['CIP'][0].Duration}} mn</td>
+                                    <td>{{allEvents['CIP'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">2. {{$t("changeoOver")}} (COV)</th>
+                                <template v-if="allEvents['COV'] === 0 || allEvents['COV'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['COV'][0].Duration}} mn</td>
+                                    <td>{{allEvents['COV'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">3. {{$t("batchNumberChange")}} (BNC)</th>
+                                <template v-if="allEvents['BNC'] === 0 || allEvents['BNC'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['BNC'][0].Duration}} mn</td>
+                                    <td>{{allEvents['BNC'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">4. {{$t("unplannedExternalEvents")}} (UEE)</th>
+                                <template v-if="allEvents['UEE'] === 0 || allEvents['UEE'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['UEE'][0].Duration}} mn</td>
+                                    <td>{{allEvents['UEE'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">5. {{$t("unplannedShutdownOfMachine")}} (USM)</th>
+                                <template v-if="allEvents['USM'] === 0 || allEvents['USM'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['USM'][0].Duration}} mn</td>
+                                    <td>{{allEvents['USM'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">6. {{$t("fillerUnplannedShutdown")}} (UEE)</th>
+                                <template v-if="allEvents['FUS'] === 0 || allEvents['FUS'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['FUS'][0].Duration}} mn</td>
+                                    <td>{{allEvents['FUS'][0].nbEvents}}</td>
+                                </template>
+
+                            </tr>
+
+                            </tbody>
+                        </table>
                     </div>
 
                     <br/>
 
+                    <div class="">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">{{$t("speedl osses")}}</th>
+                                <th scope="col">{{$t("duration(Minutes)")}}</th>
+                                <th scope="col">{{$t("numberOfEvents")}}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">1. {{$t("reducedRateAtFiller")}} (RRF)</th>
+                                <template v-if="allEvents['RRF'] === 0 || allEvents['RRF'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
 
-                    <h5>{{$t("plantOperatingTimeOverview")}} </h5>
-                    <div class="row rect" id="rect1">
-                        <p class="blueBack">
-                            {{$t("plannedProductionTime")}} (PPT)
-                        </p>
-                        <p class="greenBack">
-                            {{$t("plannedDowntime")}} (PD)
-                        </p>
-                        <p>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['RRF'][0].Duration}} mn</td>
+                                    <td>{{allEvents['RRF'][0].nbEvents}}</td>
+                                </template>
 
-                            {{(plannedDowntimes / plannedProductionTime * 100).toFixed(2)}}%
-                        </p>
+
+                            </tr>
+                            <tr>
+                                <th scope="row">2. {{$t("reducedRateAtAnOtherMachine")}} (RRM)</th>
+                                <template v-if="allEvents['RRM'] === 0 || allEvents['RRM'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['RRM'][0].Duration}} mn</td>
+                                    <td>{{allEvents['RRM'][0].nbEvents}}</td>
+                                </template>
+
+
+                            </tr>
+                            <tr>
+                                <th scope="row">3. {{$t("fillerOwnStoppage")}} (FOS)</th>
+                                <template v-if="allEvents['FOS'] === 0 || allEvents['FOS'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['FOS'][0].Duration}} mn</td>
+                                    <td>{{allEvents['FOS'][0].nbEvents}}</td>
+                                </template>
+
+                            </tr>
+                            <tr>
+                                <th scope="row">4. {{$t("fillerOwnStoppageByAnOtherMachine")}}(FSM)</th>
+                                <template v-if="allEvents['FSM'] === 0 || allEvents['FSM'][0].Duration === null">
+                                    <td>0 mn</td>
+                                    <td>0</td>
+
+                                </template>
+                                <template v-else>
+                                    <td>{{allEvents['FSM'][0].Duration}} mn</td>
+                                    <td>{{allEvents['FSM'][0].nbEvents}}</td>
+                                </template>
+
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
-
-
-                    <div class="row rect" id="rect2">
-                        <p class="blueBack">
-                            {{$t("operatingTime")}} (OT)
-                        </p>
-                        <p class="redBack">
-                            {{$t("unplannedDowntime")}} (UD)
-                        </p>
-                        <p>
-
-                            {{(unplannedDowntimes / operatingTime * 100).toFixed(2)}}%
-                        </p>
-                    </div>
-
-                    <div class="row rect" id="rect3">
-                        <p class="blueBack">
-                            {{$t("netOperatingTime")}} (NOT)
-                        </p>
-                        <p class="redBack">
-                           {{$t("speedLosses")}} (SL)
-                        </p>
-                        <p>
-                            {{(performance* 100).toFixed(2)}}%
-                        </p>
-                    </div>
-
-                    <div class="row rect" id="rect4">
-                        <p class="blueBack">
-                            {{$t("valuableOperatingTime")}} (VOT)
-                        </p>
-                        <p class="redBack">
-                            {{$t("qualityLosses")}} (QL)
-                        </p>
-                        <p>
-                            {{(quality* 100).toFixed(2)}}%
-                        </p>
-                    </div>
-
-
-                </div>
-            </template>
-
-            <br/>
-
-
-            <div class="d-flex zoneDessin">
-
-                <div class="container">
-                    <canvas id="Availability">
-                    </canvas>
-                    <template v-if="show===1">
-                        <h5>{{$t("availability")}}</h5>
-                    </template>
-                </div>
-
-                <div class="container">
-                    <canvas id="Performance">
-                    </canvas>
-                    <template v-if="show===1">
-                        <h5>{{$t("performance")}}</h5>
-                    </template>
-                </div>
-
-
+                </template>
             </div>
-            <div class="d-flex zoneDessin">
+
+            <div class="col-sm">
+                <h1>
+                    {{$t("downtimesReport")}}
+                </h1>
+
                 <br/>
+                <div class="">
+                    <label class="" for="startingPO">{{$t("from")}}</label>
+                    <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
-                <div class="container">
-                    <canvas id="Quality">
-                    </canvas>
-                    <template v-if="show===1">
-                        <h5>{{$t("quality")}}</h5>
-                    </template>
+
+                    <label class="" for="endingPO">{{$t("to")}}</label>
+                    <input type="date" id="endingPO" class=""
+                           required v-model="endingDate">
                 </div>
 
-                <div class="container">
-                    <canvas id="OLE">
-                    </canvas>
-                    <template v-if="show===1">
-                        <h5>OLE</h5>
-                    </template>
-                </div>
 
+                <template v-if="show===1">
+
+                    <div id="squareZone">
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <canvas id="can" width="100" height="100"/>
+                                <h5>{{$t("formVolumeSplit")}}</h5>
+                            </div>
+
+                            <div class="col-sm">
+                                <canvas id="can2" width="100" height="100"/>
+                                <h5>{{$t("packSizeSplit")}}</h5>
+                            </div>
+
+                        </div>
+
+                        <br/>
+
+                        <h5>{{$t("plantOperatingTimeOverview")}} </h5>
+                        <div class="row rect" id="rect1">
+                            <p class="blueBack">
+                                {{$t("plannedProductionTime")}} (PPT)
+                            </p>
+                            <p class="greenBack">
+                                {{$t("plannedDowntime")}} (PD)
+                            </p>
+                            <p v-if="plannedProductionTime === 0">
+                                0.00%
+
+                            </p>
+                            <p v-else>
+
+                                {{(plannedDowntimes / plannedProductionTime * 100).toFixed(2)}}%
+                            </p>
+                        </div>
+
+
+                        <div class="row rect" id="rect2">
+                            <p class="blueBack">
+                                {{$t("operatingTime")}} (OT)
+                            </p>
+                            <p class="redBack">
+                                {{$t("unplannedDowntime")}} (UD)
+                            </p>
+                            <p v-if="operatingTime ===0 ">
+                                0.00%
+                            </p>
+                            <p v-else>
+                                {{(unplannedDowntimes / operatingTime * 100).toFixed(2)}}%
+                            </p>
+                        </div>
+
+                        <div class="row rect" id="rect3">
+                            <p class="blueBack">
+                                {{$t("netOperatingTime")}} (NOT)
+                            </p>
+                            <p class="redBack">
+                                {{$t("speedLosses")}} (SL)
+                            </p>
+
+                            <p v-if="speedLosses ===0 ">
+                                0.00%
+                            </p>
+                            <p v-else>
+                                {{(netOperatingTime / speedLosses * 100).toFixed(2)}}%
+                            </p>
+                        </div>
+
+                        <div class="row rect" id="rect4">
+                            <p class="blueBack">
+                                {{$t("valuableOperatingTime")}} (VOT)
+                            </p>
+                            <p class="redBack">
+                                {{$t("qualityLosses")}} (QL)
+                            </p>
+                            <p>
+                                {{(quality* 100).toFixed(2)}}%
+                            </p>
+                        </div>
+
+                    </div>
+                </template>
 
             </div>
+        </div>
 
-            <br/>
+        <div class="row zoneDessin">
+            <div class="col-sm">
+                <canvas id="Availability">
+                </canvas>
+                <template v-if="show===1">
+                    <h5>{{$t("availability")}}</h5>
+                </template>
+            </div>
+
+            <div class="col-sm">
+                <canvas id="Performance">
+                </canvas>
+                <template v-if="show===1">
+                    <h5>{{$t("performance")}}</h5>
+                </template>
+            </div>
+
+
+            <div class="col-sm">
+                <canvas id="Quality">
+                </canvas>
+                <template v-if="show===1">
+                    <h5>{{$t("quality")}}</h5>
+                </template>
+            </div>
+
+            <div class="col-sm">
+                <canvas id="OLE">
+                </canvas>
+                <template v-if="show===1">
+                    <h5>OLE</h5>
+                </template>
+            </div>
 
         </div>
+
 
 
     </div>
@@ -452,10 +445,9 @@
     export default {
         name: "downtimesReport",
 
-
         data() {
             return {
-                lo : this.$t("load"),
+                lo: this.$t("load"),
                 site: '',
                 productionline: '',
                 product: '',
@@ -487,6 +479,8 @@
                 availability: 0,
                 quality: 0,
                 OLE: 0,
+
+                speedLosses : 0,
             }
         },
 
@@ -508,6 +502,8 @@
                     tab.push(this.beginningDate);
                     tab.push(this.endingDate);
 
+
+                    console.log(this.beginningDate);
                     this.$store.dispatch('fetchAllEvents', tab);
                     await this.resolveAfter15Second();
                     this.show = 1;
@@ -531,6 +527,14 @@
             },
 
             loadArray: function () {
+                this.formulationArray = [];
+                this.formatArray = [];
+                this.quantityArray = [];
+                this.quantityPerArray = [];
+                this.qtyProduced = 0;
+                this.littersProduced = 0;
+                this.productsName = [];
+
                 for (let i = 0; i < this.allEvents['SITE'].length; i++) {
                     this.quantityArray[i] = 0;
                     this.quantityPerArray[i] = 0;
@@ -541,24 +545,23 @@
                     let nbBottles = this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase;
                     this.qtyProduced += nbBottles * 1;
 
-                    if(!this.formulationArray.includes(this.allEvents['SITE'][i].formulationType)){
-                        this.formulationArray.push(this.allEvents['SITE'][i].formulationType);
+                    if (!this.formulationArray.includes(this.allEvents['SITE'][i].GIFAP)) {
+                        this.formulationArray.push(this.allEvents['SITE'][i].GIFAP);
                     }
 
-                    let indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][i].formulationType);
+                    let indexFormulation = this.formulationArray.indexOf(this.allEvents['SITE'][i].GIFAP);
 
                     this.quantityPerArray[indexFormulation] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
                         * this.allEvents['SITE'][i].size;
 
 
-                    if(!this.formatArray.includes(this.allEvents['SITE'][i].size)){
+                    if (!this.formatArray.includes(this.allEvents['SITE'][i].size)) {
                         this.formatArray.push(this.allEvents['SITE'][i].size);
                     }
 
                     let indexSize = this.formatArray.indexOf(this.allEvents['SITE'][i].size);
                     this.quantityArray[indexSize] += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase
                         * this.allEvents['SITE'][i].size;
-
 
 
                     if (!this.productsName.includes(this.allEvents['SITE'][i].product)) {
@@ -579,6 +582,8 @@
                 console.log(this.quantityArray);
                 console.log(this.formatArray);
                 console.log(this.quantityPerArray);
+                console.log("formulations : ");
+
                 console.log(this.formulationArray);
 
 
@@ -608,10 +613,31 @@
                 this.netOperatingTime = 0;
                 var sommeWorkingTime = 0;
 
+                this.speedLosses = 0;
+
+                if(this.allEvents['RRF'][0].nbEvents > 0){
+                    this.speedLosses += this.allEvents['RRF'][0].Duration*1;
+                }
+
+                if(this.allEvents['RRM'][0].nbEvents > 0){
+                    this.speedLosses += this.allEvents['RRM'][0].Duration*1;
+                }
+
+                if(this.allEvents['FOS'][0].nbEvents > 0){
+                    this.speedLosses += this.allEvents['FOS'][0].Duration*1;
+
+
+                }
+
+                if(this.allEvents['FSM'][0].nbEvents > 0){
+                    this.speedLosses += this.allEvents['FSM'][0].Duration*1;
+
+                }
+
 
                 for (let i = 0; i < this.allEvents['SITE'].length; i++) {
 
-                    sommeWorkingTime += this.allEvents['SITE'][i].workingDuration * 1;
+                    sommeWorkingTime += this.allEvents['SITE'][i].workingDuration;
 
 
                     let PO = this.allEvents['SITE'][i];
@@ -640,12 +666,26 @@
                 }
 
 
+
+
                 this.plannedDowntimes = sommePlannedEvents;
                 this.unplannedDowntimes = sommeUnplannedEvents;
 
 
                 this.plannedProductionTime = sommeWorkingTime - sommePlannedEvents;
+
+
                 this.operatingTime = sommeWorkingTime - sommePlannedEvents - sommeUnplannedEvents;
+                this.netOperatingTime = this.operatingTime - this.speedLosses;
+                console.log('working TIME : ');
+                console.log(sommeWorkingTime);
+                console.log('planned TIME : ');
+                console.log(sommePlannedEvents);
+                console.log('unplanned TIME : ');
+                console.log(sommeUnplannedEvents);
+                console.log('speedLosses TIME : ');
+                console.log(this.speedLosses);
+
 
                 this.availability = this.operatingTime / this.plannedProductionTime;
                 this.performance = this.netOperatingTime / this.operatingTime;
@@ -671,7 +711,7 @@
 
                 }
 
-                if (this.netOperatingTime === 0) {
+                if (this.operatingTime === 0) {
                     this.performance = 0;
                     this.unplannedDowntimes = 1;
                 }
@@ -697,19 +737,31 @@
             ,
 
             pieCharts: function () {
-
                 let obj;
                 var data = [];
-                for(let j= 0; j<this.formulationArray.length; j++){
+                var totalPieChart1 = 0;
+                for (let j = 0; j < this.formulationArray.length; j++) {
                     obj = {
                         name: this.formulationArray[j],
                         nbr: this.quantityPerArray[j]
                     };
                     data.push(obj);
+                    totalPieChart1 += this.quantityPerArray[j];
                 }
                 console.log('DATA');
 
                 console.log(data);
+
+                if(data.length === 0){
+                    obj = {
+                        name : this.$t("nothingProduced"),
+                        nbr : 1
+                    };
+                    data.push(obj);
+
+                    totalPieChart1 = 1;
+                }
+
 
 
                 const randomHexColorCode = () => {
@@ -720,15 +772,16 @@
                 var ctx = canvas.getContext("2d");
                 canvas.width = 400;
                 canvas.height = 300;
-                let total = data.reduce( (ttl, house) => {
+                let total = data.reduce((ttl, house) => {
                     return ttl + house.nbr
                 }, 0);
                 let startAngle = 0;
-                let radius = 100;
-                let cx = canvas.width/2;
-                let cy = canvas.height/2;
+                let radius = 70;
+                let cx = canvas.width / 2;
+                let cy = canvas.height / 2;
 
-                for(let j= 0; j<data.length; j++){
+
+                for (let j = 0; j < data.length; j++) {
 
                     let item = data[j];
                     //set the styles before beginPath
@@ -748,7 +801,7 @@
 
                     // add the labels
                     ctx.beginPath();
-                    ctx.font = '20px Helvetica, Calibri';
+                    ctx.font = '15px Helvetica, Calibri';
                     ctx.textAlign = 'center';
                     ctx.fillStyle = 'rebeccapurple';
                     // midpoint between the two angles
@@ -765,39 +818,54 @@
 
                      ***/
                     var txt = item.name + '\n';
-                    ctx.fillText(txt, deltaX+cx, deltaY+cy);
+                    var pct = item.nbr / totalPieChart1 * 100;
+                    txt = txt + ' ' + pct.toFixed(2) + '%';
+
+                    ctx.fillText(txt, deltaX + cx, deltaY + cy);
                     ctx.closePath();
 
                     startAngle = endAngle;
                 }
 
                 data = [];
-                for(let j= 0; j<this.formatArray.length; j++){
+                var totalPieChart2 = 0;
+                for (let j = 0; j < this.formatArray.length; j++) {
                     obj = {
                         name: this.formatArray[j],
                         nbr: this.quantityArray[j],
                     };
                     data.push(obj);
+                    totalPieChart2 += this.quantityArray[j];
                 }
+
+                if(data.length === 0){
+                    obj = {
+                        name : this.$t("nothingProduced"),
+                        nbr : 1
+                    };
+                    data.push(obj);
+
+                    totalPieChart2 = 1;
+                }
+
                 console.log('DATA');
 
                 console.log(data);
-
 
 
                 canvas = document.getElementById("can2");
                 ctx = canvas.getContext("2d");
                 canvas.width = 400;
                 canvas.height = 300;
-                total = data.reduce( (ttl, house) => {
+                total = data.reduce((ttl, house) => {
                     return ttl + house.nbr
                 }, 0);
                 startAngle = 0;
-                radius = 100;
-                cx = canvas.width/2;
-                cy = canvas.height/2;
+                radius = 70;
+                cx = canvas.width / 2;
+                cy = canvas.height / 2;
 
-                for(let j= 0; j<data.length; j++){
+                for (let j = 0; j < data.length; j++) {
 
                     let item = data[j];
                     //set the styles before beginPath
@@ -817,7 +885,7 @@
 
                     // add the labels
                     ctx.beginPath();
-                    ctx.font = '20px Helvetica, Calibri';
+                    ctx.font = '15px Helvetica, Calibri';
                     ctx.textAlign = 'center';
                     ctx.fillStyle = 'rebeccapurple';
                     // midpoint between the two angles
@@ -825,102 +893,24 @@
                     let theta = (startAngle + endAngle) / 2;
                     let deltaY = Math.sin(theta) * 1.5 * radius;
                     let deltaX = Math.cos(theta) * 1.5 * radius;
-                    /***
-                     SOH  - sin(angle) = opposite / hypotenuse
-                     = opposite / 1px
-                     CAH  - cos(angle) = adjacent / hypotenuse
-                     = adjacent / 1px
-                     TOA
 
-                     ***/
-                    txt = item.name + '\n';
-                    txt = txt + ' L';
-                    ctx.fillText(txt, deltaX+cx, deltaY+cy);
+                    if(item.name !== this.$t("nothingProduced")) {
+                        txt = item.name + 'L\n';
+                        pct = item.nbr / totalPieChart2 * 100;
+                        txt = txt + ' ' + pct.toFixed(2) + '%';
+                    }else{
+                        txt = item.name + '\n';
+                    }
+
+
+                    startAngle = endAngle;
+                    ctx.fillText(txt, deltaX + cx, deltaY + cy);
                     ctx.closePath();
 
                     startAngle = endAngle;
                 }
 
-                /**
-                 var data = [];
-                 for(let i=0; i<this.productsName.length; i++){
-                    let item = {
-                      y:  this.quantityArray[i],
-                        label: this.productsName[i]
-                    };
-                    data.push(item);
-                }
 
-
-
-                 var chart = new CanvasJS.Chart("can", {
-                    animationEnabled: true,
-                    title: {
-                        text: "Desktop Search Engine Market Share - 2016"
-                    },
-                    data: [{
-                        type: "pie",
-                        startAngle: 240,
-                        yValueFormatString: "##0.00\"%\"",
-                        indexLabel: "{label} {y}",
-                        dataPoints: data,
-                    }]
-                });
-
-                 chart.render();
-                 **/
-
-/**
-                data = [];
-                for (let i = 0; i < this.productsName.length; i++) {
-                    data.push(this.quantityArray[i]);
-                }
-                var canvas = document.getElementById("can");
-                var ctx = canvas.getContext("2d");
-                var lastend = 0;
-
-
-                var myTotal = 0; // Automatically calculated so don't touch
-                var myColor = ['red', 'green', 'blue', 'yellow', 'gray', 'black', 'pink', 'purple']; // Colors of each slice
-
-                for (var e = 0; e < data.length; e++) {
-                    myTotal += data[e];
-                }
-
-                for (var i = 0; i < data.length; i++) {
-                    ctx.fillStyle = myColor[i];
-                    ctx.beginPath();
-                    ctx.moveTo(canvas.width / 2, canvas.height / 2);
-                    // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-                    ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
-                    ctx.lineTo(canvas.width / 2, canvas.height / 2);
-                    ctx.fill();
-                    lastend += Math.PI * 2 * (data[i] / myTotal);
-                }
-
-
-                canvas = document.getElementById("can2");
-                ctx = canvas.getContext("2d");
-                lastend = 0;
-                data = [60, 60, 20, 50]; // If you add more data values make sure you add more colors
-                myTotal = 0; // Automatically calculated so don't touch
-                myColor = ['pink', 'green', 'blue', 'purple']; // Colors of each slice
-
-                for (e = 0; e < data.length; e++) {
-                    myTotal += data[e];
-                }
-
-                for (i = 0; i < data.length; i++) {
-                    ctx.fillStyle = myColor[i];
-                    ctx.beginPath();
-                    ctx.moveTo(canvas.width / 2, canvas.height / 2);
-                    // Arc Parameters: x, y, radius, startingAngle (radians), endingAngle (radians), antiClockwise (boolean)
-                    ctx.arc(canvas.width / 2, canvas.height / 2, canvas.height / 2, lastend, lastend + (Math.PI * 2 * (data[i] / myTotal)), false);
-                    ctx.lineTo(canvas.width / 2, canvas.height / 2);
-                    ctx.fill();
-                    lastend += Math.PI * 2 * (data[i] / myTotal);
-                }
-**/
 
             }
             ,
@@ -945,13 +935,13 @@
                 } else if (this.availability >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
-                context.arc(80, 80, 62, 0, 2 * Math.PI);
+                context.arc(80, 80, 40, 0, 2 * Math.PI);
                 context.stroke();
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
                 let ava = this.availability * 100;
-                context.fillText(ava.toFixed(2), 70, 90);
+                context.fillText(ava.toFixed(2), 65, 90);
 
 
                 canvas = document.getElementById("Performance");
@@ -963,13 +953,13 @@
                 } else if (this.performance >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
-                context.arc(80, 80, 62, 0, 2 * Math.PI);
+                context.arc(80, 80, 40, 0, 2 * Math.PI);
                 context.stroke();
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
                 let perf = this.performance * 100;
-                context.fillText(perf.toFixed(2), 70, 90);
+                context.fillText(perf.toFixed(2), 65, 90);
 
                 canvas = document.getElementById("Quality");
                 context = canvas.getContext("2d");
@@ -980,13 +970,14 @@
                 } else if (this.quality >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
-                context.arc(80, 80, 62, 0, 2 * Math.PI);
+                context.arc(80, 80, 40, 0, 2 * Math.PI);
                 context.stroke();
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
                 let qua = this.quality * 100;
-                context.fillText(qua.toFixed(2), 70, 90);
+                context.fillText(qua.toFixed(2), 65, 90);
+
 
                 canvas = document.getElementById("OLE");
                 context = canvas.getContext("2d");
@@ -994,16 +985,16 @@
                 context.fillStyle = "#FF0000";
                 if (this.OLE >= 0.70 && this.OLE < 0.95) {
                     context.fillStyle = "#FF8700";
-                } else if (this.OLE >= 95) {
+                } else if (this.OLE >= 0.95) {
                     context.fillStyle = "#71FA23";
                 }
-                context.arc(80, 80, 62, 0, 2 * Math.PI);
+                context.arc(80, 80, 40, 0, 2 * Math.PI);
                 context.stroke();
                 context.fill();
                 context.fillStyle = "#FFF";
                 context.font = '20px serif';
                 let o = this.OLE * 100;
-                context.fillText(o.toFixed(2), 70, 90);
+                context.fillText(o.toFixed(2), 65, 90);
 
 
             }
@@ -1014,7 +1005,7 @@
 
 
         mounted() {
-            if(sessionStorage.getItem("language") !== null){
+            if (sessionStorage.getItem("language") !== null) {
                 this.$i18n.locale = sessionStorage.getItem("language");
             }
             this.$store.dispatch('fetchSites');
@@ -1154,3 +1145,4 @@
 
 
 </style>
+
