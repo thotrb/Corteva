@@ -7,7 +7,7 @@
             <div class="d-flex site-pl-selection">
                 <div class="d-flex">
                     <label for="site-selection">Site: </label>
-                    <select id="site-selection" v-model="site">
+                    <select id="site-selection" v-model="site"  v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
                         <template v-for="site of sites[0]">
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
@@ -142,7 +142,11 @@
             },
 
             productionLineSelected: function() {
-                if (document.getElementById("pl-selection").value) this.chargeData();
+                setTimeout(() => {
+                    if (document.getElementById("pl-selection").value) {
+                        this.chargeData();
+                    }
+                });
             },
 
             createDowntimeObject: function() {

@@ -64,14 +64,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At Filler'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Reduced Rate At Filler'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
                 <div class="chart-panel no-bottom-border rounded-top-right">
                     <span class="content-subtitle">Filler Own Stop</span>
                     <div class="chart-container">
                         <canvas class="chart" id="own-stop-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Own Stoppage'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Filler Own Stoppage'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
 
                 <div class="table-panel rounded-bottom-left">
@@ -102,14 +102,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At An Other Machine'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Reduced Rate At An Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
                 <div class="chart-panel rounded-bottom-right">
                     <span class="content-subtitle">Filler Stop by Other Machine</span>
                     <div class="chart-container">
                         <canvas class="chart" id="other-machine-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
             </div>
     </div>
@@ -205,14 +205,10 @@
                                         acc[slEvent.reason].events.push(slEvent);
                                     }
 
+                                    return acc;
+                                }, this.slEvents);
+                            }
 
-                                    acc[slEvent.reason].totalDuration += slEvent.duration;
-                                    const reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
-                                    slEvent.reducedRate = reducedRate || 0;
-                                    acc[slEvent.reason].events.push(slEvent);
-                                }
-                                return acc;
-                            }, this.slEvents);
 
                             //Total speed loss duration as the sum of all categorie's durations
                             const totalSpeedLossDuration = Object.values(this.slEvents).reduce((acc, slCat) => {
@@ -231,8 +227,11 @@
                                 'Reduced Rate At An Other Machine': 'other-machine'
                             }
 
-
                             //Update charts' data
+                            Object.keys(map).forEach(key => {
+                                this.chartObjects[map[key]].chart.data.datasets[0].data = [];
+                                this.chartObjects[map[key]].chart.data.datasets[1].data = [];
+                            });
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
                                 this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);

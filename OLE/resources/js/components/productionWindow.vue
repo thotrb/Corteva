@@ -2,12 +2,12 @@
     <!-- Production window -->
     <div class="d-flex production-window">
         <div class="d-flex title">
-            <span>Production Window</span>
+            <span>{{$t("productionWindow")}}</span>
         </div>
         <div class="d-flex interval-selection">
-            <span>From</span>
+            <span>{{$t("from")}}</span>
             <input type="date" id="select-date-from" v-on:change="dateSelected();"/>
-            <span>to</span>
+            <span>{{$t("to")}}</span>
             <input type="date" id="select-date-to" v-on:change="dateSelected();"/>
         </div>
     </div>

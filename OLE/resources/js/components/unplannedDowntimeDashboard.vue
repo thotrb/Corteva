@@ -2,7 +2,7 @@
     <div class="d-flex main-container">
         <!-- Page title - Unplanned Downtime Dashboard -->
         <div class="row container-title">
-            <span>Unplanned Downtime Dashboard</span>
+            <span>{{$t("unplannedDowntimeDashboard")}}</span>
         </div>
 
         <!-- Interval, site and production line selection menu -->
@@ -18,7 +18,7 @@
                     </select>
 
 
-                    <label for="pl-selection">Production line: </label>
+                    <label for="pl-selection">{{$t("productionLine")}} </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
                         <template v-for="productionLine of sites[1]">
@@ -39,15 +39,15 @@
                             <thead></thead>
                             <tbody>
                                 <tr class="t-row">
-                                    <td scope="col">{{unplannedDowntimesCategories[cat]}}</td>
+                                    <td scope="col">{{$t(unplannedDowntimesCategories[cat])}}</td>
                                     <td scope="col"></td>
                                 </tr>
                                 <tr class="subrow">
-                                    <td scope="col">&emsp;Duration</td>
+                                    <td scope="col">&emsp;{{$t("duration")}}</td>
                                     <td scope="col">{{generalData[cat].totalDuration}}</td>
                                 </tr>
                                 <tr class="subrow last-subrow">
-                                    <td scope="col">&emsp;Number</td>
+                                    <td scope="col">&emsp;{{$t("number")}}</td>
                                     <td scope="col">{{generalData[cat].totalNb}}</td>
                                 </tr>
 
@@ -67,7 +67,7 @@
                         <tr>
                             <th scope="col"></th>
                             <template v-for="month of months">
-                                <th :key="month" scope="col">{{month}}</th>
+                                <th :key="month" scope="col">{{$t(month)}}</th>
                             </template>
                         </tr>
                     </thead>
@@ -75,9 +75,9 @@
                         <template v-for="cat of Object.keys(unplannedDowntimesCategories)">
                             <tr :key="cat">
                                 <th scope="col" class="side">
-                                    <tr class="table-row-title">{{unplannedDowntimesCategories[cat]}}</tr>
-                                    <tr class="table-sub-row">&emsp;Duration</tr>
-                                    <tr class="table-sub-row">&emsp;Number</tr>
+                                    <tr class="table-row-title">{{$t(unplannedDowntimesCategories[cat])}}</tr>
+                                    <tr class="table-sub-row">&emsp;{{$t("duration")}}</tr>
+                                    <tr class="table-sub-row">&emsp;{{$t("number")}}</tr>
                                 </th>
 
                                 <template v-for="month of months">
@@ -98,13 +98,13 @@
                 <template v-for="cat of ['cip', 'cov', 'bnc']">
                     <div :key="cat" class="d-flex ya-info-row">
                         <div class="d-flex">
-                            <span style="font-weight: bold">{{"Yearly " + cat.toUpperCase()}}</span>
-                            <span>&emsp;{{downtimes[cat].general.yearlyDuration}} Hours</span>
+                            <span style="font-weight: bold">{{$t("yearly" + cat.toUpperCase())}}</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyDuration}} {{$t("number")}}</span>
                             <span>&emsp;{{downtimes[cat].general.yearlyNb}} {{cat.toUpperCase()}}</span>
                         </div>
                         <div class="d-flex">
-                            <span style="font-weight: bold">Average</span>
-                            <span>&emsp;{{downtimes[cat].general.yearlyAvg}} Hours</span>
+                            <span style="font-weight: bold">{{$t("average")}}</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyAvg}} {{$t("hours")}}</span>
                         </div>
                     </div>
                 </template>
@@ -115,15 +115,27 @@
         <div class="main-chart-container">
             <div class="chart-container">
                 <canvas class="chart" id="cip-chart"></canvas>
-                <p class="downtime-percent" id="cip-percent">{{downtimes.cip.general.downtimePercentage}} % of Unplanned Downtime</p>
+                <p class="downtime-percent" id="cip-percent">
+                    <span>{{downtimes.cip.general.downtimePercentage}} % </span>
+                    <span>{{$t("of")}}</span>
+                    <span>{{$t("unplannedDowntime")}}</span>
+                </p>
             </div>
             <div class="chart-container">
                 <canvas class="chart" id="cov-chart"></canvas>
-                <p class="downtime-percent" id="cov-percent">{{downtimes.cov.general.downtimePercentage}} % of Unplanned Downtime</p>
+                <p class="downtime-percent" id="cov-percent">
+                    <span>{{downtimes.cov.general.downtimePercentage}} % </span>
+                    <span>{{$t("of")}}</span>
+                    <span>{{$t("unplannedDowntime")}}</span>
+                </p>
             </div>
             <div class="chart-container">
                 <canvas class="chart" id="bnc-chart"></canvas>
-                <p class="downtime-percent" id="bnc-percent">{{downtimes.bnc.general.downtimePercentage}} % of Unplanned Downtime</p>
+                <p class="downtime-percent" id="bnc-percent">
+                    <span>{{downtimes.bnc.general.downtimePercentage}} % </span>
+                    <span>{{$t("of")}}</span>
+                    <span>{{$t("unplannedDowntime")}}</span>
+                </p>
             </div>
         </div>
     </div>
@@ -141,9 +153,9 @@
             var data = {
                 months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 unplannedDowntimesCategories: {
-                    cip: 'Cleaning in Place (CIP)',
-                    cov: 'Change Over (COV)',
-                    bnc: 'Batch Number Change (BNC)'
+                    cip: 'cleaningInPlaceCIP',
+                    cov: 'changeOverCOV',
+                    bnc: 'batchNumberChangeBNC'
                 },
                 downtimes: {
                     cip: {},
@@ -342,7 +354,7 @@
                       plugins: {
                           title: {
                             display: true,
-                            text: this.unplannedDowntimesCategories[type]
+                            text: this.$t(this.unplannedDowntimesCategories[type])
                         }
                       }
                     }

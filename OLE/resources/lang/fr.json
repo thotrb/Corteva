@@ -128,10 +128,32 @@
     "square" : "Carré",
     "round" : "Rond",
     "formatSplit" : "Répartition des formats",
-    "nothingProduced" : "Pas de production"
-
-
-
+    "nothingProduced" : "Pas de production",
+    "unplannedDowntimeDashboard": "Tableau de bord des arrêts non planifiés",
+    "productionWindow": "Fenêtre de prodcution",
+    "duration": "Quantité",
+    "number": "Durée",
+    "yearlyCIP": "CIP Annuel",
+    "yearlyCOV": "COV Annuel",
+    "yearlyBNC": "BNC Annuel",
+    "average": "Moyenne",
+    "hours": "Heures",
+    "of": "de",
+    "cleaningInPlaceCIP": "CIP",
+    "changeOverCOV": "Changements de format (COV)",
+    "batchNumberChangeBNC": "Changements de lot (BNC)",
+    "Jan": "Janv",
+    "Feb": "Févr",
+    "Mar": "Mars",
+    "Apr": "Avr",
+    "May": "Mai",
+    "Jun": "Juin",
+    "Jul": "Juill",
+    "Aug": "Août",
+    "Sep": "Sep",
+    "Oct": "Oct",
+    "Nov": "Nov",
+    "Dec": "Déc"
 
 
 

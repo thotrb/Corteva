@@ -1,4 +1,5 @@
 {
+
     "choiceLoginOperator" : "Operator connection",
     "choiceLoginSupervisor" : "Supervisor connection",
     "choiceLoginAdministrator" : "Supervisor connection",
@@ -129,9 +130,31 @@
     "square" : "Square",
     "round" : "Round",
     "formatSplit" : "Format split",
-    "nothingProduced" : "Nothing produced"
-
-
-
+    "nothingProduced" : "Nothing produced",
+    "unplannedDowntimeDashboard": "Unplanned Downtime Dashboard",
+    "productionWindow": "Production Window",
+    "duration": "Number",
+    "number": "Duration",
+    "yearlyCIP": "Yearly CIP",
+    "yearlyCOV": "Yearly COV",
+    "yearlyBNC": "Yearly BNC",
+    "average": "Average",
+    "hours": "Hours",
+    "of": "of",
+    "cleaningInPlaceCIP": "Cleaning in Place (CIP)",
+    "changeOverCOV": "Change over (COV)",
+    "batchNumberChangeBNC": "Batch number change (BNC)",
+    "Jan": "Jan",
+    "Feb": "Feb",
+    "Mar": "Mar",
+    "Apr": "Apr",
+    "May": "May",
+    "Jun": "Jun",
+    "Jul": "Jul",
+    "Aug": "Aug",
+    "Sep": "Sep",
+    "Oct": "Oct",
+    "Nov": "Nov",
+    "Dec": "Dec"
 
 }
