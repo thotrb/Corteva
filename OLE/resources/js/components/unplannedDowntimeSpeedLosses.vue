@@ -64,14 +64,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At Filler'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Reduced Rate At Filler'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
                 <div class="chart-panel no-bottom-border rounded-top-right">
                     <span class="content-subtitle">Filler Own Stop</span>
                     <div class="chart-container">
                         <canvas class="chart" id="own-stop-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Own Stoppage'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Filler Own Stoppage'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
 
                 <div class="table-panel rounded-bottom-left">
@@ -102,14 +102,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At An Other Machine'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Reduced Rate At An Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
                 <div class="chart-panel rounded-bottom-right">
                     <span class="content-subtitle">Filler Stop by Other Machine</span>
                     <div class="chart-container">
                         <canvas class="chart" id="other-machine-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage || '--'}}% of Speed Losses</span>
+                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
                 </div>
             </div>
     </div>
@@ -204,22 +204,10 @@
                                         slEvent.reducedRate = reducedRate || 0;
                                         acc[slEvent.reason].events.push(slEvent);
                                     }
-<<<<<<< HEAD
                                     return acc;
                                 }, this.slEvents);
                             }
                             
-=======
-
-                                    acc[slEvent.reason].totalDuration += slEvent.duration;
-                                    const reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
-                                    slEvent.reducedRate = reducedRate || 0;
-                                    acc[slEvent.reason].events.push(slEvent);
-                                }
-                                return acc;
-                            }, this.slEvents);
-
->>>>>>> 5eb412be4f414863fa73b2a4812f5097f0abfd26
                             //Total speed loss duration as the sum of all categorie's durations
                             const totalSpeedLossDuration = Object.values(this.slEvents).reduce((acc, slCat) => {
                                 return acc + slCat.totalDuration;
@@ -236,17 +224,12 @@
                                 'Reduced Rate At Filler': 'own-stop',
                                 'Reduced Rate At An Other Machine': 'other-machine'
                             }
-<<<<<<< HEAD
                             
                             //Update charts' data
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data = [];
                                 this.chartObjects[map[key]].chart.data.datasets[1].data = [];
                             });
-=======
-
-                            //Update charts' data
->>>>>>> 5eb412be4f414863fa73b2a4812f5097f0abfd26
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
                                 this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
