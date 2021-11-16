@@ -130,8 +130,8 @@
                 site: '',
                 productionLine: '',
                 chartObjects: {
-                    'own-stop': {chart: undefined, labels: ['Filler Own Stop']},
-                    'other-machine': {chart: undefined, labels: ['Filler Stop by Other Machine']},
+                    'own-stop': {chart: undefined, labels: ['Filler Own Stoppage', 'Reduced Rate At Filler']},
+                    'other-machine': {chart: undefined, labels: ['Filler Stop by Other Machine', 'Reduced Rate At And Other Machine']},
                     created: false
                 },
                 slEvents: {
@@ -173,6 +173,7 @@
                     const params = [site, selectedPL, begDate, endDate];
                     console.log(params);
                     this.$store.dispatch('fetchAllEvents', params).then(() => {
+
                         this.resolveAfter(1000).then(() => {
 
                             if (!this.chartObjects.created) this.createCharts();
@@ -182,18 +183,28 @@
 
                             let chartData = {
                                 "Filler Own Stoppage": {duration: 0, freq: 0},
-                                "Filler Stop By Other Machine": {duration: 0, freq: 0}
+                                "Filler Stop By Other Machine": {duration: 0, freq: 0},
+                                "Reduced Rate At Filler": {duration: 0, freq: 0},
+                                "Reduced Rate At An Other Machine": {duration: 0, freq: 0}
                             };
 
                             //Add fetched events to the slEvents variable
                             //Creates charts' data
-                            this.slEvents = this.allEvents.SLEVENTS.reduce((acc, slEvent) => {
-                                if (acc[slEvent.reason]) {
-                                    //If event is concerned by a chart, create its data
-                                    if (chartData[slEvent.reason]) {
-                                        chartData[slEvent.reason].duration += slEvent.duration;
-                                        chartData[slEvent.reason].freq++;
+                            if (this.allEvents.SLEVENTS) {
+                                this.slEvents = this.allEvents.SLEVENTS.reduce((acc, slEvent) => {
+                                    if (acc[slEvent.reason]) {
+                                        //If event is concerned by a chart, create its data
+                                        if (chartData[slEvent.reason]) {
+                                            chartData[slEvent.reason].duration += slEvent.duration;
+                                            chartData[slEvent.reason].freq++;
+                                        }
+
+                                        acc[slEvent.reason].totalDuration += slEvent.duration;
+                                        const reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
+                                        slEvent.reducedRate = reducedRate || 0;
+                                        acc[slEvent.reason].events.push(slEvent);
                                     }
+
 
                                     acc[slEvent.reason].totalDuration += slEvent.duration;
                                     const reducedRate = Math.floor(slEvent.qtyProduced / slEvent.workingDuration);
@@ -214,17 +225,21 @@
                             });
 
                             const map = {
-                                "Filler Own Stoppage": 'own-stop',
-                                "Filler Stop By Other Machine": 'other-machine'
+                                'Filler Own Stoppage': 'own-stop',
+                                'Filler Stop By Other Machine': 'other-machine',
+                                'Reduced Rate At Filler': 'own-stop',
+                                'Reduced Rate At An Other Machine': 'other-machine'
                             }
+
 
                             //Update charts' data
                             Object.keys(map).forEach(key => {
-                                this.chartObjects[map[key]].chart.data.datasets[0].data[0] = chartData[key].duration;
-                                this.chartObjects[map[key]].chart.data.datasets[1].data[0] = chartData[key].freq;
+                                this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
+                                this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
                                 this.chartObjects[map[key]].chart.update();
                             });
                         });
+
                     });
                 }
             },
@@ -239,12 +254,12 @@
                         datasets: [{
                                 label: 'Time in minutes',
                                 backgroundColor: 'rgb(245, 194, 67)',
-                                data: [0]
+                                data: []
                             },
                             {
                                 label: 'Number',
                                 backgroundColor: 'rgb(90, 90, 90)',
-                                data: [0],
+                                data: [],
                                 yAxisID: "freq"
                             }
                         ]
