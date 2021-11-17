@@ -11,7 +11,7 @@
             <div class="site-pl-selection">
                     <label for="site-selection">Site: </label>
                     <select id="site-selection" v-model="site">
-                        <option disabled selected value>-- Select --</option>
+                        <option disabled selected value>-- ${{$t("select")}} --</option>
                         <template v-for="site of sites[0]">
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
                         </template>
@@ -383,6 +383,17 @@
 
         components: {
             ProductionWindow
+        },
+        
+        watch: {
+            '$i18n.locale': function() {
+                for (let type of ['cip', 'cov', 'bnc']) {
+                    if (this.chartObjects[type]) {
+                        this.chartObjects[type].options.plugins.title.text = this.$t(this.unplannedDowntimesCategories[type]);
+                        this.chartObjects[type].update();
+                    }
+                }
+            }
         }
     }
 </script>

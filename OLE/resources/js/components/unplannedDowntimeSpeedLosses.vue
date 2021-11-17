@@ -7,15 +7,15 @@
             <div class="d-flex site-pl-selection">
                     <label for="site-selection">Site: </label>
                     <select id="site-selection" v-model="site">
-                        <option disabled selected value>-- Select --</option>
+                        <option disabled selected value>-- {{$t("select")}} --</option>
                         <template v-for="site of sites[0]">
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
                         </template>
                     </select>
 
-                    <label for="pl-selection">Production line: </label>
+                    <label for="pl-selection">{{$t("prdocutionLine")}}: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
-                        <option disabled selected value>-- Select --</option>
+                        <option disabled selected value>-- {{$t("select")}} --</option>
                         <template v-for="productionLine of sites[1]">
                             <template v-if="productionLine.name === site">
                                 <option v-bind:key="productionLine.productionline_name" v-bind:value="productionLine.productionline_name">
@@ -35,19 +35,19 @@
 
 
         <div class="content-panel">
-            <span class="content-title">Speed Losses</span>
+            <span class="content-title">{{$t("speedLosses")}}</span>
                 <div class="table-panel no-bottom-border rounded-top-left">
-                    <span class="content-subtitle">Reduce rate at filler</span>
+                    <span class="content-subtitle">{{$t("reduceRateAtFiller")}}</span>
                     <div class="table-container">
                         <table class="table table-responsive table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col">Production Order</th>
-                                    <th scope="col">Format</th>
-                                    <th scope="col">Design Rate (cpm)</th>
-                                    <th scope="col">Reduce Rate (cpm)</th>
-                                    <th scope="col">Wasted Time (mn)</th>
-                                    <th scope="col">Comments / Reason</th>
+                                    <th scope="col">{{$t("productionOrder")}}</th>
+                                    <th scope="col">{{$t("format")}}</th>
+                                    <th scope="col">{{$t("designRate")}}</th>
+                                    <th scope="col">{{$t("reduceRate")}}</th>
+                                    <th scope="col">{{$t("wastedTime")}}</th>
+                                    <th scope="col">{{$t("comments/reason")}}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,28 +64,28 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At Filler'].percentage.y || '--'}}% of Speed Losses</span>
+                    
                 </div>
                 <div class="chart-panel no-bottom-border rounded-top-right">
-                    <span class="content-subtitle">Filler Own Stop</span>
+                    <span class="content-subtitle">{{$t("fillerOwnStop")}}</span>
                     <div class="chart-container">
                         <canvas class="chart" id="own-stop-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Own Stoppage'].percentage.y || '--'}}% of Speed Losses</span>
+                    
                 </div>
 
                 <div class="table-panel rounded-bottom-left">
-                    <span class="content-subtitle">Reduce rate at filler due to other machine capacity</span>
+                    <span class="content-subtitle">{{$t("reduceRateAtFillerDueToAnotherMachineCapacity")}}</span>
                     <div class="table-container">
                         <table class="table table-responsive table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col">Production Order</th>
-                                    <th scope="col">Format</th>
-                                    <th scope="col">Design Rate (cpm)</th>
-                                    <th scope="col">Reduce Rate (cpm)</th>
-                                    <th scope="col">Wasted Time (mn)</th>
-                                    <th scope="col">Comments / Reason</th>
+                                    <th scope="col">{{$t("productionOrder")}}</th>
+                                    <th scope="col">{{$t("format")}}</th>
+                                    <th scope="col">{{$t("designRate")}}</th>
+                                    <th scope="col">{{$t("reduceRate")}}</th>
+                                    <th scope="col">{{$t("wastedTime")}}</th>
+                                    <th scope="col">{{$t("comments/reason")}}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -102,14 +102,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Reduced Rate At An Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
+                    
                 </div>
                 <div class="chart-panel rounded-bottom-right">
-                    <span class="content-subtitle">Filler Stop by Other Machine</span>
+                    <span class="content-subtitle">{{$t("fillerStopByOtherMachine")}}</span>
                     <div class="chart-container">
                         <canvas class="chart" id="other-machine-sl-chart"></canvas>
                     </div>
-                    <span class="content-subtitle">{{slEvents['Filler Stop By Other Machine'].percentage.y || '--'}}% of Speed Losses</span>
+                    
                 </div>
             </div>
     </div>
@@ -249,12 +249,12 @@
                     data: {
                         labels: this.chartObjects[slCat].labels,
                         datasets: [{
-                                label: 'Time in minutes',
+                                label: this.$t("timeInMinutes"),
                                 backgroundColor: 'rgb(245, 194, 67)',
                                 data: []
                             },
                             {
-                                label: 'Number',
+                                label: this.$t("number"),
                                 backgroundColor: 'rgb(90, 90, 90)',
                                 data: [],
                                 yAxisID: "freq"
@@ -269,7 +269,7 @@
                                 axis: 'y',
                                 title: {
                                     display: true,
-                                    text: 'Time in minutes'
+                                    text: this.$t("timeInMinutes"),
                                 },
                                 position: 'left'
                             },
@@ -277,7 +277,7 @@
                                 axis: 'y',
                                 title: {
                                     display: true,
-                                    text: 'Number'
+                                    text: this.$t("number"),
                                 },
                                 position: 'right'
                             }
@@ -314,6 +314,20 @@
 
         components: {
             ProductionWindow
+        },
+
+        watch: {
+            '$i18n.locale': function() {
+                for (let slCat of ['own-stop', 'other-machine']) {
+                    if (this.chartObjects[slCat]) {
+                        this.chartObjects[slCat].chart.data.datasets[0].label = this.$t("timeInMinutes");
+                        this.chartObjects[slCat].chart.data.datasets[1].label = this.$t("number");
+                        this.chartObjects[slCat].chart.options.scales.time.title.text = this.$t("timeInMinutes");
+                        this.chartObjects[slCat].chart.options.scales.freq.title.text = this.$t("number");
+                        this.chartObjects[slCat].chart.update();
+                    }
+                }
+            }
         }
     }
 </script>

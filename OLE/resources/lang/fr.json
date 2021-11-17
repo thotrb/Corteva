@@ -125,9 +125,9 @@
     "screwingTurret" : "Tourelle de Vissage",
     "year" : "Année",
     "unplannedDowntimeDashboard": "Tableau de bord des arrêts non planifiés",
-    "productionWindow": "Fenêtre de prodcution",
-    "duration": "Quantité",
-    "number": "Durée",
+    "productionWindow": "Fenêtre de production",
+    "duration": "Durée",
+    "number": "Quantité",
     "yearlyCIP": "CIP Annuel",
     "yearlyCOV": "COV Annuel",
     "yearlyBNC": "BNC Annuel",
@@ -148,13 +148,23 @@
     "Sep": "Sep",
     "Oct": "Oct",
     "Nov": "Nov",
-    "Dec": "Déc"
-
-
-
-
-
-
-
-
+    "Dec": "Déc",
+    "machinesShutdowns": "Arrêts machines",
+    "externalShutdowns" : "Arrêts externes ",
+    "machineShutdown": "Arrêt machine",
+    "totalDowntime": "Durée totale de l'arrêt",
+    "frequency": "Fréquence",
+    "averageDuration": "Durée moyenne",
+    "externalShutdown": "Arrêt externe",
+    "timeInMinutes": "Durée en minutes",
+    "speedLosses": "Pertes de vitesse",
+    "reduceRateAtFiller": "Débit de remplissage réduit",
+    "reduceRateAtFillerDueToAnotherMachineCapacity": "Débit de remplissage réduit à la capacité d'une autre machine",
+    "fillerOwnStop": "Arrêt remplisseur",
+    "fillerStopByOtherMachine": "Arrêt remplisseur dû à une autre machine",
+    "productionOrder": "Ordre de production (PO)",
+    "reduceRate": "Débit réduit (cpm)",
+    "wastedTime": "Temps perdu (min)",
+    "comments/reason": "Commentaires / Raison",
+    "select": "Sélectionner"
 }

@@ -15,7 +15,7 @@
                     </select>
                 </div>
                 <div class="d-flex">
-                    <label for="pl-selection">Production line: </label>
+                    <label for="pl-selection">{{$t("productionLine")}}: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
                         <template v-for="productionLine of sites[1]">
@@ -32,9 +32,9 @@
 
 
         <div class="d-flex content-panel">
-            <div class="external-shutdown-panel">
+            <div class="machines-shutdown-panel">
                 <div class="title-container">
-                    <span class="content-title">Machines Shutdown</span>
+                    <span class="content-title">{{$t("machinesShutdowns")}}</span>
                 </div>
                 <div class="chart-container">
                     <canvas class="chart" id="machines-shutdown-chart"></canvas>
@@ -43,31 +43,47 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Machine Shutdown</th>
-                                <th scope="col">Total Downtime</th>
-                                <th scope="col">Frequency</th>
-                                <th scope="col">Average Duration</th>
+                                <th scope="col" class="center-text">{{$t("machineShutdown")}}</th>
+                                <th scope="col" class="center-text">{{$t("totalDowntime")}}</th>
+                                <th scope="col" class="center-text">{{$t("frequency")}}</th>
+                                <th scope="col" class="center-text">{{$t("averageDuration")}}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="downtimeCat of Object.keys(downtimes.machines)">
-                                <tr :key="downtimeCat">
-                                    <td scope="col">{{downtimeCat}}</td>
-                                    <td scope="col">{{downtimes.machines[downtimeCat].totalDuration}}</td>
-                                    <td scope="col">{{downtimes.machines[downtimeCat].totalNb}}</td>
-                                    <td scope="col">{{downtimes.machines[downtimeCat].avgDuration}}</td>
+                            <template v-for="machine of Object.values(shutdowns.machines)">
+                                <tr class="t-row" :key="machine">
+                                    <td scope="col">{{machine.machine}}</td>
+                                    <td scope="col" class="center-text">{{machine.totalDowntime}}</td>
+                                    <td scope="col" class="center-text">{{machine.frequency}}</td>
+                                    <td scope="col"></td>
                                 </tr>
+                                <template v-for="cause of Object.values(machine.causes)">
+                                    <tr class="subrow" :key="cause">
+                                        <td scope="col">&emsp;{{cause.cause}}</td>
+                                        <td scope="col" class="center-text">{{cause.totalDowntime}}</td>
+                                        <td scope="col" class="center-text">{{cause.frequency}}</td>
+                                        <td scope="col" class="center-text">{{cause.avgDuration}}</td>
+                                    </tr>
+                                    <template v-for="comment of Object.values(cause.comments)">
+                                        <tr class="sub-subrow" :key="comment">
+                                            <td scope="col">&emsp;&emsp;{{comment.comment}}</td>
+                                            <td scope="col" class="center-text">{{comment.totalDowntime}}</td>
+                                            <td scope="col" class="center-text">{{comment.frequency}}</td>
+                                            <td scope="col" class="center-text">{{comment.avgDuration}}</td>
+                                        </tr>
+                                    </template>    
+                                </template>
                             </template>
                         </tbody>
                     </table>
                 </div>
                 <div class="d-flex downtime-percent-container">
-                    <p class="downtime-percent">{{downtimePercentages.machines || '--'}} % of Unplanned Downtime</p>
+                    <p class="downtime-percent">{{percentages.machines}} % {{$t("of")}} {{$t("unplannedDowntime")}}</p>
                 </div>
             </div>
-            <div class="machines-shutdown-panel">
+            <div class="external-shutdown-panel">
                 <div class="title-container">
-                    <span class="content-title">External Shutdown</span>
+                    <span class="content-title">{{$t("externalShutdowns")}}</span>
                 </div>
                 <div class="chart-container">
                     <canvas class="chart" id="external-shutdown-chart"></canvas>
@@ -75,27 +91,27 @@
                 <div class="d-flex table-container">
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th scope="col">External Shutdown</th>
-                                <th scope="col">Total Downtime</th>
-                                <th scope="col">Frequency</th>
-                                <th scope="col">Average Duration</th>
+                            <tr class="t-row">
+                                <th scope="col" class="center-text">{{$t("externalShutdown")}}</th>
+                                <th scope="col" class="center-text">{{$t("totalDowntime")}}</th>
+                                <th scope="col" class="center-text">{{$t("frequency")}}</th>
+                                <th scope="col" class="center-text">{{$t("averageDuration")}}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <template v-for="downtimeCat of Object.keys(downtimes.external)">
-                                <tr :key="downtimeCat">
-                                    <td scope="col">{{downtimeCat}}</td>
-                                    <td scope="col">{{downtimes.external[downtimeCat].totalDuration}}</td>
-                                    <td scope="col">{{downtimes.external[downtimeCat].totalNb}}</td>
-                                    <td scope="col">{{downtimes.external[downtimeCat].avgDuration}}</td>
+                            <template v-for="external of Object.values(shutdowns.external)">
+                                <tr class="t-row" :key="external">
+                                    <td scope="col">{{external.cause}}</td>
+                                    <td scope="col" class="center-text">{{external.totalDowntime}}</td>
+                                    <td scope="col" class="center-text">{{external.frequency}}</td>
+                                    <td scope="col" class="center-text">{{external.avgDuration}}</td>
                                 </tr>
                             </template>
                         </tbody>
                     </table>
                 </div>
                 <div class="d-flex downtime-percent-container">
-                    <p class="downtime-percent">{{downtimePercentages.external || '--'}} % of Unplanned Downtime</p>
+                    <p class="downtime-percent">{{percentages.external}} % {{$t("of")}} {{$t("unplannedDowntime")}}</p>
                 </div>
             </div>
         </div>
@@ -117,13 +133,13 @@
                     machines: undefined,
                     created: false
                 },
-                downtimes: {
+                shutdowns: {
                     external: {},
                     machines: {}
                 },
-                downtimePercentages: {
-                    external: undefined,
-                    machines: undefined
+                percentages: {
+                    external: "--",
+                    machines: "--"
                 },
                 startYear: 2000,
                 currentYear: (new Date()).getFullYear(),
@@ -164,65 +180,110 @@
                         this.createDowntimeObject();
                         if (!this.chartObjects.created) this.createCharts();
 
-                        //Structure data
-                        let allShutdowns = {
-                            external: this.unplannedDowntimeEvents[0].external,
-                            machines: this.unplannedDowntimeEvents[0].machines
-                        }
+                        //Used to calculate machine shutdown percentages
+                        let totalMachineDowntime = 0;
+                        //Range machine shutdown events by implicated machine and shutdown cause
+                        let machinesShutdownsRanged = this.unplannedDowntimeEvents[0].machines.reduce((acc, event) => {
+                            //Machines key doesn't exist yet
+                            if (!acc[event.implicated_machine]) {
+                                acc[event.implicated_machine] = {
+                                    totalDowntime: 0,
+                                    frequency: 0,
+                                    machine: event.implicated_machine,
+                                    causes: {}
+                                };
+                            }
+                            //Cause key doesn't exist yet for current machine
+                            if (!event.component) event.component = "N/A";
+                            if (!acc[event.implicated_machine].causes[event.component]) {
+                                acc[event.implicated_machine].causes[event.component] = {
+                                    totalDowntime: 0,
+                                    frequency: 0,
+                                    avgDuration: 0,
+                                    cause: event.component,
+                                    comments: {}
+                                };
+                            }
 
-                        this.downtimes = {
-                            machines: {},
-                            external: {}
-                        }
+                            if (!event.comment) event.comment = "N/A";
+                            if (!acc[event.implicated_machine].causes[event.component].comments[event.comment]) {
+                                acc[event.implicated_machine].causes[event.component].comments[event.comment] = {
+                                    totalDowntime: 0,
+                                    frequency: 0,
+                                    avgDuration: 0,
+                                    comment: event.comment
+                                };
+                            }
 
-                        for (let shtdCat of ['external', 'machines']) {
-                            for (let shtdEvent of allShutdowns[shtdCat]) {
-                                //Shutdown type exists already
-                                if (!this.downtimes[shtdCat][shtdEvent.type]) {
-                                    this.downtimes[shtdCat][shtdEvent.type] = {
-                                        events: [],
-                                        totalDuration: 0,
-                                        totalNb: 0,
-                                        avgDuration: 0
-                                    };
+                            totalMachineDowntime += event.total_duration;
+
+                            //Update machine related data
+                            acc[event.implicated_machine].totalDowntime += event.total_duration;
+                            acc[event.implicated_machine].frequency++;
+
+                            //Update reason related data for current machine 
+                            acc[event.implicated_machine].causes[event.component].totalDowntime += event.total_duration;
+                            acc[event.implicated_machine].causes[event.component].frequency++;
+                            acc[event.implicated_machine].causes[event.component].avgDuration = 
+                                    Math.floor(acc[event.implicated_machine].causes[event.component].totalDowntime
+                                    /acc[event.implicated_machine].causes[event.component].frequency);
+
+                            //Update comment related data for current reason and machine 
+                            acc[event.implicated_machine].causes[event.component].comments[event.comment].totalDowntime += event.total_duration;
+                            acc[event.implicated_machine].causes[event.component].comments[event.comment].frequency++;
+                            acc[event.implicated_machine].causes[event.component].comments[event.comment].avgDuration = 
+                                    Math.floor(acc[event.implicated_machine].causes[event.component].comments[event.comment].totalDowntime
+                                    /acc[event.implicated_machine].causes[event.component].comments[event.comment].frequency);
+
+                            return acc;
+                        }, {});
+
+                        console.log(machinesShutdownsRanged);
+
+                        //Used to calculate external shutdown percentage
+                        let totalExternalDowntime = 0;
+                        //Range external shutdown events by shutdown cause
+                        let externalShutdownsRanged = this.unplannedDowntimeEvents[0].external.reduce((acc, event) => {
+                            if (!event.component) event.component = "N/A";
+                            if (!acc[event.component]) {
+                                acc[event.component] = {
+                                    totalDowntime: 0,
+                                    frequency: 0,
+                                    avgDuration: 0,
+                                    cause: event.component
                                 }
-
-                                this.downtimes[shtdCat][shtdEvent.type].events.push(shtdEvent);
-                                this.downtimes[shtdCat][shtdEvent.type].totalDuration += shtdEvent.total_duration;
-                                this.downtimes[shtdCat][shtdEvent.type].totalNb++;
                             }
 
-                            //Calculate average durations
-                            for (let shtdEventType of Object.keys(this.downtimes[shtdCat])) {
-                                const eventTypeAvgDuration = Math.round(this.downtimes[shtdCat][shtdEventType].totalDuration / this.downtimes[shtdCat][shtdEventType].totalNb);
-                                this.downtimes[shtdCat][shtdEventType].avgDuration = eventTypeAvgDuration;
-                            }
+                            totalExternalDowntime += event.total_duration;
+                            acc[event.component].totalDowntime += event.total_duration;
+                            acc[event.component].frequency++;
+                            acc[event.component].avgDuration = Math.floor(acc[event.component].totalDowntime/acc[event.component].frequency);
 
-                            //Create charts' datasets
-                            this.chartObjects[shtdCat].data.labels = Object.keys(this.downtimes[shtdCat]);
+                            return acc;
+                        }, {});
+
+                        this.shutdowns.machines = machinesShutdownsRanged;
+                        this.shutdowns.external = externalShutdownsRanged;
+                        this.percentages.machines = 100*totalMachineDowntime/(totalMachineDowntime + totalExternalDowntime);
+                        this.percentages.machines = (this.percentages.machines ? this.percentages.machines.toFixed(2) : "--");
+                        this.percentages.external = 100*totalExternalDowntime/(totalMachineDowntime + totalExternalDowntime);
+                        this.percentages.external = (this.percentages.external ? this.percentages.external.toFixed(2) : "--");
+
+                         //Update charts' data 
+                        for (let shtdCat of ['external', 'machines']) {
+                            //Delete old values
+                            this.chartObjects[shtdCat].data.labels = [];
                             this.chartObjects[shtdCat].data.datasets[0].data = [];
                             this.chartObjects[shtdCat].data.datasets[1].data = [];
-                            for (let shtdType of Object.keys(this.downtimes[shtdCat])) {
-                                this.chartObjects[shtdCat].data.datasets[0].data.push(this.downtimes[shtdCat][shtdType].totalDuration);
-                                this.chartObjects[shtdCat].data.datasets[1].data.push(this.downtimes[shtdCat][shtdType].totalNb);
+
+                            //Insert new values
+                            for (let shutdownEvent of Object.values(this.shutdowns[shtdCat])) {
+                                if (shtdCat === "machines") this.chartObjects[shtdCat].data.labels.push(shutdownEvent.machine);
+                                else this.chartObjects[shtdCat].data.labels.push(shutdownEvent.cause);
+                                this.chartObjects[shtdCat].data.datasets[0].data.push(shutdownEvent.totalDowntime);
+                                this.chartObjects[shtdCat].data.datasets[1].data.push(shutdownEvent.frequency);
                             }
                             this.chartObjects[shtdCat].update();
-                        }
-
-                        //Calculate unplanned downtime percentages
-                        let categoryTotalDowntime = {
-                            machines: 0,
-                            external: 0,
-                            total: 0
-                        };
-                        for (let shtdCat of ['external', 'machines']) {
-                            for (let event of Object.values(this.downtimes[shtdCat])) {
-                                categoryTotalDowntime[shtdCat] += event.totalDuration;
-                                categoryTotalDowntime.total += event.totalDuration;
-                            }
-                        }
-                        for (let shtdCat of ['external', 'machines']) {
-                            this.downtimePercentages[shtdCat] = Math.round((categoryTotalDowntime[shtdCat]/categoryTotalDowntime.total)*100)
                         }
                     });
                 });
@@ -236,12 +297,12 @@
                     data: {
                         labels: [],
                         datasets: [{
-                                label: 'Time in minutes',
+                                label: this.$t("timeInMinutes"),
                                 backgroundColor: 'rgb(112, 184, 232)',
                                 data: []
                             },
                             {
-                                label: 'Number',
+                                label: this.$t("number"),
                                 backgroundColor: 'rgb(246, 184, 192)',
                                 data: [],
                                 yAxisID: "freq"
@@ -256,7 +317,7 @@
                                 axis: 'y',
                                 title: {
                                     display: true,
-                                    text: 'Time in minutes'
+                                    text: this.$t("timeInMinutes")
                                 },
                                 position: 'left'
                             },
@@ -264,7 +325,7 @@
                                 axis: 'y',
                                 title: {
                                     display: true,
-                                    text: 'Number'
+                                    text: this.$t("number")
                                 },
                                 position: 'right'
                             }
@@ -298,6 +359,20 @@
 
         components: {
             ProductionWindow
+        },
+        
+        watch: {
+            '$i18n.locale': function() {
+                for (let shtdCat of ['external', 'machines']) {
+                    if (this.chartObjects[shtdCat]) {
+                        this.chartObjects[shtdCat].data.datasets[0].label = this.$t("timeInMinutes");
+                        this.chartObjects[shtdCat].data.datasets[1].label = this.$t("number");
+                        this.chartObjects[shtdCat].options.scales.time.title.text = this.$t("timeInMinutes");
+                        this.chartObjects[shtdCat].options.scales.freq.title.text = this.$t("number");
+                        this.chartObjects[shtdCat].update();
+                    }
+                }
+            }
         }
     }
 </script>
@@ -363,7 +438,33 @@
         padding: 15px 30px;
     }
 
-     
+    div.table-container .center-text {
+        text-align: center;
+    }
+
+    tr.subrow > td {
+        padding: 0px 0px 0px 5px !important;
+        border: none;
+        color: rgb(85, 85, 85);
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+    tr.sub-subrow > td {
+        padding: 0px 0px 0px 5px !important;
+        border: none;
+        color: gray;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+
+    tr.t-row > td {
+        padding: 0.75rem 0px 0.75px 5px;
+        color: black;
+        font-weight: bold;
+        font-size: 17px;
+    }
 
 
     div.downtime-percent-container {
