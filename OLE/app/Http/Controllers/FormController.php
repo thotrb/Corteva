@@ -171,6 +171,8 @@ class FormController extends Controller
             ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
             ->where('worksite.name', '=', $site)
             ->where('ole_productionline.productionline_name', '=', $productionLine)
+            ->whereDate('ole_pos.created_at', '>=', $beginningDate)
+            ->whereDate('ole_pos.created_at', '<=', $endingDate)
             ->get();
 
 
@@ -362,6 +364,50 @@ class FormController extends Controller
 
                 ->get();
 
+            $RRFMonth = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Reduced Rate At Filler')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+
+                })
+
+                ->get();
+
+            $RRMMonth = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Reduce Rate At An Other Machine')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+
+                })
+
+                ->get();
+
+            $FOSMonth = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+
+                })
+
+                ->get();
+
+            $FSMMonth = DB::table('ole_speed_losses')
+                ->where(function($query) use ($endDate, $startDate, $site) {
+                    $query->where('ole_speed_losses.productionline', '=', $site[0]->productionline_name)
+                        ->where('ole_speed_losses.reason', '=', 'Filler Own Stoppage By An Other Machine')
+                        -> whereBetween(DB::raw('DATE(ole_speed_losses.created_at)'), [$startDate, $endDate]);
+
+                })
+
+                ->get();
+
+
+
+
+
 
 
             $RRM = DB::table('ole_speed_losses')
@@ -462,8 +508,11 @@ class FormController extends Controller
                 'SITE' => $site,
                 'EVENTS' => $changingFormats,
                 'SLEVENTS' => $speedLossesEvents,
-                'PLANNEDEVENTS' => $plannedEvents
-
+                'PLANNEDEVENTS' => $plannedEvents,
+                'RRFMonth' => $RRFMonth,
+                'RRMMonth' => $RRMMonth,
+                'FOSMonth' => $FOSMonth,
+                'FSMMonth' => $FSMMonth,
             );
 
 
@@ -472,21 +521,21 @@ class FormController extends Controller
         }else{
             $tab = array(
 
-                'BM' => null,
-                'CP' => null,
-                'PM' => null,
-                'PP' => null,
-                'CIP' => null,
-                'COV' => null,
-                'BNC' => null,
-                'UEE' => null,
-                'USM' => null,
-                'FUS' => null,
-                'RRF' => null,
-                'RRM' => null,
-                'FOS' => null,
-                'FSM' => null,
-                'SITE' => null,
+                'BM' => 0,
+                'CP' => 0,
+                'PM' => 0,
+                'PP' => 0,
+                'CIP' => 0,
+                'COV' => 0,
+                'BNC' => 0,
+                'UEE' => 0,
+                'USM' => 0,
+                'FUS' => 0,
+                'RRF' => 0,
+                'RRM' => 0,
+                'FOS' => 0,
+                'FSM' => 0,
+                'SITE' => $site,
                 'EVENTS' => null,
 
 

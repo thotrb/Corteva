@@ -173,7 +173,7 @@
                     const params = [site, selectedPL, begDate, endDate];
                     console.log(params);
                     this.$store.dispatch('fetchAllEvents', params).then(() => {
-                        
+
                         this.resolveAfter(1000).then(() => {
 
                             if (!this.chartObjects.created) this.createCharts();
@@ -204,10 +204,12 @@
                                         slEvent.reducedRate = reducedRate || 0;
                                         acc[slEvent.reason].events.push(slEvent);
                                     }
+
                                     return acc;
                                 }, this.slEvents);
                             }
-                            
+
+
                             //Total speed loss duration as the sum of all categorie's durations
                             const totalSpeedLossDuration = Object.values(this.slEvents).reduce((acc, slCat) => {
                                 return acc + slCat.totalDuration;
@@ -224,7 +226,7 @@
                                 'Reduced Rate At Filler': 'own-stop',
                                 'Reduced Rate At An Other Machine': 'other-machine'
                             }
-                            
+
                             //Update charts' data
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data = [];
@@ -236,7 +238,7 @@
                                 this.chartObjects[map[key]].chart.update();
                             });
                         });
-                        
+
                     });
                 }
             },

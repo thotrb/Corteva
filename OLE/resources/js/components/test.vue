@@ -256,7 +256,8 @@
     import {mapGetters} from "vuex";
 
     export default {
-        name: "productionDashboard",
+        name: "test",
+
         data() {
             return {
                 lo: this.$t("load"),

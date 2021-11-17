@@ -73,6 +73,7 @@ Vue.component('unplanned_pannel_unplanned2', require('./components/unplanned_pan
 
 Vue.component('navbarSaisie', require('./components/navbarSaisie.vue').default);
 
+Vue.component('test', require('./components/test.vue').default);
 
 Vue.component('CIP_Declaration', require('./components/CIP_Declaration.vue').default);
 

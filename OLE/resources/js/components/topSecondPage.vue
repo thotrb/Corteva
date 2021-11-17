@@ -223,14 +223,7 @@
             }
 
             this.$store.dispatch('fetchSites');
-            let spinner = document.createElement('script');
-            spinner.setAttribute('src', 'https://unpkg.com/vue');
-            document.head.appendChild(spinner);
 
-            let spinner2 = document.createElement('script');
-            spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
-            spinner2.setAttribute('src', 'https://unpkg.com/vue-spinners-css');
-            document.head.appendChild(spinner2);
 
 
             console.log("POS : ");

@@ -37,10 +37,10 @@
 </header>
 
 <body>
-<div id="app">
+<div id="app" class="">
+
 
     <navbar></navbar>
-
     <downtimes-report></downtimes-report>
 </div>
 

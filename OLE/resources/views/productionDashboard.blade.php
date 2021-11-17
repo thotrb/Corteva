@@ -38,6 +38,7 @@
 <div id="app">
 
     <navbar></navbar>
+
     <production-dashboard></production-dashboard>
 </div>
 
