@@ -164,7 +164,6 @@
     "averageDuration": "Average duration",
     "externalShutdown": "External shutdown",
     "timeInMinutes": "Time in minutes",
-    "speedLosses": "Speed Losses",
     "reduceRateAtFiller": "Reduce rate at filler",
     "reduceRateAtFillerDueToAnotherMachineCapacity": "Reduce rate at filler due to another machine capacity",
     "fillerOwnStop": "Filler own stop",
@@ -173,5 +172,6 @@
     "reduceRate": "Reduce rate (cpm)",
     "wastedTime": "Wasted time (min)",
     "comments/reason": "Comments/Reason",
-    "select": "Select"
+    "select": "Select",
+    "standardDeviation": "Standard deviation"
 }

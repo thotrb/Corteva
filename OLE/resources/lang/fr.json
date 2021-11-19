@@ -81,7 +81,7 @@
     "fillerUnplannedShutdown" : "Arrêt de la Remplisseuse Non Planifié",
     "productionShift" : "Fenêtre de production",
     "from" : "De",
-    "to" : "A",
+    "to" : "à",
     "formVolumeSplit" : "Répartition des volumes",
     "packSizeSplit" : "Répartition des tailles d'emballage",
     "formulationSplit" : "Répartition des formulations",
@@ -162,14 +162,14 @@
     "averageDuration": "Durée moyenne",
     "externalShutdown": "Arrêt externe",
     "timeInMinutes": "Durée en minutes",
-    "speedLosses": "Pertes de vitesse",
     "reduceRateAtFiller": "Débit de remplissage réduit",
-    "reduceRateAtFillerDueToAnotherMachineCapacity": "Débit de remplissage réduit à la capacité d'une autre machine",
+    "reduceRateAtFillerDueToAnotherMachineCapacity": "Débit de remplissage réduit dû à la capacité d'une autre machine",
     "fillerOwnStop": "Arrêt remplisseur",
     "fillerStopByOtherMachine": "Arrêt remplisseur dû à une autre machine",
     "productionOrder": "Ordre de production (PO)",
     "reduceRate": "Débit réduit (cpm)",
     "wastedTime": "Temps perdu (min)",
     "comments/reason": "Commentaires / Raison",
-    "select": "Sélectionner"
+    "select": "Sélectionner",
+    "standardDeviation": "Écart-type"
 }

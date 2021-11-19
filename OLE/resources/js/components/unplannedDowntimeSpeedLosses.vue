@@ -13,7 +13,7 @@
                         </template>
                     </select>
 
-                    <label for="pl-selection">{{$t("prdocutionLine")}}: </label>
+                    <label for="pl-selection">{{$t("productionLine")}}: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- {{$t("select")}} --</option>
                         <template v-for="productionLine of sites[1]">
@@ -25,7 +25,7 @@
                         </template>
                     </select>
 
-                    <button id="pl-selection-load" type="button" class="btn btn-primary" v-on:click="chargeData();">Load</button>
+                    <button id="pl-selection-load" type="button" class="btn btn-primary" v-on:click="chargeData();">{{$t("load")}}</button>
             </div>
 
             <div class="production-window-container">
@@ -37,6 +37,43 @@
         <div class="content-panel">
             <span class="content-title">{{$t("speedLosses")}}</span>
                 <div class="table-panel no-bottom-border rounded-top-left">
+                    <span class="content-subtitle">{{$t("fillerOwnStop")}}</span>
+                    <div class="table-container">
+                        <table class="table table-responsive table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{{$t("productionOrder")}}</th>
+                                    <th scope="col">{{$t("format")}}</th>
+                                    <th scope="col">{{$t("designRate")}}</th>
+                                    <th scope="col">{{$t("reduceRate")}}</th>
+                                    <th scope="col">{{$t("wastedTime")}}</th>
+                                    <th scope="col">{{$t("comments/reason")}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template v-for="event of slEventsByTable.fillerStop">
+                                        <tr :key="event">
+                                            <td>{{event.id}}</td>
+                                            <td>{{event.size}} L</td>
+                                            <td>{{event.idealRate}}</td>
+                                            <td>{{event.reducedRate}}</td>
+                                            <td>{{event.duration}}</td>
+                                            <td>{{event.comment}}</td>
+                                        </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+                <div class="chart-panel no-bottom-border rounded-top-right">
+                    <div class="chart-container">
+                        <canvas class="chart" id="own-stop-sl-chart"></canvas>
+                    </div>
+                    
+                </div>
+
+                <div class="table-panel rounded-bottom-left">
                     <span class="content-subtitle">{{$t("reduceRateAtFiller")}}</span>
                     <div class="table-container">
                         <table class="table table-responsive table-hover">
@@ -51,52 +88,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <template v-for="slEvent of slEvents['Reduced Rate At Filler'].events">
-                                        <tr :key="slEvent">
-                                            <td>{{slEvent.id}}</td>
-                                            <td>{{slEvent.size}} L</td>
-                                            <td>{{slEvent.idealRate}}</td>
-                                            <td>{{slEvent.reducedRate}}</td>
-                                            <td>{{slEvent.duration}}</td>
-                                            <td>{{slEvent.comment}}</td>
-                                        </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                </div>
-                <div class="chart-panel no-bottom-border rounded-top-right">
-                    <span class="content-subtitle">{{$t("fillerOwnStop")}}</span>
-                    <div class="chart-container">
-                        <canvas class="chart" id="own-stop-sl-chart"></canvas>
-                    </div>
-                    
-                </div>
-
-                <div class="table-panel rounded-bottom-left">
-                    <span class="content-subtitle">{{$t("reduceRateAtFillerDueToAnotherMachineCapacity")}}</span>
-                    <div class="table-container">
-                        <table class="table table-responsive table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">{{$t("productionOrder")}}</th>
-                                    <th scope="col">{{$t("format")}}</th>
-                                    <th scope="col">{{$t("designRate")}}</th>
-                                    <th scope="col">{{$t("reduceRate")}}</th>
-                                    <th scope="col">{{$t("wastedTime")}}</th>
-                                    <th scope="col">{{$t("comments/reason")}}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template v-for="slEvent of slEvents['Reduced Rate At An Other Machine'].events">
-                                    <tr :key="slEvent">
-                                        <td>{{slEvent.id}}</td>
-                                        <td>{{slEvent.size}} L</td>
-                                        <td>{{slEvent.idealRate}}</td>
-                                        <td>{{slEvent.reducedRate}}</td>
-                                        <td>{{slEvent.duration}}</td>
-                                        <td>{{slEvent.comment}}</td>
+                                <template v-for="event of slEventsByTable.reducedRate">
+                                    <tr :key="event">
+                                        <td>{{event.id}}</td>
+                                        <td>{{event.size}} L</td>
+                                        <td>{{event.idealRate}}</td>
+                                        <td>{{event.reducedRate}}</td>
+                                        <td>{{event.duration}}</td>
+                                        <td>{{event.comment}}</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -105,11 +104,9 @@
                     
                 </div>
                 <div class="chart-panel rounded-bottom-right">
-                    <span class="content-subtitle">{{$t("fillerStopByOtherMachine")}}</span>
                     <div class="chart-container">
                         <canvas class="chart" id="other-machine-sl-chart"></canvas>
                     </div>
-                    
                 </div>
             </div>
     </div>
@@ -130,8 +127,12 @@
                 site: '',
                 productionLine: '',
                 chartObjects: {
-                    'own-stop': {chart: undefined, labels: ['Filler Own Stoppage', 'Reduced Rate At Filler']},
-                    'other-machine': {chart: undefined, labels: ['Filler Stop by Other Machine', 'Reduced Rate At And Other Machine']},
+                    'own-stop': {
+                        chart: undefined
+                    },
+                    'other-machine': {
+                        chart: undefined
+                    },
                     created: false
                 },
                 slEvents: {
@@ -139,6 +140,14 @@
                     'Reduced Rate At An Other Machine': {events: [], totalDuration: 0, percentage: 0},
                     'Filler Own Stoppage': {events: [], totalDuration: 0, percentage: 0},
                     'Filler Stop By Other Machine': {events: [], totalDuration: 0, percentage: 0}
+                },
+                dbNames: {
+                    fillerStop: ['Filler Own Stoppage', 'Filler Stop By Other Machine'],
+                    reducedRate: ['Reduced Rate At Filler', 'Reduced Rate At An Other Machine']
+                },
+                slEventsByTable: {
+                    fillerStop: [],
+                    reducedRate: []
                 }
             }
 
@@ -172,6 +181,7 @@
                 if (site && selectedPL && begDate && endDate) {
                     const params = [site, selectedPL, begDate, endDate];
                     console.log(params);
+                
                     this.$store.dispatch('fetchAllEvents', params).then(() => {
 
                         this.resolveAfter(1000).then(() => {
@@ -207,6 +217,17 @@
 
                                     return acc;
                                 }, this.slEvents);
+
+                                //Join table events
+                                this.slEventsByTable.reducedRate = [];
+                                this.slEventsByTable.fillerStop = [];
+                                for (let event of this.allEvents.SLEVENTS) {
+                                    if (this.dbNames.reducedRate.includes(event.reason)) {
+                                        this.slEventsByTable.reducedRate.push(event);
+                                    } else if (this.dbNames.fillerStop.includes(event.reason)) {
+                                        this.slEventsByTable.fillerStop.push(event);
+                                    }
+                                }
                             }
 
 
@@ -228,11 +249,23 @@
                             }
 
                             //Update charts' data
+                            let labels = {
+                                'own-stop': [
+                                    this.$t("fillerOwnStop"),
+                                    this.$t("fillerStopByOtherMachine")
+                                ],
+                                'other-machine': [
+                                    this.$t("reduceRateAtFiller"),
+                                    this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")
+                                ]
+                            };
                             Object.keys(map).forEach(key => {
                                 this.chartObjects[map[key]].chart.data.datasets[0].data = [];
                                 this.chartObjects[map[key]].chart.data.datasets[1].data = [];
                             });
+                            
                             Object.keys(map).forEach(key => {
+                                this.chartObjects[map[key]].chart.data.labels = labels[map[key]];
                                 this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
                                 this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
                                 this.chartObjects[map[key]].chart.update();
@@ -249,7 +282,7 @@
                     this.chartObjects[slCat].chart = new Chart(slCat + '-sl-chart', {
                     type: 'bar',
                     data: {
-                        labels: this.chartObjects[slCat].labels,
+                        labels: [],
                         datasets: [{
                                 label: this.$t("timeInMinutes"),
                                 backgroundColor: 'rgb(245, 194, 67)',
@@ -320,12 +353,24 @@
 
         watch: {
             '$i18n.locale': function() {
+                const labels = {
+                    'own-stop': [
+                        this.$t("fillerOwnStop"),
+                        this.$t("fillerStopByOtherMachine")
+                    ],
+                    'other-machine': [
+                        this.$t("reduceRateAtFiller"),
+                        this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")
+                    ]
+                };
+
                 for (let slCat of ['own-stop', 'other-machine']) {
                     if (this.chartObjects[slCat]) {
                         this.chartObjects[slCat].chart.data.datasets[0].label = this.$t("timeInMinutes");
                         this.chartObjects[slCat].chart.data.datasets[1].label = this.$t("number");
                         this.chartObjects[slCat].chart.options.scales.time.title.text = this.$t("timeInMinutes");
                         this.chartObjects[slCat].chart.options.scales.freq.title.text = this.$t("number");
+                        this.chartObjects[slCat].chart.data.labels = labels[slCat];
                         this.chartObjects[slCat].chart.update();
                     }
                 }

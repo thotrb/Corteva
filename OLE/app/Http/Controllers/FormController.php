@@ -79,7 +79,22 @@ class FormController extends Controller
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
             ->get();
+        
+        $seqCips = DB::table('ole_unplanned_event_cips')
+            ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
+            ->whereDate('ole_unplanned_event_cips.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_cips.created_at', '<=', $endingDate)
+            ->join('ole_pos', 'ole_pos.number', '=', 'ole_unplanned_event_cips.OLE')
+            ->join('ole_products', 'ole_products.GMID', '=', 'ole_pos.GMIDCode')
+            ->get();
 
+        $seqCovs = DB::table('ole_unplanned_event_changing_clients')
+            ->where('ole_unplanned_event_changing_clients.productionline', '=', $productionLine)
+            ->whereDate('ole_unplanned_event_changing_clients.created_at', '>=', $beginningDate)
+            ->whereDate('ole_unplanned_event_changing_clients.created_at', '<=', $endingDate)
+            ->join('ole_pos', 'ole_pos.number', '=', 'ole_unplanned_event_changing_clients.OLE')
+            ->join('ole_products', 'ole_products.GMID', '=', 'ole_pos.GMIDCode')
+            ->get();
 
 
         $tab = array([
@@ -87,7 +102,9 @@ class FormController extends Controller
             'COV' => $COV,
             'BNC' => $BNC,
             'machines' => $machineShutdowns,
-            'external' => $externalShutdowns
+            'external' => $externalShutdowns,
+            'seqCIP' => $seqCips,
+            'seqCOV' => $seqCovs
         ]);
 
         return response()->json($tab);
@@ -193,6 +210,8 @@ class FormController extends Controller
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear.'-'.$endingMonth.'-'.$endingDay)->startOfDay();
 
             
+
+
             $speedLossesEvents =  DB::table('ole_speed_losses')
                 ->select('ole_speed_losses.duration', 'ole_speed_losses.reason', 'ole_speed_losses.comment', 'ole_pos.id', 'ole_pos.qtyProduced', 'ole_pos.workingDuration', 'ole_products.size', 'ole_products.idealRate')
                 ->where('ole_speed_losses.productionline', '=', $productionLine)

@@ -10,8 +10,8 @@
             <!-- Site and production line selection-->
             <div class="site-pl-selection">
                     <label for="site-selection">Site: </label>
-                    <select id="site-selection" v-model="site">
-                        <option disabled selected value>-- ${{$t("select")}} --</option>
+                    <select id="site-selection" v-on:change="productionLineSelected();" v-model="site">
+                        <option disabled selected value>-- {{$t("select")}} --</option>
                         <template v-for="site of sites[0]">
                             <option v-bind:key="site.name" v-bind:value="site.name">{{site.name}}</option>
                         </template>
@@ -20,7 +20,7 @@
 
                     <label for="pl-selection">{{$t("productionLine")}} </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
-                        <option disabled selected value>-- Select --</option>
+                        <option disabled selected value="">-- {{$t("select")}} --</option>
                         <template v-for="productionLine of sites[1]">
                             <template v-if="productionLine.name === site">
                                 <option v-bind:key="productionLine.productionline_name" v-bind:value="productionLine.productionline_name">
@@ -99,7 +99,7 @@
                     <div :key="cat" class="d-flex ya-info-row">
                         <div class="d-flex">
                             <span style="font-weight: bold">{{$t("yearly" + cat.toUpperCase())}}</span>
-                            <span>&emsp;{{downtimes[cat].general.yearlyDuration}} {{$t("number")}}</span>
+                            <span>&emsp;{{downtimes[cat].general.yearlyDuration}} {{$t("hours")}}</span>
                             <span>&emsp;{{downtimes[cat].general.yearlyNb}} {{cat.toUpperCase()}}</span>
                         </div>
                         <div class="d-flex">
@@ -116,7 +116,7 @@
             <div class="chart-container">
                 <canvas class="chart" id="cip-chart"></canvas>
                 <p class="downtime-percent" id="cip-percent">
-                    <span>{{downtimes.cip.general.downtimePercentage}} % </span>
+                    <span>{{downtimes.cip.general ? downtimes.cip.general.downtimePercentage : '--'}} % </span>
                     <span>{{$t("of")}}</span>
                     <span>{{$t("unplannedDowntime")}}</span>
                 </p>
@@ -124,7 +124,7 @@
             <div class="chart-container">
                 <canvas class="chart" id="cov-chart"></canvas>
                 <p class="downtime-percent" id="cov-percent">
-                    <span>{{downtimes.cov.general.downtimePercentage}} % </span>
+                    <span>{{downtimes.cov.general ? downtimes.cov.general.downtimePercentage : '--'}} % </span>
                     <span>{{$t("of")}}</span>
                     <span>{{$t("unplannedDowntime")}}</span>
                 </p>
@@ -132,11 +132,95 @@
             <div class="chart-container">
                 <canvas class="chart" id="bnc-chart"></canvas>
                 <p class="downtime-percent" id="bnc-percent">
-                    <span>{{downtimes.bnc.general.downtimePercentage}} % </span>
+                    <span>{{downtimes.bnc.general ? downtimes.bnc.general.downtimePercentage : '--'}} % </span>
                     <span>{{$t("of")}}</span>
                     <span>{{$t("unplannedDowntime")}}</span>
                 </p>
             </div>
+        </div>
+
+
+        <div class="row justify-content-center seq-tables-container">
+           <div class="col-auto">
+                <table class="table table-responsive seq-cip">
+                <thead>
+                    <tr>
+                        <th scope="col">{{$t('cleaningInPlaceCIP')}}</th>
+                        <template v-for="cat of Object.keys(sequencesCIP)">
+                            <th :key="cat">{{cat}}</th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr :key="event">
+                        <th scope="row">{{$t('duration')}}</th>
+                        <template v-for="event of sequencesCIP">
+                            <td :key="event">{{event.totalDuration}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('number')}}</th>
+                        <template v-for="event of sequencesCIP">
+                            <td :key="event">{{event.number}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('average')}}</th>
+                        <template v-for="event of sequencesCIP">
+                            <td :key="event">{{event.avgDuration}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('standardDeviation')}}</th>
+                        <template v-for="event of sequencesCIP">
+                            <td :key="event">{{event.std.toFixed(4)}}</td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table> 
+           </div>
+        </div>
+            
+         <div class="row justify-content-center seq-tables-container">
+           <div class="col-auto">
+                <table class="table table-responsive seq-cov">
+                <thead>
+                    <tr>
+                        <th scope="col">{{$t('changeOver')}}</th>
+                        <template v-for="cat of Object.keys(sequencesCOV)">
+                            <th :key="cat">{{cat}}</th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr :key="event">
+                        <th scope="row">{{$t('duration')}}</th>
+                        <template v-for="event of sequencesCOV">
+                            <td :key="event">{{event.totalDuration}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('number')}}</th>
+                        <template v-for="event of sequencesCOV">
+                            <td :key="event">{{event.number}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('average')}}</th>
+                        <template v-for="event of sequencesCOV">
+                            <td :key="event">{{event.avgDuration}}</td>
+                        </template>
+                    </tr>
+                    <tr :key="event">
+                        <th scope="row">{{$t('standardDeviation')}}</th>
+                        <template v-for="event of sequencesCOV">
+                            <td :key="event">{{event.std.toFixed(4)}}</td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table> 
+           </div>
+         </div>
         </div>
     </div>
 </template>
@@ -174,7 +258,9 @@
                     created: false
                 },
                 site: '',
-                productionLine: ''
+                productionLine: '',
+                sequencesCIP: {},
+                sequencesCOV: {}
             }
 
             //Populate downtimes array
@@ -204,11 +290,11 @@
           },
 
           productionLineSelected: function () {
-              if (document.getElementById("pl-selection").value) {
-                  document.querySelector('div.production-window-container').style.visibility = 'visible';
-                  this.chargeCurrentYearData();
-                  //this.chargeGeneralData();
-              } else document.querySelector('div.production-window-container').style.visibility = 'hidden';
+                this.resolveAfter(300).then(() => {
+                    if (document.getElementById("pl-selection").value) {
+                    this.chargeCurrentYearData();
+                    }
+                });
           },
 
           getMonth: function (dateString) {
@@ -230,11 +316,13 @@
               const dateTo = currentYear + '-12-31'
               const params = [selectedPL, dateFrom, dateTo];
 
+
               this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
                     //Wait for data
               this.resolveAfter(1000).then(() => {
                   //A new downtime object is created to delete previous data
                   this.createDowntimeObject();
+                 
                   let totalDuration = {
                       cip: 0,
                       cov: 0,
@@ -252,7 +340,7 @@
                   };
 
                   let totalDowntimeDuration = 0;
-
+              
                   for (let type of ['cip', 'cov', 'bnc']) {
                       for (let event of this.unplannedDowntimeEvents[0][type.toUpperCase()]) {
                           const monthCreated = this.getMonth(event.created_at);
@@ -276,7 +364,7 @@
 
                       //Nb.: Or (||) operator returns last velue when both are falsy
                       this.downtimes[type].general.yearlyDuration = totalDuration[type].toFixed(2);
-                      this.downtimes[type].general.yearlyNb = totalNb[type].toFixed(2);
+                      this.downtimes[type].general.yearlyNb = totalNb[type];
                       this.downtimes[type].general.yearlyAvg = ((totalDuration[type] / totalNb[type]) || 0).toFixed(2);
 
                       //Create charts if they dont exist already
@@ -305,6 +393,65 @@
                       }
 
                   }
+
+                  this.sequencesCIP = {};
+                  for (let event of this.unplannedDowntimeEvents[0].seqCIP) {
+                      const pair = event.previous_bulk + "/" + event.BULK;
+                      if (!this.sequencesCIP[pair]) {
+                        this.sequencesCIP[pair] = {
+                            totalDuration: 0,
+                            number: 0,
+                            avgDuration: 0,
+                            std: 0,
+                            durations: []
+                        };
+                      }
+                      this.sequencesCIP[pair].durations.push(event.total_duration);
+                      this.sequencesCIP[pair].totalDuration += event.total_duration;
+                      this.sequencesCIP[pair].number++;
+                      this.sequencesCIP[pair].avgDuration = this.sequencesCIP[pair].totalDuration/this.sequencesCIP[pair].number;
+                      
+                      //Calculate standard deviation
+                      let std = 0;
+                      let mean = this.sequencesCIP[pair].avgDuration;
+                      for (let duration of this.sequencesCIP[pair].durations) {
+                          std += (duration - mean)**2;
+                      }
+                      std /= this.sequencesCIP[pair].durations.length;
+                      std **= 0.5;
+
+                      this.sequencesCIP[pair].std = std;
+                  }
+
+                  this.sequencesCOV = {};
+                  for (let event of this.unplannedDowntimeEvents[0].seqCOV) {
+                      const type = event.size + "L";
+                      if (!this.sequencesCOV[type]) {
+                        this.sequencesCOV[type] = {
+                            totalDuration: 0,
+                            number: 0,
+                            avgDuration: 0,
+                            std: 0,
+                            durations: []
+                        };
+                      }
+                      this.sequencesCOV[type].durations.push(event.total_duration);
+                      this.sequencesCOV[type].totalDuration += event.total_duration;
+                      this.sequencesCOV[type].number++;
+                      this.sequencesCOV[type].avgDuration = this.sequencesCOV[type].totalDuration/this.sequencesCOV[type].number;
+                      
+                      //Calculate standard deviation
+                      let std = 0;
+                      let mean = this.sequencesCOV[type].avgDuration;
+                      for (let duration of this.sequencesCOV[type].durations) {
+                          std += (duration - mean)**2;
+                      }
+                      std /= this.sequencesCOV[type].durations.length;
+                      std **= 0.5;
+
+                      this.sequencesCOV[type].std = std;
+                  }
+
                 }).then(() => this.chargeGeneralData());
             });
           },
@@ -378,7 +525,7 @@
         },
 
         computed: {
-            ...mapGetters(['sites', 'unplannedDowntimeEvents'])
+            ...mapGetters(['sites', 'unplannedDowntimeEvents', 'allEvents'])
         },
 
         components: {
@@ -471,6 +618,7 @@
         display: flex;
         justify-content: center;
         height: 350px;
+        border-bottom: 1px solid;
     }
 
     div.chart-container {
@@ -515,7 +663,8 @@
         padding: 0px 10px;
     }
 
-    div.table-ya-container thead {
+    div.table-ya-container thead,
+    div.seq-tables-container thead {
         color: white;
         background: #56baed;
     }
@@ -537,15 +686,31 @@
         border-bottom: none;
     }
 
-    div.container-table th:first-of-type{
+    div.container-table th:first-of-type,
+    div.seq-tables-container th:first-of-type {
         border-top-left-radius: 7px;
         border-bottom-left-radius: 7px;
     }
 
-    div.container-table th:last-of-type{
+    div.container-table th:last-of-type,
+    div.seq-tables-container th:last-of-type
+    {
         border-top-right-radius: 7px;
         border-bottom-right-radius: 7px;
     }
+
+
+    div.seq-tables-container table {
+        text-align: center;
+
+    }
+
+    table.seq-cip {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+
 
 
 </style>
