@@ -63,8 +63,16 @@ let mutations = {
         return state.machines = machines;
     },
 
+    FETCH_PERFORMANCE_INDEXES(state, performanceIndexes){
+        return state.performanceIndexes = performanceIndexes;
+    },
+
     FETCH_ALL_EVENTS(state, events){
         return state.allEvents = events;
+    },
+
+    FETCH_QUALITY_LOSSES(state, qualityLosses){
+        return state.qualityLosses = qualityLosses;
     },
 
     FETCH_ALL_VOLUMES(state, volumes){

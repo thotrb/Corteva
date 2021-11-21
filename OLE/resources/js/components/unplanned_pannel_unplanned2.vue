@@ -310,7 +310,7 @@
                 this.title = this.$t("unplannedDowntime");
             }
 
-            this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "Remplisseuse");
+            this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "filler");
 
             //while(this.downtimeReasons_2.length === 0){
             //  this.resolveAfter05Second();

@@ -12,13 +12,13 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
           integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="{{mix('css/app.css')}}">
-
+    <link rel="stylesheet" href="css/domaarrwo.css">
+    <script src="js/domaarrow.js"></script>
     <!-- Styles -->
     <style>
 
         <!--
         html, body {
-            padding: 45px;
             background-color: lightgray;
             color: #636b6f;
             font-family: 'Nunito', sans-serif;
@@ -32,10 +32,12 @@
 <div id="app">
 <body>
     <navbar></navbar>
-    <quality-losses-dashboard></quality-losses-dashboard>
-    <script async src="{{mix('js/app.js')}}"></script>
+
+    <quality-losses-dashboard2></quality-losses-dashboard2>
+
 </body>
 </div>
+<script async src="{{mix('js/app.js')}}"></script>
 
 </html>
 <script>

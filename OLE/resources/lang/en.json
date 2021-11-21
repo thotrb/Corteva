@@ -38,7 +38,7 @@
     "totalPOOperatingTime" : "Total PO Operating Time",
     "difference" : "Difference",
     "totalPOPerformance" : "Total PO Performance",
-    "noPerformanceRegistered" : "No Performance Registered",
+    "noPerformanceLossRegistered" : "No Performance Loss Registered",
     "speedLossJustification" : "Speedloss Justification",
     "speedLoss" : "Speedloss",
     "fillerOwnStoppage" : "Filler own stoppage",
@@ -66,6 +66,7 @@
     "volumePacked" : "Volume Packed",
     "numberOfProductionOrder" : "Number of Production Order",
     "numberOfItemsProduced" : "Number of items Produced",
+    "numberOfItems" : "Number of items",
     "bottles" : "Bottles",
     "prioritizeList" : "Prioritize list",
     "noProductionPlanned" : "No Production Planned",
@@ -155,6 +156,15 @@
     "Sep": "Sep",
     "Oct": "Oct",
     "Nov": "Nov",
-    "Dec": "Dec"
+    "Dec": "Dec",
+    "qualityLossesByMachine" : "Quality Losses By Machine",
+    "qualityLossesByFormat" : "Quality Losses By Format",
+    "filling" : "Filling",
+    "capping" : "Capping",
+    "qualityLossesDashboard" : "Quality Losses Dashboard",
+    "total" : "Total",
+    "qualityControl" : "Quality Control"
+
+
 
 }

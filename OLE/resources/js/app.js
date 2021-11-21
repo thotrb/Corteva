@@ -96,7 +96,11 @@ Vue.component('unplannedDowntimeShutdowns', require('./components/unplannedDownt
 Vue.component('unplannedDowntimeSpeedLosses', require('./components/unplannedDowntimeSpeedLosses.vue').default);
 
 Vue.component('qualityLossesDashboard', require('./components/qualityLossesDashboard.vue').default);
+
+Vue.component('qualityLossesDashboard2', require('./components/qualityLossesDashboard2.vue').default);
+
 /**
+ *
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.

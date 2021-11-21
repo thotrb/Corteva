@@ -27,6 +27,10 @@ let getters = {
         return state.allEvents;
     },
 
+    qualityLosses : state =>{
+        return state.qualityLosses;
+    },
+
     unplannedDowntimeEvents: state => {
         return state.unplannedDowntimeEvents;
     },
@@ -79,6 +83,10 @@ let getters = {
     netOP: state => {
 
         return state.netOP
+    },
+
+    performanceIndexes: state => {
+        return state.performanceIndexes;
     },
 
     downtimeReasons_2: state => {

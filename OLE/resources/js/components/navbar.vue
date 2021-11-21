@@ -24,8 +24,8 @@
                         {{$t("downtimesReport")}}
                     </option>
 
-                    <option value="monthlyLoadFactor">
-                        {{$t("monthlyLoadFactor")}}
+                    <option value="qualityLossesDashboard">
+                        {{$t("qualityLossesDashboard")}}
                     </option>
 
                     <option value="productionDashboard">

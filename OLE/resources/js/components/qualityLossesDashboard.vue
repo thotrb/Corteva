@@ -1,12 +1,13 @@
 <template>
-    <div class="d-flex main-container">
 
+
+    <div class="d-flex main-container">
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
             <div class="d-flex site-pl-selection">
                 <div class="d-flex">
-                    <label for="site-selection">Site: </label>
+                    <label for="site-selection">{{$t("site")}}: </label>
                     <select id="site-selection" v-model="site">
                         <option disabled selected value>-- Select --</option>
                         <template v-for="site of sites[0]">
@@ -15,7 +16,7 @@
                     </select>
                 </div>
                 <div class="d-flex">
-                    <label for="pl-selection">Production line: </label>
+                    <label for="pl-selection">{{$t("productionLine")}}: </label>
                     <select id="pl-selection" v-on:change="productionLineSelected();">
                         <option disabled selected value>-- Select --</option>
                         <template v-for="productionLine of sites[1]">
@@ -27,20 +28,25 @@
                         </template>
                     </select>
                 </div>
+
+                <div class="d-flex">
+                    <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                </div>
+
             </div>
         </div>
 
 
         <div class="content-panel">
             <div class="upper-panel">
-                <span class="content-title">Quality Losses</span>
+                <span class="content-title">{{$t("qualityLosses")}}</span>
                 <div class="chart-panel">
 
                 </div>
             </div>
             <div class="bottom-panel">
                 <div class="ql-machine-panel">
-                    <span class="content-title">Quality Losses by Machine</span>
+                    <span class="content-title">{{$t("qualityLossesByMachine")}}</span>
                     <div class="inner-content-panel">
                         <div class="table-panel">
 
@@ -51,7 +57,7 @@
                     </div>
                 </div>
                 <div class="ql-format-panel">
-                    <span class="content-title">Quality Losses by Format</span>
+                    <span class="content-title">{{$t("qualityLossesByFormat")}}</span>
                     <div class="inner-content-panel">
                         <div class="table-panel">
 
@@ -79,8 +85,9 @@
 
                 currentYear: (new Date()).getFullYear(),
                 site: '',
-                productionLine: ''
-            }
+                productionLine: '',
+                lo : this.$t("load"),
+            };
 
             return data;
         },
@@ -165,6 +172,24 @@
                 this.$i18n.locale = sessionStorage.getItem("language");
             }
             this.$store.dispatch('fetchSites');
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("startingPO").setAttribute("max", today);
+            document.getElementById("endingPO").setAttribute("max", today);
+
 
             //Load chart.js into vue component
             let chartJs = document.createElement('script');
