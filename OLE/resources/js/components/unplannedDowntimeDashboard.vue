@@ -30,32 +30,7 @@
                         </template>
                     </select>
             </div>
-            <!-- Production window -->
-            <div class="d-flex production-window-container">
-                <production-window :yearSelectedFunction="chargeGeneralData"/>
-                <div class="d-flex pw-table-container">
-                    <template v-for="cat of Object.keys(unplannedDowntimesCategories)">
-                        <table class="table" :key="cat">
-                            <thead></thead>
-                            <tbody>
-                                <tr class="t-row">
-                                    <td scope="col">{{$t(unplannedDowntimesCategories[cat])}}</td>
-                                    <td scope="col"></td>
-                                </tr>
-                                <tr class="subrow">
-                                    <td scope="col">&emsp;{{$t("duration")}}</td>
-                                    <td scope="col">{{generalData[cat].totalDuration}}</td>
-                                </tr>
-                                <tr class="subrow last-subrow">
-                                    <td scope="col">&emsp;{{$t("number")}}</td>
-                                    <td scope="col">{{generalData[cat].totalNb}}</td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </template>
-                </div>
-            </div>
+            
         </div>
 
         <!-- Downtime table, yearly and average information container-->
@@ -139,6 +114,32 @@
             </div>
         </div>
 
+        <!-- Production window -->
+            <div class="d-flex production-window-container">
+                <production-window :yearSelectedFunction="chargeGeneralData"/>
+                <div class="d-flex pw-table-container">
+                    <template v-for="cat of Object.keys(unplannedDowntimesCategories)">
+                        <table class="table" :key="cat">
+                            <thead></thead>
+                            <tbody>
+                                <tr class="t-row">
+                                    <td scope="col">{{$t(unplannedDowntimesCategories[cat])}}</td>
+                                    <td scope="col"></td>
+                                </tr>
+                                <tr class="subrow">
+                                    <td scope="col">&emsp;{{$t("duration")}}</td>
+                                    <td scope="col">{{generalData[cat].totalDuration}}</td>
+                                </tr>
+                                <tr class="subrow last-subrow">
+                                    <td scope="col">&emsp;{{$t("number")}}</td>
+                                    <td scope="col">{{generalData[cat].totalNb}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </template>
+                </div>
+            </div>
 
         <div class="row justify-content-center seq-tables-container">
            <div class="col-auto">
@@ -393,7 +394,28 @@
 
                   }
 
-                  this.sequencesCIP = {};
+                }).then(() => this.chargeGeneralData());
+            });
+          },
+
+          chargeGeneralData: function () {
+            const selectedPL = document.getElementById('pl-selection').value;
+            const dateFrom = document.getElementById('select-date-from').value;
+            const dateTo = document.getElementById('select-date-to').value;
+            const params = [selectedPL, dateFrom, dateTo];
+
+            this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
+                this.resolveAfter(1000).then(() => {
+                    for (let cat of ['cip', 'cov', 'bnc']) {
+                        this.generalData[cat] = {totalDuration: 0, totalNb: 0};
+                        for (let event of this.unplannedDowntimeEvents[0][cat.toUpperCase()]) {
+                            this.generalData[cat].totalDuration += (event.total_duration / 60);
+                            this.generalData[cat].totalNb ++;
+                        }
+                        this.generalData[cat].totalDuration = this.generalData[cat].totalDuration.toFixed(2);
+                    }
+
+                    this.sequencesCIP = {};
                   for (let event of this.unplannedDowntimeEvents[0].seqCIP) {
                       const pair = event.previous_bulk + "/" + event.BULK;
                       if (!this.sequencesCIP[pair]) {
@@ -450,27 +472,6 @@
 
                       this.sequencesCOV[type].std = std;
                   }
-
-                }).then(() => this.chargeGeneralData());
-            });
-          },
-
-          chargeGeneralData: function () {
-            const selectedPL = document.getElementById('pl-selection').value;
-            const dateFrom = document.getElementById('select-date-from').value;
-            const dateTo = document.getElementById('select-date-to').value;
-            const params = [selectedPL, dateFrom, dateTo];
-
-            this.$store.dispatch('fetchDowntimeEvents', params).then(() => {
-                this.resolveAfter(1000).then(() => {
-                    for (let cat of ['cip', 'cov', 'bnc']) {
-                        this.generalData[cat] = {totalDuration: 0, totalNb: 0};
-                        for (let event of this.unplannedDowntimeEvents[0][cat.toUpperCase()]) {
-                            this.generalData[cat].totalDuration += (event.total_duration / 60);
-                            this.generalData[cat].totalNb ++;
-                        }
-                        this.generalData[cat].totalDuration = this.generalData[cat].totalDuration.toFixed(2);
-                    }
                 });
             });
           },
@@ -639,6 +640,7 @@
         border-radius: 5px;
         margin-top: 10px;
         width: 800px;
+        align-self: center;
     }
 
     tr.subrow > td {

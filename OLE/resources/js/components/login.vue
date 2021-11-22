@@ -65,8 +65,6 @@
                     window.location.replace( this.url + "packagingLineID");
                 }
 
-
-
             },
 
             mounted: function () {
