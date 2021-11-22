@@ -134,8 +134,8 @@
     "nothingProduced" : "Nothing produced",
     "unplannedDowntimeDashboard": "Unplanned Downtime Dashboard",
     "productionWindow": "Production Window",
-    "duration": "Number",
-    "number": "Duration",
+    "number": "Number",
+    "duration": "Duration",
     "yearlyCIP": "Yearly CIP",
     "yearlyCOV": "Yearly COV",
     "yearlyBNC": "Yearly BNC",
@@ -163,8 +163,23 @@
     "capping" : "Capping",
     "qualityLossesDashboard" : "Quality Losses Dashboard",
     "total" : "Total",
-    "qualityControl" : "Quality Control"
-
-
-
+    "qualityControl" : "Quality Control",
+    "machinesShutdowns": "Machines Shutdowns",
+    "externalShutdowns" : "External Shutdowns",
+    "machineShutdown": "Machine shutdown",
+    "totalDowntime": "Total downtime",
+    "frequency": "Frequency",
+    "averageDuration": "Average duration",
+    "externalShutdown": "External shutdown",
+    "timeInMinutes": "Time in minutes",
+    "reduceRateAtFiller": "Reduce rate at filler",
+    "reduceRateAtFillerDueToAnotherMachineCapacity": "Reduce rate at filler due to another machine capacity",
+    "fillerOwnStop": "Filler own stop",
+    "fillerStopByOtherMachine": "Filler stop by other machine",
+    "productionOrder": "Production order (PO)",
+    "reduceRate": "Reduce rate (cpm)",
+    "wastedTime": "Wasted time (min)",
+    "comments/reason": "Comments/Reason",
+    "select": "Select",
+    "standardDeviation": "Standard deviation"
 }

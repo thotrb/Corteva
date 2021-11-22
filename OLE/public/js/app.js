@@ -10635,6 +10635,89 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -10664,7 +10747,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         created: false
       },
       site: '',
-      productionLine: ''
+      productionLine: '',
+      sequencesCIP: {},
+      sequencesCOV: {}
     }; //Populate downtimes array
 
     var _iterator = _createForOfIteratorHelper(data.months),
@@ -10731,10 +10816,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }
     },
     productionLineSelected: function productionLineSelected() {
-      if (document.getElementById("pl-selection").value) {
-        document.querySelector('div.production-window-container').style.visibility = 'visible';
-        this.chargeCurrentYearData(); //this.chargeGeneralData();
-      } else document.querySelector('div.production-window-container').style.visibility = 'hidden';
+      var _this = this;
+
+      this.resolveAfter(300).then(function () {
+        if (document.getElementById("pl-selection").value) {
+          _this.chargeCurrentYearData();
+        }
+      });
     },
     getMonth: function getMonth(dateString) {
       return parseInt(dateString.substring(5, 7));
@@ -10769,7 +10857,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }
     },
     chargeCurrentYearData: function chargeCurrentYearData() {
-      var _this = this;
+      var _this2 = this;
 
       var selectedPL = document.getElementById('pl-selection').value;
       var currentYear = new Date().getFullYear().toString();
@@ -10778,9 +10866,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       var params = [selectedPL, dateFrom, dateTo];
       this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
         //Wait for data
-        _this.resolveAfter(1000).then(function () {
+        _this2.resolveAfter(1000).then(function () {
           //A new downtime object is created to delete previous data
-          _this.createDowntimeObject();
+          _this2.createDowntimeObject();
 
           var totalDuration = {
             cip: 0,
@@ -10802,25 +10890,25 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           var _loop = function _loop() {
             var type = _arr[_i];
 
-            var _iterator3 = _createForOfIteratorHelper(_this.unplannedDowntimeEvents[0][type.toUpperCase()]),
+            var _iterator3 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0][type.toUpperCase()]),
                 _step3;
 
             try {
               for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
                 var event = _step3.value;
 
-                var monthCreated = _this.getMonth(event.created_at);
+                var monthCreated = _this2.getMonth(event.created_at);
 
-                var month = _this.months[monthCreated - 1];
+                var month = _this2.months[monthCreated - 1];
                 var eventDurationInHours = event.total_duration / 60;
                 var eventDurationLabelCoef = Math.floor(event.total_duration / 10);
                 var durationIntervalChartLabel = "".concat(10 * eventDurationLabelCoef, "-").concat(10 * eventDurationLabelCoef + 9, " min");
                 if (!Object.keys(labels[type]).includes(durationIntervalChartLabel)) labels[type][durationIntervalChartLabel] = 1;else labels[type][durationIntervalChartLabel]++;
 
-                _this.downtimes[type][month].events.push(event);
+                _this2.downtimes[type][month].events.push(event);
 
-                _this.downtimes[type][month].totalNb++;
-                _this.downtimes[type][month].totalDuration += eventDurationInHours;
+                _this2.downtimes[type][month].totalNb++;
+                _this2.downtimes[type][month].totalDuration += eventDurationInHours;
                 totalDuration[type] += eventDurationInHours;
                 totalNb[type]++;
               }
@@ -10832,27 +10920,27 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
             totalDowntimeDuration += totalDuration[type]; //Nb.: Or (||) operator returns last velue when both are falsy
 
-            _this.downtimes[type].general.yearlyDuration = totalDuration[type].toFixed(2);
-            _this.downtimes[type].general.yearlyNb = totalNb[type].toFixed(2);
-            _this.downtimes[type].general.yearlyAvg = (totalDuration[type] / totalNb[type] || 0).toFixed(2); //Create charts if they dont exist already
+            _this2.downtimes[type].general.yearlyDuration = totalDuration[type].toFixed(2);
+            _this2.downtimes[type].general.yearlyNb = totalNb[type];
+            _this2.downtimes[type].general.yearlyAvg = (totalDuration[type] / totalNb[type] || 0).toFixed(2); //Create charts if they dont exist already
 
-            if (!_this.chartObjects.created) _this.createCharts(); //Sort labels alphabetically
+            if (!_this2.chartObjects.created) _this2.createCharts(); //Sort labels alphabetically
 
             labels[type] = Object.keys(labels[type]).sort().reduce(function (acc, key) {
               acc[key] = labels[type][key];
               return acc;
             }, {}); //Update chart data
 
-            _this.chartObjects[type].data.labels = Object.keys(labels[type]);
-            _this.chartObjects[type].data.datasets[0].data = [];
+            _this2.chartObjects[type].data.labels = Object.keys(labels[type]);
+            _this2.chartObjects[type].data.datasets[0].data = [];
 
             for (var _i2 = 0, _Object$keys = Object.keys(labels[type]); _i2 < _Object$keys.length; _i2++) {
               var label = _Object$keys[_i2];
 
-              _this.chartObjects[type].data.datasets[0].data.push(labels[type][label]);
+              _this2.chartObjects[type].data.datasets[0].data.push(labels[type][label]);
             }
 
-            _this.chartObjects[type].update();
+            _this2.chartObjects[type].update();
           };
 
           for (var _i = 0, _arr = ['cip', 'cov', 'bnc']; _i < _arr.length; _i++) {
@@ -10865,46 +10953,153 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
             if (downtimePercent) {
               downtimePercent = downtimePercent.toFixed(2);
-              _this.downtimes[type].general.downtimePercentage = downtimePercent;
+              _this2.downtimes[type].general.downtimePercentage = downtimePercent;
             }
           }
+
+          _this2.sequencesCIP = {};
+
+          var _iterator4 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0].seqCIP),
+              _step4;
+
+          try {
+            for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+              var event = _step4.value;
+              var pair = event.previous_bulk + "/" + event.BULK;
+
+              if (!_this2.sequencesCIP[pair]) {
+                _this2.sequencesCIP[pair] = {
+                  totalDuration: 0,
+                  number: 0,
+                  avgDuration: 0,
+                  std: 0,
+                  durations: []
+                };
+              }
+
+              _this2.sequencesCIP[pair].durations.push(event.total_duration);
+
+              _this2.sequencesCIP[pair].totalDuration += event.total_duration;
+              _this2.sequencesCIP[pair].number++;
+              _this2.sequencesCIP[pair].avgDuration = _this2.sequencesCIP[pair].totalDuration / _this2.sequencesCIP[pair].number; //Calculate standard deviation
+
+              var std = 0;
+              var mean = _this2.sequencesCIP[pair].avgDuration;
+
+              var _iterator6 = _createForOfIteratorHelper(_this2.sequencesCIP[pair].durations),
+                  _step6;
+
+              try {
+                for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+                  var duration = _step6.value;
+                  std += Math.pow(duration - mean, 2);
+                }
+              } catch (err) {
+                _iterator6.e(err);
+              } finally {
+                _iterator6.f();
+              }
+
+              std /= _this2.sequencesCIP[pair].durations.length;
+              std = Math.pow(std, 0.5);
+              _this2.sequencesCIP[pair].std = std;
+            }
+          } catch (err) {
+            _iterator4.e(err);
+          } finally {
+            _iterator4.f();
+          }
+
+          _this2.sequencesCOV = {};
+
+          var _iterator5 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0].seqCOV),
+              _step5;
+
+          try {
+            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+              var _event = _step5.value;
+
+              var _type = _event.size + "L";
+
+              if (!_this2.sequencesCOV[_type]) {
+                _this2.sequencesCOV[_type] = {
+                  totalDuration: 0,
+                  number: 0,
+                  avgDuration: 0,
+                  std: 0,
+                  durations: []
+                };
+              }
+
+              _this2.sequencesCOV[_type].durations.push(_event.total_duration);
+
+              _this2.sequencesCOV[_type].totalDuration += _event.total_duration;
+              _this2.sequencesCOV[_type].number++;
+              _this2.sequencesCOV[_type].avgDuration = _this2.sequencesCOV[_type].totalDuration / _this2.sequencesCOV[_type].number; //Calculate standard deviation
+
+              var _std = 0;
+              var _mean = _this2.sequencesCOV[_type].avgDuration;
+
+              var _iterator7 = _createForOfIteratorHelper(_this2.sequencesCOV[_type].durations),
+                  _step7;
+
+              try {
+                for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+                  var _duration = _step7.value;
+                  _std += Math.pow(_duration - _mean, 2);
+                }
+              } catch (err) {
+                _iterator7.e(err);
+              } finally {
+                _iterator7.f();
+              }
+
+              _std /= _this2.sequencesCOV[_type].durations.length;
+              _std = Math.pow(_std, 0.5);
+              _this2.sequencesCOV[_type].std = _std;
+            }
+          } catch (err) {
+            _iterator5.e(err);
+          } finally {
+            _iterator5.f();
+          }
         }).then(function () {
-          return _this.chargeGeneralData();
+          return _this2.chargeGeneralData();
         });
       });
     },
     chargeGeneralData: function chargeGeneralData() {
-      var _this2 = this;
+      var _this3 = this;
 
       var selectedPL = document.getElementById('pl-selection').value;
       var dateFrom = document.getElementById('select-date-from').value;
       var dateTo = document.getElementById('select-date-to').value;
       var params = [selectedPL, dateFrom, dateTo];
       this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
-        _this2.resolveAfter(1000).then(function () {
+        _this3.resolveAfter(1000).then(function () {
           for (var _i4 = 0, _arr3 = ['cip', 'cov', 'bnc']; _i4 < _arr3.length; _i4++) {
             var cat = _arr3[_i4];
-            _this2.generalData[cat] = {
+            _this3.generalData[cat] = {
               totalDuration: 0,
               totalNb: 0
             };
 
-            var _iterator4 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0][cat.toUpperCase()]),
-                _step4;
+            var _iterator8 = _createForOfIteratorHelper(_this3.unplannedDowntimeEvents[0][cat.toUpperCase()]),
+                _step8;
 
             try {
-              for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                var event = _step4.value;
-                _this2.generalData[cat].totalDuration += event.total_duration / 60;
-                _this2.generalData[cat].totalNb++;
+              for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+                var event = _step8.value;
+                _this3.generalData[cat].totalDuration += event.total_duration / 60;
+                _this3.generalData[cat].totalNb++;
               }
             } catch (err) {
-              _iterator4.e(err);
+              _iterator8.e(err);
             } finally {
-              _iterator4.f();
+              _iterator8.f();
             }
 
-            _this2.generalData[cat].totalDuration = _this2.generalData[cat].totalDuration.toFixed(2);
+            _this3.generalData[cat].totalDuration = _this3.generalData[cat].totalDuration.toFixed(2);
           }
         });
       });
@@ -10957,9 +11152,21 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
     document.head.appendChild(chartJs);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents'])),
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents', 'allEvents'])),
   components: {
     ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
+  },
+  watch: {
+    '$i18n.locale': function $i18nLocale() {
+      for (var _i6 = 0, _arr5 = ['cip', 'cov', 'bnc']; _i6 < _arr5.length; _i6++) {
+        var type = _arr5[_i6];
+
+        if (this.chartObjects[type]) {
+          this.chartObjects[type].options.plugins.title.text = this.$t(this.unplannedDowntimesCategories[type]);
+          this.chartObjects[type].update();
+        }
+      }
+    }
   }
 });
 
@@ -10969,6 +11176,390 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 /*!*********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeShutdowns.vue?vue&type=script&lang=js& ***!
   \*********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "unplannedDowntimeShutdowns",
+  data: function data() {
+    var data = {
+      chartObjects: {
+        external: undefined,
+        machines: undefined,
+        created: false
+      },
+      shutdowns: {
+        external: {},
+        machines: {}
+      },
+      percentages: {
+        external: "--",
+        machines: "--"
+      },
+      startYear: 2000,
+      currentYear: new Date().getFullYear(),
+      site: '',
+      productionLine: ''
+    };
+    return data;
+  },
+  methods: {
+    resolveAfter: function resolveAfter(milliseconds) {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          return resolve();
+        }, milliseconds);
+      });
+    },
+    productionLineSelected: function productionLineSelected() {
+      var _this = this;
+
+      setTimeout(function () {
+        if (document.getElementById("pl-selection").value) {
+          _this.chargeData();
+        }
+      });
+    },
+    createDowntimeObject: function createDowntimeObject() {},
+    chargeData: function chargeData() {
+      var _this2 = this;
+
+      var selectedPL = document.getElementById('pl-selection').value;
+      var dateFrom = this.currentYear + '-01-01';
+      var dateTo = this.currentYear + '-12-31';
+      var params = [selectedPL, dateFrom, dateTo];
+      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
+        _this2.resolveAfter(1000).then(function () {
+          _this2.createDowntimeObject();
+
+          if (!_this2.chartObjects.created) _this2.createCharts(); //Used to calculate machine shutdown percentages
+
+          var totalMachineDowntime = 0; //Range machine shutdown events by implicated machine and shutdown cause
+
+          var machinesShutdownsRanged = _this2.unplannedDowntimeEvents[0].machines.reduce(function (acc, event) {
+            //Machines key doesn't exist yet
+            if (!acc[event.implicated_machine]) {
+              acc[event.implicated_machine] = {
+                totalDowntime: 0,
+                frequency: 0,
+                machine: event.implicated_machine,
+                causes: {}
+              };
+            } //Cause key doesn't exist yet for current machine
+
+
+            if (!event.component) event.component = "N/A";
+
+            if (!acc[event.implicated_machine].causes[event.component]) {
+              acc[event.implicated_machine].causes[event.component] = {
+                totalDowntime: 0,
+                frequency: 0,
+                avgDuration: 0,
+                cause: event.component,
+                comments: {}
+              };
+            }
+
+            if (!event.comment) event.comment = "N/A";
+
+            if (!acc[event.implicated_machine].causes[event.component].comments[event.comment]) {
+              acc[event.implicated_machine].causes[event.component].comments[event.comment] = {
+                totalDowntime: 0,
+                frequency: 0,
+                avgDuration: 0,
+                comment: event.comment
+              };
+            }
+
+            totalMachineDowntime += event.total_duration; //Update machine related data
+
+            acc[event.implicated_machine].totalDowntime += event.total_duration;
+            acc[event.implicated_machine].frequency++; //Update reason related data for current machine 
+
+            acc[event.implicated_machine].causes[event.component].totalDowntime += event.total_duration;
+            acc[event.implicated_machine].causes[event.component].frequency++;
+            acc[event.implicated_machine].causes[event.component].avgDuration = Math.floor(acc[event.implicated_machine].causes[event.component].totalDowntime / acc[event.implicated_machine].causes[event.component].frequency); //Update comment related data for current reason and machine 
+
+            acc[event.implicated_machine].causes[event.component].comments[event.comment].totalDowntime += event.total_duration;
+            acc[event.implicated_machine].causes[event.component].comments[event.comment].frequency++;
+            acc[event.implicated_machine].causes[event.component].comments[event.comment].avgDuration = Math.floor(acc[event.implicated_machine].causes[event.component].comments[event.comment].totalDowntime / acc[event.implicated_machine].causes[event.component].comments[event.comment].frequency);
+            return acc;
+          }, {});
+
+          console.log(machinesShutdownsRanged); //Used to calculate external shutdown percentage
+
+          var totalExternalDowntime = 0; //Range external shutdown events by shutdown cause
+
+          var externalShutdownsRanged = _this2.unplannedDowntimeEvents[0].external.reduce(function (acc, event) {
+            if (!event.component) event.component = "N/A";
+
+            if (!acc[event.component]) {
+              acc[event.component] = {
+                totalDowntime: 0,
+                frequency: 0,
+                avgDuration: 0,
+                cause: event.component
+              };
+            }
+
+            totalExternalDowntime += event.total_duration;
+            acc[event.component].totalDowntime += event.total_duration;
+            acc[event.component].frequency++;
+            acc[event.component].avgDuration = Math.floor(acc[event.component].totalDowntime / acc[event.component].frequency);
+            return acc;
+          }, {});
+
+          _this2.shutdowns.machines = machinesShutdownsRanged;
+          _this2.shutdowns.external = externalShutdownsRanged;
+          _this2.percentages.machines = 100 * totalMachineDowntime / (totalMachineDowntime + totalExternalDowntime);
+          _this2.percentages.machines = _this2.percentages.machines ? _this2.percentages.machines.toFixed(2) : "--";
+          _this2.percentages.external = 100 * totalExternalDowntime / (totalMachineDowntime + totalExternalDowntime);
+          _this2.percentages.external = _this2.percentages.external ? _this2.percentages.external.toFixed(2) : "--"; //Update charts' data 
+
+          for (var _i = 0, _arr = ['external', 'machines']; _i < _arr.length; _i++) {
+            var shtdCat = _arr[_i];
+            //Delete old values
+            _this2.chartObjects[shtdCat].data.labels = [];
+            _this2.chartObjects[shtdCat].data.datasets[0].data = [];
+            _this2.chartObjects[shtdCat].data.datasets[1].data = []; //Insert new values
+
+            for (var _i2 = 0, _Object$values = Object.values(_this2.shutdowns[shtdCat]); _i2 < _Object$values.length; _i2++) {
+              var shutdownEvent = _Object$values[_i2];
+              if (shtdCat === "machines") _this2.chartObjects[shtdCat].data.labels.push(shutdownEvent.machine);else _this2.chartObjects[shtdCat].data.labels.push(shutdownEvent.cause);
+
+              _this2.chartObjects[shtdCat].data.datasets[0].data.push(shutdownEvent.totalDowntime);
+
+              _this2.chartObjects[shtdCat].data.datasets[1].data.push(shutdownEvent.frequency);
+            }
+
+            _this2.chartObjects[shtdCat].update();
+          }
+        });
+      });
+    },
+    createCharts: function createCharts() {
+      this.chartObjects.created = true;
+
+      for (var _i3 = 0, _arr2 = ['external', 'machines']; _i3 < _arr2.length; _i3++) {
+        var ch = _arr2[_i3];
+        this.chartObjects[ch] = new Chart(ch + '-shutdown-chart', {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [{
+              label: this.$t("timeInMinutes"),
+              backgroundColor: 'rgb(112, 184, 232)',
+              data: []
+            }, {
+              label: this.$t("number"),
+              backgroundColor: 'rgb(246, 184, 192)',
+              data: [],
+              yAxisID: "freq"
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              time: {
+                axis: 'y',
+                title: {
+                  display: true,
+                  text: this.$t("timeInMinutes")
+                },
+                position: 'left'
+              },
+              freq: {
+                axis: 'y',
+                title: {
+                  display: true,
+                  text: this.$t("number")
+                },
+                position: 'right'
+              }
+            },
+            plugins: {
+              legend: {
+                display: true
+              }
+            }
+          }
+        });
+      }
+    }
+  },
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
+    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
+
+    var chartJs = document.createElement('script');
+    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+    document.head.appendChild(chartJs);
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents'])),
+  components: {
+    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
+  },
+  watch: {
+    '$i18n.locale': function $i18nLocale() {
+      for (var _i4 = 0, _arr3 = ['external', 'machines']; _i4 < _arr3.length; _i4++) {
+        var shtdCat = _arr3[_i4];
+
+        if (this.chartObjects[shtdCat]) {
+          this.chartObjects[shtdCat].data.datasets[0].label = this.$t("timeInMinutes");
+          this.chartObjects[shtdCat].data.datasets[1].label = this.$t("number");
+          this.chartObjects[shtdCat].options.scales.time.title.text = this.$t("timeInMinutes");
+          this.chartObjects[shtdCat].options.scales.freq.title.text = this.$t("number");
+          this.chartObjects[shtdCat].update();
+        }
+      }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeSpeedLosses.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeSpeedLosses.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -11094,346 +11685,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "unplannedDowntimeShutdowns",
-  data: function data() {
-    var data = {
-      chartObjects: {
-        external: undefined,
-        machines: undefined,
-        created: false
-      },
-      downtimes: {
-        external: {},
-        machines: {}
-      },
-      downtimePercentages: {
-        external: undefined,
-        machines: undefined
-      },
-      startYear: 2000,
-      currentYear: new Date().getFullYear(),
-      site: '',
-      productionLine: ''
-    };
-    return data;
-  },
-  methods: {
-    resolveAfter: function resolveAfter(milliseconds) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
-          return resolve();
-        }, milliseconds);
-      });
-    },
-    productionLineSelected: function productionLineSelected() {
-      var _this = this;
-
-      setTimeout(function () {
-        if (document.getElementById("pl-selection").value) {
-          _this.chargeData();
-        }
-      });
-    },
-    createDowntimeObject: function createDowntimeObject() {},
-    chargeData: function chargeData() {
-      var _this2 = this;
-
-      var selectedPL = document.getElementById('pl-selection').value;
-      var dateFrom = this.currentYear + '-01-01';
-      var dateTo = this.currentYear + '-12-31';
-      var params = [selectedPL, dateFrom, dateTo];
-      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
-        _this2.resolveAfter(1000).then(function () {
-          _this2.createDowntimeObject();
-
-          if (!_this2.chartObjects.created) _this2.createCharts(); //Structure data
-
-          var allShutdowns = {
-            external: _this2.unplannedDowntimeEvents[0].external,
-            machines: _this2.unplannedDowntimeEvents[0].machines
-          };
-          _this2.downtimes = {
-            machines: {},
-            external: {}
-          };
-
-          for (var _i = 0, _arr = ['external', 'machines']; _i < _arr.length; _i++) {
-            var shtdCat = _arr[_i];
-
-            var _iterator = _createForOfIteratorHelper(allShutdowns[shtdCat]),
-                _step;
-
-            try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                var shtdEvent = _step.value;
-
-                //Shutdown type exists already
-                if (!_this2.downtimes[shtdCat][shtdEvent.type]) {
-                  _this2.downtimes[shtdCat][shtdEvent.type] = {
-                    events: [],
-                    totalDuration: 0,
-                    totalNb: 0,
-                    avgDuration: 0
-                  };
-                }
-
-                _this2.downtimes[shtdCat][shtdEvent.type].events.push(shtdEvent);
-
-                _this2.downtimes[shtdCat][shtdEvent.type].totalDuration += shtdEvent.total_duration;
-                _this2.downtimes[shtdCat][shtdEvent.type].totalNb++;
-              } //Calculate average durations
-
-            } catch (err) {
-              _iterator.e(err);
-            } finally {
-              _iterator.f();
-            }
-
-            for (var _i2 = 0, _Object$keys = Object.keys(_this2.downtimes[shtdCat]); _i2 < _Object$keys.length; _i2++) {
-              var shtdEventType = _Object$keys[_i2];
-              var eventTypeAvgDuration = Math.round(_this2.downtimes[shtdCat][shtdEventType].totalDuration / _this2.downtimes[shtdCat][shtdEventType].totalNb);
-              _this2.downtimes[shtdCat][shtdEventType].avgDuration = eventTypeAvgDuration;
-            } //Create charts' datasets
-
-
-            _this2.chartObjects[shtdCat].data.labels = Object.keys(_this2.downtimes[shtdCat]);
-            _this2.chartObjects[shtdCat].data.datasets[0].data = [];
-            _this2.chartObjects[shtdCat].data.datasets[1].data = [];
-
-            for (var _i3 = 0, _Object$keys2 = Object.keys(_this2.downtimes[shtdCat]); _i3 < _Object$keys2.length; _i3++) {
-              var shtdType = _Object$keys2[_i3];
-
-              _this2.chartObjects[shtdCat].data.datasets[0].data.push(_this2.downtimes[shtdCat][shtdType].totalDuration);
-
-              _this2.chartObjects[shtdCat].data.datasets[1].data.push(_this2.downtimes[shtdCat][shtdType].totalNb);
-            }
-
-            _this2.chartObjects[shtdCat].update();
-          } //Calculate unplanned downtime percentages
-
-
-          var categoryTotalDowntime = {
-            machines: 0,
-            external: 0,
-            total: 0
-          };
-
-          for (var _i4 = 0, _arr2 = ['external', 'machines']; _i4 < _arr2.length; _i4++) {
-            var _shtdCat = _arr2[_i4];
-
-            for (var _i5 = 0, _Object$values = Object.values(_this2.downtimes[_shtdCat]); _i5 < _Object$values.length; _i5++) {
-              var event = _Object$values[_i5];
-              categoryTotalDowntime[_shtdCat] += event.totalDuration;
-              categoryTotalDowntime.total += event.totalDuration;
-            }
-          }
-
-          for (var _i6 = 0, _arr3 = ['external', 'machines']; _i6 < _arr3.length; _i6++) {
-            var _shtdCat2 = _arr3[_i6];
-            _this2.downtimePercentages[_shtdCat2] = Math.round(categoryTotalDowntime[_shtdCat2] / categoryTotalDowntime.total * 100);
-          }
-        });
-      });
-    },
-    createCharts: function createCharts() {
-      this.chartObjects.created = true;
-
-      for (var _i7 = 0, _arr4 = ['external', 'machines']; _i7 < _arr4.length; _i7++) {
-        var ch = _arr4[_i7];
-        this.chartObjects[ch] = new Chart(ch + '-shutdown-chart', {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Time in minutes',
-              backgroundColor: 'rgb(112, 184, 232)',
-              data: []
-            }, {
-              label: 'Number',
-              backgroundColor: 'rgb(246, 184, 192)',
-              data: [],
-              yAxisID: "freq"
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              time: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Time in minutes'
-                },
-                position: 'left'
-              },
-              freq: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Number'
-                },
-                position: 'right'
-              }
-            },
-            plugins: {
-              legend: {
-                display: true
-              }
-            }
-          }
-        });
-      }
-    }
-  },
-  mounted: function mounted() {
-    if (sessionStorage.getItem("language") !== null) {
-      this.$i18n.locale = sessionStorage.getItem("language");
-    }
-
-    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
-
-    var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
-    document.head.appendChild(chartJs);
-  },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents'])),
-  components: {
-    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
-  }
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeSpeedLosses.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/unplannedDowntimeSpeedLosses.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -11455,12 +11706,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       productionLine: '',
       chartObjects: {
         'own-stop': {
-          chart: undefined,
-          labels: ['Filler Own Stoppage', 'Reduced Rate At Filler']
+          chart: undefined
         },
         'other-machine': {
-          chart: undefined,
-          labels: ['Filler Stop by Other Machine', 'Reduced Rate At And Other Machine']
+          chart: undefined
         },
         created: false
       },
@@ -11485,6 +11734,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           totalDuration: 0,
           percentage: 0
         }
+      },
+      dbNames: {
+        fillerStop: ['Filler Own Stoppage', 'Filler Stop By Other Machine'],
+        reducedRate: ['Reduced Rate At Filler', 'Reduced Rate At An Other Machine']
+      },
+      slEventsByTable: {
+        fillerStop: [],
+        reducedRate: []
       }
     };
     return data;
@@ -11555,7 +11812,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 return acc;
-              }, _this.slEvents);
+              }, _this.slEvents); //Join table events
+
+              _this.slEventsByTable.reducedRate = [];
+              _this.slEventsByTable.fillerStop = [];
+
+              var _iterator = _createForOfIteratorHelper(_this.allEvents.SLEVENTS),
+                  _step;
+
+              try {
+                for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                  var event = _step.value;
+
+                  if (_this.dbNames.reducedRate.includes(event.reason)) {
+                    _this.slEventsByTable.reducedRate.push(event);
+                  } else if (_this.dbNames.fillerStop.includes(event.reason)) {
+                    _this.slEventsByTable.fillerStop.push(event);
+                  }
+                }
+              } catch (err) {
+                _iterator.e(err);
+              } finally {
+                _iterator.f();
+              }
             } //Total speed loss duration as the sum of all categorie's durations
 
 
@@ -11573,11 +11852,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               'Reduced Rate At An Other Machine': 'other-machine'
             }; //Update charts' data
 
+            var labels = {
+              'own-stop': [_this.$t("fillerOwnStop"), _this.$t("fillerStopByOtherMachine")],
+              'other-machine': [_this.$t("reduceRateAtFiller"), _this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")]
+            };
             Object.keys(map).forEach(function (key) {
               _this.chartObjects[map[key]].chart.data.datasets[0].data = [];
               _this.chartObjects[map[key]].chart.data.datasets[1].data = [];
             });
             Object.keys(map).forEach(function (key) {
+              _this.chartObjects[map[key]].chart.data.labels = labels[map[key]];
+
               _this.chartObjects[map[key]].chart.data.datasets[0].data.push(chartData[key].duration);
 
               _this.chartObjects[map[key]].chart.data.datasets[1].data.push(chartData[key].freq);
@@ -11596,13 +11881,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.chartObjects[slCat].chart = new Chart(slCat + '-sl-chart', {
           type: 'bar',
           data: {
-            labels: this.chartObjects[slCat].labels,
+            labels: [],
             datasets: [{
-              label: 'Time in minutes',
+              label: this.$t("timeInMinutes"),
               backgroundColor: 'rgb(245, 194, 67)',
               data: []
             }, {
-              label: 'Number',
+              label: this.$t("number"),
               backgroundColor: 'rgb(90, 90, 90)',
               data: [],
               yAxisID: "freq"
@@ -11616,7 +11901,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 axis: 'y',
                 title: {
                   display: true,
-                  text: 'Time in minutes'
+                  text: this.$t("timeInMinutes")
                 },
                 position: 'left'
               },
@@ -11624,7 +11909,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 axis: 'y',
                 title: {
                   display: true,
-                  text: 'Number'
+                  text: this.$t("number")
                 },
                 position: 'right'
               }
@@ -11653,6 +11938,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss', 'allEvents'])),
   components: {
     ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
+  },
+  watch: {
+    '$i18n.locale': function $i18nLocale() {
+      var labels = {
+        'own-stop': [this.$t("fillerOwnStop"), this.$t("fillerStopByOtherMachine")],
+        'other-machine': [this.$t("reduceRateAtFiller"), this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")]
+      };
+
+      for (var _i2 = 0, _arr2 = ['own-stop', 'other-machine']; _i2 < _arr2.length; _i2++) {
+        var slCat = _arr2[_i2];
+
+        if (this.chartObjects[slCat]) {
+          this.chartObjects[slCat].chart.data.datasets[0].label = this.$t("timeInMinutes");
+          this.chartObjects[slCat].chart.data.datasets[1].label = this.$t("number");
+          this.chartObjects[slCat].chart.options.scales.time.title.text = this.$t("timeInMinutes");
+          this.chartObjects[slCat].chart.options.scales.freq.title.text = this.$t("number");
+          this.chartObjects[slCat].chart.data.labels = labels[slCat];
+          this.chartObjects[slCat].chart.update();
+        }
+      }
+    }
   }
 });
 
@@ -17822,7 +18128,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n    align-items: center;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    align-items: center;\n    margin: 0px 30px;\n    padding-left: 10px;\n    border: solid 1px;\n    border-radius: 5px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 350px;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    height: 300px;\n    margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n    text-align: center;\n    margin: 10px 0px;\n    font-size: 16px;\n}\ndiv.production-window-container[data-v-5f72b0a5] {\n    display: flex;\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    margin-top: 10px;\n    width: 800px;\n}\ntr.subrow > td[data-v-5f72b0a5] {\n    padding: 0px !important;\n    border: none;\n    color: gray;\n    font-weight: bold;\n}\ntr.last-subrow > td[data-v-5f72b0a5] {\n    padding: 0px 0px 0.75rem 0px !important;\n}\ntr.t-row > td[data-v-5f72b0a5] {\n    padding: 0.75rem 0px 0px 0px;\n    color: black;\n    font-weight: bold;\n}\ndiv.pw-table-container[data-v-5f72b0a5] {\n    padding: 0px 10px;\n}\ndiv.table-ya-container thead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\ndiv.pw-table-container th[data-v-5f72b0a5] {\n    border: none;\n}\ndiv.pw-table-container table.table[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    border: none !important;\n}\ndiv.container-table th[data-v-5f72b0a5] {\n    border-top: none;\n    border-bottom: none;\n}\ndiv.container-table th[data-v-5f72b0a5]:first-of-type{\n    border-top-left-radius: 7px;\n    border-bottom-left-radius: 7px;\n}\ndiv.container-table th[data-v-5f72b0a5]:last-of-type{\n    border-top-right-radius: 7px;\n    border-bottom-right-radius: 7px;\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n    align-items: center;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    align-items: center;\n    margin: 0px 30px;\n    padding-left: 10px;\n    border: solid 1px;\n    border-radius: 5px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 350px;\n    border-bottom: 1px solid;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    height: 300px;\n    margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n    text-align: center;\n    margin: 10px 0px;\n    font-size: 16px;\n}\ndiv.production-window-container[data-v-5f72b0a5] {\n    display: flex;\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    margin-top: 10px;\n    width: 800px;\n}\ntr.subrow > td[data-v-5f72b0a5] {\n    padding: 0px !important;\n    border: none;\n    color: gray;\n    font-weight: bold;\n}\ntr.last-subrow > td[data-v-5f72b0a5] {\n    padding: 0px 0px 0.75rem 0px !important;\n}\ntr.t-row > td[data-v-5f72b0a5] {\n    padding: 0.75rem 0px 0px 0px;\n    color: black;\n    font-weight: bold;\n}\ndiv.pw-table-container[data-v-5f72b0a5] {\n    padding: 0px 10px;\n}\ndiv.table-ya-container thead[data-v-5f72b0a5],\ndiv.seq-tables-container thead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\ndiv.pw-table-container th[data-v-5f72b0a5] {\n    border: none;\n}\ndiv.pw-table-container table.table[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    border: none !important;\n}\ndiv.container-table th[data-v-5f72b0a5] {\n    border-top: none;\n    border-bottom: none;\n}\ndiv.container-table th[data-v-5f72b0a5]:first-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:first-of-type {\n    border-top-left-radius: 7px;\n    border-bottom-left-radius: 7px;\n}\ndiv.container-table th[data-v-5f72b0a5]:last-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:last-of-type\n{\n    border-top-right-radius: 7px;\n    border-bottom-right-radius: 7px;\n}\ndiv.seq-tables-container table[data-v-5f72b0a5] {\n    text-align: center;\n}\ntable.seq-cip[data-v-5f72b0a5] {\n    margin-top: 20px;\n    margin-bottom: 20px;\n}\n\n\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17846,7 +18152,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-4aef8324] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-4aef8324] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-4aef8324] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-4aef8324]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-4aef8324] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-4aef8324] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-4aef8324] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-4aef8324] {\n    font-size: 20px;\n    font-weight: bold;\n}\ndiv.content-panel > div[data-v-4aef8324] {\n    display: flex;\n    flex-direction: column;\n    width: 50%;\n}\ndiv.chart-container[data-v-4aef8324] {\n    padding: 15px;\n    height: 300px;\n}\ndiv.table-container[data-v-4aef8324] {\n    justify-content: center;\n    padding: 15px 30px;\n}\ndiv.downtime-percent-container[data-v-4aef8324] {\n    justify-content: center;\n}\np.downtime-percent[data-v-4aef8324] {\n    font-size: 16px;\n}\nthead[data-v-4aef8324] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-4aef8324] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-4aef8324] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-4aef8324] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-4aef8324]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-4aef8324] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-4aef8324] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-4aef8324] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-4aef8324] {\n    font-size: 20px;\n    font-weight: bold;\n}\ndiv.content-panel > div[data-v-4aef8324] {\n    display: flex;\n    flex-direction: column;\n    width: 50%;\n}\ndiv.chart-container[data-v-4aef8324] {\n    padding: 15px;\n    height: 300px;\n}\ndiv.table-container[data-v-4aef8324] {\n    justify-content: center;\n    padding: 15px 30px;\n}\ndiv.table-container .center-text[data-v-4aef8324] {\n    text-align: center;\n}\ntr.subrow > td[data-v-4aef8324] {\n    padding: 0px 0px 0px 5px !important;\n    border: none;\n    color: rgb(85, 85, 85);\n    font-weight: bold;\n    font-size: 15px;\n}\ntr.sub-subrow > td[data-v-4aef8324] {\n    padding: 0px 0px 0px 5px !important;\n    border: none;\n    color: gray;\n    font-weight: bold;\n    font-size: 14px;\n}\ntr.t-row > td[data-v-4aef8324] {\n    padding: 0.75rem 0px 0.75px 5px;\n    color: black;\n    font-weight: bold;\n    font-size: 17px;\n}\ndiv.downtime-percent-container[data-v-4aef8324] {\n    justify-content: center;\n}\np.downtime-percent[data-v-4aef8324] {\n    font-size: 16px;\n}\nthead[data-v-4aef8324] {\n    color: white;\n    background: #56baed;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -64263,24 +64569,29 @@ var render = function() {
             ],
             attrs: { id: "site-selection" },
             on: {
-              change: function($event) {
-                var $$selectedVal = Array.prototype.filter
-                  .call($event.target.options, function(o) {
-                    return o.selected
-                  })
-                  .map(function(o) {
-                    var val = "_value" in o ? o._value : o.value
-                    return val
-                  })
-                _vm.site = $event.target.multiple
-                  ? $$selectedVal
-                  : $$selectedVal[0]
-              }
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.site = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                },
+                function($event) {
+                  return _vm.productionLineSelected()
+                }
+              ]
             }
           },
           [
             _c("option", { attrs: { disabled: "", selected: "", value: "" } }, [
-              _vm._v("-- Select --")
+              _vm._v("-- " + _vm._s(_vm.$t("select")) + " --")
             ]),
             _vm._v(" "),
             _vm._l(_vm.sites[0], function(site) {
@@ -64312,7 +64623,7 @@ var render = function() {
           },
           [
             _c("option", { attrs: { disabled: "", selected: "", value: "" } }, [
-              _vm._v("-- Select --")
+              _vm._v("-- " + _vm._s(_vm.$t("select")) + " --")
             ]),
             _vm._v(" "),
             _vm._l(_vm.sites[1], function(productionLine) {
@@ -64516,7 +64827,7 @@ var render = function() {
                       " " +
                         _vm._s(_vm.downtimes[cat].general.yearlyDuration) +
                         " " +
-                        _vm._s(_vm.$t("number"))
+                        _vm._s(_vm.$t("hours"))
                     )
                   ]),
                   _vm._v(" "),
@@ -64562,7 +64873,11 @@ var render = function() {
           [
             _c("span", [
               _vm._v(
-                _vm._s(_vm.downtimes.cip.general.downtimePercentage) + " % "
+                _vm._s(
+                  _vm.downtimes.cip.general
+                    ? _vm.downtimes.cip.general.downtimePercentage
+                    : "--"
+                ) + " % "
               )
             ]),
             _vm._v(" "),
@@ -64582,7 +64897,11 @@ var render = function() {
           [
             _c("span", [
               _vm._v(
-                _vm._s(_vm.downtimes.cov.general.downtimePercentage) + " % "
+                _vm._s(
+                  _vm.downtimes.cov.general
+                    ? _vm.downtimes.cov.general.downtimePercentage
+                    : "--"
+                ) + " % "
               )
             ]),
             _vm._v(" "),
@@ -64602,7 +64921,11 @@ var render = function() {
           [
             _c("span", [
               _vm._v(
-                _vm._s(_vm.downtimes.bnc.general.downtimePercentage) + " % "
+                _vm._s(
+                  _vm.downtimes.bnc.general
+                    ? _vm.downtimes.bnc.general.downtimePercentage
+                    : "--"
+                ) + " % "
               )
             ]),
             _vm._v(" "),
@@ -64612,7 +64935,211 @@ var render = function() {
           ]
         )
       ])
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "row justify-content-center seq-tables-container" },
+      [
+        _c("div", { staticClass: "col-auto" }, [
+          _c("table", { staticClass: "table table-responsive seq-cip" }, [
+            _c("thead", [
+              _c(
+                "tr",
+                [
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("cleaningInPlaceCIP")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(Object.keys(_vm.sequencesCIP), function(cat) {
+                    return [_c("th", { key: cat }, [_vm._v(_vm._s(cat))])]
+                  })
+                ],
+                2
+              )
+            ]),
+            _vm._v(" "),
+            _c("tbody", [
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("duration")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCIP, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.totalDuration))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("number")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCIP, function(event) {
+                    return [
+                      _c("td", { key: event }, [_vm._v(_vm._s(event.number))])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("average")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCIP, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.avgDuration))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("standardDeviation")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCIP, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.std.toFixed(4)))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ])
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "row justify-content-center seq-tables-container" },
+      [
+        _c("div", { staticClass: "col-auto" }, [
+          _c("table", { staticClass: "table table-responsive seq-cov" }, [
+            _c("thead", [
+              _c(
+                "tr",
+                [
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("changeOver")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(Object.keys(_vm.sequencesCOV), function(cat) {
+                    return [_c("th", { key: cat }, [_vm._v(_vm._s(cat))])]
+                  })
+                ],
+                2
+              )
+            ]),
+            _vm._v(" "),
+            _c("tbody", [
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("duration")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCOV, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.totalDuration))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("number")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCOV, function(event) {
+                    return [
+                      _c("td", { key: event }, [_vm._v(_vm._s(event.number))])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("average")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCOV, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.avgDuration))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "tr",
+                { key: _vm.event },
+                [
+                  _c("th", { attrs: { scope: "row" } }, [
+                    _vm._v(_vm._s(_vm.$t("standardDeviation")))
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.sequencesCOV, function(event) {
+                    return [
+                      _c("td", { key: event }, [
+                        _vm._v(_vm._s(event.std.toFixed(4)))
+                      ])
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ])
+        ])
+      ]
+    )
   ])
 }
 var staticRenderFns = []
@@ -64700,7 +65227,7 @@ var render = function() {
         _vm._v(" "),
         _c("div", { staticClass: "d-flex" }, [
           _c("label", { attrs: { for: "pl-selection" } }, [
-            _vm._v("Production line: ")
+            _vm._v(_vm._s(_vm.$t("productionLine")) + ": ")
           ]),
           _vm._v(" "),
           _c(
@@ -64752,49 +65279,151 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "d-flex content-panel" }, [
-      _c("div", { staticClass: "external-shutdown-panel" }, [
-        _vm._m(0),
+      _c("div", { staticClass: "machines-shutdown-panel" }, [
+        _c("div", { staticClass: "title-container" }, [
+          _c("span", { staticClass: "content-title" }, [
+            _vm._v(_vm._s(_vm.$t("machinesShutdowns")))
+          ])
+        ]),
         _vm._v(" "),
-        _vm._m(1),
+        _vm._m(0),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex table-container" }, [
           _c("table", { staticClass: "table" }, [
-            _vm._m(2),
+            _c("thead", [
+              _c("tr", [
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("machineShutdown")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("totalDowntime")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("frequency")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("averageDuration")))]
+                )
+              ])
+            ]),
             _vm._v(" "),
             _c(
               "tbody",
               [
-                _vm._l(Object.keys(_vm.downtimes.machines), function(
-                  downtimeCat
+                _vm._l(Object.values(_vm.shutdowns.machines), function(
+                  machine
                 ) {
                   return [
-                    _c("tr", { key: downtimeCat }, [
+                    _c("tr", { key: machine, staticClass: "t-row" }, [
                       _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(downtimeCat))
+                        _vm._v(_vm._s(machine.machine))
                       ]),
                       _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm.downtimes.machines[downtimeCat].totalDuration
+                      _c(
+                        "td",
+                        { staticClass: "center-text", attrs: { scope: "col" } },
+                        [_vm._v(_vm._s(machine.totalDowntime))]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "td",
+                        { staticClass: "center-text", attrs: { scope: "col" } },
+                        [_vm._v(_vm._s(machine.frequency))]
+                      ),
+                      _vm._v(" "),
+                      _c("td", { attrs: { scope: "col" } })
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(Object.values(machine.causes), function(cause) {
+                      return [
+                        _c("tr", { key: cause, staticClass: "subrow" }, [
+                          _c("td", { attrs: { scope: "col" } }, [
+                            _vm._v(" " + _vm._s(cause.cause))
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            {
+                              staticClass: "center-text",
+                              attrs: { scope: "col" }
+                            },
+                            [_vm._v(_vm._s(cause.totalDowntime))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            {
+                              staticClass: "center-text",
+                              attrs: { scope: "col" }
+                            },
+                            [_vm._v(_vm._s(cause.frequency))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "td",
+                            {
+                              staticClass: "center-text",
+                              attrs: { scope: "col" }
+                            },
+                            [_vm._v(_vm._s(cause.avgDuration))]
                           )
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(_vm.downtimes.machines[downtimeCat].totalNb)
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm.downtimes.machines[downtimeCat].avgDuration
-                          )
-                        )
-                      ])
-                    ])
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(Object.values(cause.comments), function(
+                          comment
+                        ) {
+                          return [
+                            _c(
+                              "tr",
+                              { key: comment, staticClass: "sub-subrow" },
+                              [
+                                _c("td", { attrs: { scope: "col" } }, [
+                                  _vm._v("  " + _vm._s(comment.comment))
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  {
+                                    staticClass: "center-text",
+                                    attrs: { scope: "col" }
+                                  },
+                                  [_vm._v(_vm._s(comment.totalDowntime))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  {
+                                    staticClass: "center-text",
+                                    attrs: { scope: "col" }
+                                  },
+                                  [_vm._v(_vm._s(comment.frequency))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  {
+                                    staticClass: "center-text",
+                                    attrs: { scope: "col" }
+                                  },
+                                  [_vm._v(_vm._s(comment.avgDuration))]
+                                )
+                              ]
+                            )
+                          ]
+                        })
+                      ]
+                    })
                   ]
                 })
               ],
@@ -64806,55 +65435,84 @@ var render = function() {
         _c("div", { staticClass: "d-flex downtime-percent-container" }, [
           _c("p", { staticClass: "downtime-percent" }, [
             _vm._v(
-              _vm._s(_vm.downtimePercentages.machines || "--") +
-                " % of Unplanned Downtime"
+              _vm._s(_vm.percentages.machines) +
+                " % " +
+                _vm._s(_vm.$t("of")) +
+                " " +
+                _vm._s(_vm.$t("unplannedDowntime"))
             )
           ])
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "machines-shutdown-panel" }, [
-        _vm._m(3),
+      _c("div", { staticClass: "external-shutdown-panel" }, [
+        _c("div", { staticClass: "title-container" }, [
+          _c("span", { staticClass: "content-title" }, [
+            _vm._v(_vm._s(_vm.$t("externalShutdowns")))
+          ])
+        ]),
         _vm._v(" "),
-        _vm._m(4),
+        _vm._m(1),
         _vm._v(" "),
         _c("div", { staticClass: "d-flex table-container" }, [
           _c("table", { staticClass: "table" }, [
-            _vm._m(5),
+            _c("thead", [
+              _c("tr", { staticClass: "t-row" }, [
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("externalShutdown")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("totalDowntime")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("frequency")))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "th",
+                  { staticClass: "center-text", attrs: { scope: "col" } },
+                  [_vm._v(_vm._s(_vm.$t("averageDuration")))]
+                )
+              ])
+            ]),
             _vm._v(" "),
             _c(
               "tbody",
               [
-                _vm._l(Object.keys(_vm.downtimes.external), function(
-                  downtimeCat
+                _vm._l(Object.values(_vm.shutdowns.external), function(
+                  external
                 ) {
                   return [
-                    _c("tr", { key: downtimeCat }, [
+                    _c("tr", { key: external, staticClass: "t-row" }, [
                       _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(_vm._s(downtimeCat))
+                        _vm._v(_vm._s(external.cause))
                       ]),
                       _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm.downtimes.external[downtimeCat].totalDuration
-                          )
-                        )
-                      ]),
+                      _c(
+                        "td",
+                        { staticClass: "center-text", attrs: { scope: "col" } },
+                        [_vm._v(_vm._s(external.totalDowntime))]
+                      ),
                       _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(_vm.downtimes.external[downtimeCat].totalNb)
-                        )
-                      ]),
+                      _c(
+                        "td",
+                        { staticClass: "center-text", attrs: { scope: "col" } },
+                        [_vm._v(_vm._s(external.frequency))]
+                      ),
                       _vm._v(" "),
-                      _c("td", { attrs: { scope: "col" } }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm.downtimes.external[downtimeCat].avgDuration
-                          )
-                        )
-                      ])
+                      _c(
+                        "td",
+                        { staticClass: "center-text", attrs: { scope: "col" } },
+                        [_vm._v(_vm._s(external.avgDuration))]
+                      )
                     ])
                   ]
                 })
@@ -64867,8 +65525,11 @@ var render = function() {
         _c("div", { staticClass: "d-flex downtime-percent-container" }, [
           _c("p", { staticClass: "downtime-percent" }, [
             _vm._v(
-              _vm._s(_vm.downtimePercentages.external || "--") +
-                " % of Unplanned Downtime"
+              _vm._s(_vm.percentages.external) +
+                " % " +
+                _vm._s(_vm.$t("of")) +
+                " " +
+                _vm._s(_vm.$t("unplannedDowntime"))
             )
           ])
         ])
@@ -64877,16 +65538,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "title-container" }, [
-      _c("span", { staticClass: "content-title" }, [
-        _vm._v("Machines Shutdown")
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -64902,53 +65553,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Machine Shutdown")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Total Downtime")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Frequency")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Average Duration")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "title-container" }, [
-      _c("span", { staticClass: "content-title" }, [
-        _vm._v("External Shutdown")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "chart-container" }, [
       _c("canvas", {
         staticClass: "chart",
         attrs: { id: "external-shutdown-chart" }
       })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("External Shutdown")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Total Downtime")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Frequency")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Average Duration")])
-      ])
     ])
   }
 ]
@@ -65009,7 +65618,7 @@ var render = function() {
           },
           [
             _c("option", { attrs: { disabled: "", selected: "", value: "" } }, [
-              _vm._v("-- Select --")
+              _vm._v("-- " + _vm._s(_vm.$t("select")) + " --")
             ]),
             _vm._v(" "),
             _vm._l(_vm.sites[0], function(site) {
@@ -65026,7 +65635,7 @@ var render = function() {
         ),
         _vm._v(" "),
         _c("label", { attrs: { for: "pl-selection" } }, [
-          _vm._v("Production line: ")
+          _vm._v(_vm._s(_vm.$t("productionLine")) + ": ")
         ]),
         _vm._v(" "),
         _c(
@@ -65041,7 +65650,7 @@ var render = function() {
           },
           [
             _c("option", { attrs: { disabled: "", selected: "", value: "" } }, [
-              _vm._v("-- Select --")
+              _vm._v("-- " + _vm._s(_vm.$t("select")) + " --")
             ]),
             _vm._v(" "),
             _vm._l(_vm.sites[1], function(productionLine) {
@@ -65083,7 +65692,7 @@ var render = function() {
               }
             }
           },
-          [_vm._v("Load")]
+          [_vm._v(_vm._s(_vm.$t("load")))]
         )
       ]),
       _vm._v(" "),
@@ -65096,141 +65705,141 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "content-panel" }, [
-      _c("span", { staticClass: "content-title" }, [_vm._v("Speed Losses")]),
+      _c("span", { staticClass: "content-title" }, [
+        _vm._v(_vm._s(_vm.$t("speedLosses")))
+      ]),
       _vm._v(" "),
       _c(
         "div",
         { staticClass: "table-panel no-bottom-border rounded-top-left" },
         [
           _c("span", { staticClass: "content-subtitle" }, [
-            _vm._v("Reduce rate at filler")
+            _vm._v(_vm._s(_vm.$t("fillerOwnStop")))
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "table-container" }, [
             _c("table", { staticClass: "table table-responsive table-hover" }, [
-              _vm._m(0),
+              _c("thead", [
+                _c("tr", [
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("productionOrder")))
+                  ]),
+                  _vm._v(" "),
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("format")))
+                  ]),
+                  _vm._v(" "),
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("designRate")))
+                  ]),
+                  _vm._v(" "),
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("reduceRate")))
+                  ]),
+                  _vm._v(" "),
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("wastedTime")))
+                  ]),
+                  _vm._v(" "),
+                  _c("th", { attrs: { scope: "col" } }, [
+                    _vm._v(_vm._s(_vm.$t("comments/reason")))
+                  ])
+                ])
+              ]),
               _vm._v(" "),
               _c(
                 "tbody",
                 [
-                  _vm._l(
-                    _vm.slEvents["Reduced Rate At Filler"].events,
-                    function(slEvent) {
-                      return [
-                        _c("tr", { key: slEvent }, [
-                          _c("td", [_vm._v(_vm._s(slEvent.id))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(slEvent.size) + " L")]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(slEvent.idealRate))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(slEvent.reducedRate))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(slEvent.duration))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(slEvent.comment))])
-                        ])
-                      ]
-                    }
-                  )
+                  _vm._l(_vm.slEventsByTable.fillerStop, function(event) {
+                    return [
+                      _c("tr", { key: event }, [
+                        _c("td", [_vm._v(_vm._s(event.id))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(event.size) + " L")]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(event.idealRate))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(event.reducedRate))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(event.duration))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(event.comment))])
+                      ])
+                    ]
+                  })
                 ],
                 2
               )
             ])
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "content-subtitle" }, [
-            _vm._v(
-              _vm._s(
-                _vm.slEvents["Reduced Rate At Filler"].percentage.y || "--"
-              ) + "% of Speed Losses"
-            )
           ])
         ]
       ),
       _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "chart-panel no-bottom-border rounded-top-right" },
-        [
-          _c("span", { staticClass: "content-subtitle" }, [
-            _vm._v("Filler Own Stop")
-          ]),
-          _vm._v(" "),
-          _vm._m(1),
-          _vm._v(" "),
-          _c("span", { staticClass: "content-subtitle" }, [
-            _vm._v(
-              _vm._s(_vm.slEvents["Filler Own Stoppage"].percentage.y || "--") +
-                "% of Speed Losses"
-            )
-          ])
-        ]
-      ),
+      _vm._m(0),
       _vm._v(" "),
       _c("div", { staticClass: "table-panel rounded-bottom-left" }, [
         _c("span", { staticClass: "content-subtitle" }, [
-          _vm._v("Reduce rate at filler due to other machine capacity")
+          _vm._v(_vm._s(_vm.$t("reduceRateAtFiller")))
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "table-container" }, [
           _c("table", { staticClass: "table table-responsive table-hover" }, [
-            _vm._m(2),
+            _c("thead", [
+              _c("tr", [
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("productionOrder")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("format")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("designRate")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("reduceRate")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("wastedTime")))
+                ]),
+                _vm._v(" "),
+                _c("th", { attrs: { scope: "col" } }, [
+                  _vm._v(_vm._s(_vm.$t("comments/reason")))
+                ])
+              ])
+            ]),
             _vm._v(" "),
             _c(
               "tbody",
               [
-                _vm._l(
-                  _vm.slEvents["Reduced Rate At An Other Machine"].events,
-                  function(slEvent) {
-                    return [
-                      _c("tr", { key: slEvent }, [
-                        _c("td", [_vm._v(_vm._s(slEvent.id))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(slEvent.size) + " L")]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(slEvent.idealRate))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(slEvent.reducedRate))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(slEvent.duration))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(slEvent.comment))])
-                      ])
-                    ]
-                  }
-                )
+                _vm._l(_vm.slEventsByTable.reducedRate, function(event) {
+                  return [
+                    _c("tr", { key: event }, [
+                      _c("td", [_vm._v(_vm._s(event.id))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(event.size) + " L")]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(event.idealRate))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(event.reducedRate))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(event.duration))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(event.comment))])
+                    ])
+                  ]
+                })
               ],
               2
             )
           ])
-        ]),
-        _vm._v(" "),
-        _c("span", { staticClass: "content-subtitle" }, [
-          _vm._v(
-            _vm._s(
-              _vm.slEvents["Reduced Rate At An Other Machine"].percentage.y ||
-                "--"
-            ) + "% of Speed Losses"
-          )
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "chart-panel rounded-bottom-right" }, [
-        _c("span", { staticClass: "content-subtitle" }, [
-          _vm._v("Filler Stop by Other Machine")
-        ]),
-        _vm._v(" "),
-        _vm._m(3),
-        _vm._v(" "),
-        _c("span", { staticClass: "content-subtitle" }, [
-          _vm._v(
-            _vm._s(
-              _vm.slEvents["Filler Stop By Other Machine"].percentage.y || "--"
-            ) + "% of Speed Losses"
-          )
-        ])
-      ])
+      _vm._m(1)
     ])
   ])
 }
@@ -65239,59 +65848,30 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Production Order")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Format")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Design Rate (cpm)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Reduce Rate (cpm)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Wasted Time (mn)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Comments / Reason")])
+    return _c(
+      "div",
+      { staticClass: "chart-panel no-bottom-border rounded-top-right" },
+      [
+        _c("div", { staticClass: "chart-container" }, [
+          _c("canvas", {
+            staticClass: "chart",
+            attrs: { id: "own-stop-sl-chart" }
+          })
+        ])
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "chart-panel rounded-bottom-right" }, [
+      _c("div", { staticClass: "chart-container" }, [
+        _c("canvas", {
+          staticClass: "chart",
+          attrs: { id: "other-machine-sl-chart" }
+        })
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "chart-container" }, [
-      _c("canvas", { staticClass: "chart", attrs: { id: "own-stop-sl-chart" } })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Production Order")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Format")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Design Rate (cpm)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Reduce Rate (cpm)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Wasted Time (mn)")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Comments / Reason")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "chart-container" }, [
-      _c("canvas", {
-        staticClass: "chart",
-        attrs: { id: "other-machine-sl-chart" }
-      })
     ])
   }
 ]
@@ -79098,7 +79678,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceLossRegistered":"No Performance Loss Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","numberOfItems":"Number of items","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","duration":"Number","number":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","qualityLossesByMachine":"Quality Losses By Machine","qualityLossesByFormat":"Quality Losses By Format","filling":"Filling","capping":"Capping","qualityLossesDashboard":"Quality Losses Dashboard","total":"Total","qualityControl":"Quality Control"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceLossRegistered":"No Performance Loss Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","numberOfItems":"Number of items","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","number":"Number","duration":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","qualityLossesByMachine":"Quality Losses By Machine","qualityLossesByFormat":"Quality Losses By Format","filling":"Filling","capping":"Capping","qualityLossesDashboard":"Quality Losses Dashboard","total":"Total","qualityControl":"Quality Control","machinesShutdowns":"Machines Shutdowns","externalShutdowns":"External Shutdowns","machineShutdown":"Machine shutdown","totalDowntime":"Total downtime","frequency":"Frequency","averageDuration":"Average duration","externalShutdown":"External shutdown","timeInMinutes":"Time in minutes","reduceRateAtFiller":"Reduce rate at filler","reduceRateAtFillerDueToAnotherMachineCapacity":"Reduce rate at filler due to another machine capacity","fillerOwnStop":"Filler own stop","fillerStopByOtherMachine":"Filler stop by other machine","productionOrder":"Production order (PO)","reduceRate":"Reduce rate (cpm)","wastedTime":"Wasted time (min)","comments/reason":"Comments/Reason","select":"Select","standardDeviation":"Standard deviation"}');
 
 /***/ }),
 
@@ -79109,7 +79689,7 @@ module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choic
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceLossRegistered":"Aucune perte de performance enregistrée","speedLossJustification":"Justification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","numberOfItems":"Nombre de produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"A","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de prodcution","duration":"Quantité","number":"Durée","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","qualityLossesByMachine":"Perte de qualité par machine","qualityLossesByFormat":"Perte de qualité par format","filling":"Remplissage","capping":"Bouchonnage","qualityLossesDashboard":"Rapport de perte de qualité","total":"Total","qualityControl":"Contrôle Qualité"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceLossRegistered":"Aucune perte de performance enregistrée","speedLossJustification":"Justification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","numberOfItems":"Nombre de produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"à","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de production","duration":"Durée","number":"Quantité","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","qualityLossesByMachine":"Perte de qualité par machine","qualityLossesByFormat":"Perte de qualité par format","filling":"Remplissage","capping":"Bouchonnage","qualityLossesDashboard":"Rapport de perte de qualité","total":"Total","qualityControl":"Contrôle Qualité","machinesShutdowns":"Arrêts machines","externalShutdowns":"Arrêts externes ","machineShutdown":"Arrêt machine","totalDowntime":"Durée totale de l\'arrêt","frequency":"Fréquence","averageDuration":"Durée moyenne","externalShutdown":"Arrêt externe","timeInMinutes":"Durée en minutes","reduceRateAtFiller":"Débit de remplissage réduit","reduceRateAtFillerDueToAnotherMachineCapacity":"Débit de remplissage réduit dû à la capacité d\'une autre machine","fillerOwnStop":"Arrêt remplisseur","fillerStopByOtherMachine":"Arrêt remplisseur dû à une autre machine","productionOrder":"Ordre de production (PO)","reduceRate":"Débit réduit (cpm)","wastedTime":"Temps perdu (min)","comments/reason":"Commentaires / Raison","select":"Sélectionner","standardDeviation":"Écart-type"}');
 
 /***/ }),
 
