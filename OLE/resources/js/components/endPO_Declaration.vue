@@ -3,6 +3,8 @@
 
     <div>
 
+        {{netOP}}
+
 
         <template v-if="displayNumber === 0">
             <div align="center">
@@ -71,7 +73,7 @@
                         <br/>
 
                         <template v-if="speedLoss.length <= 0">
-                            <h4>{{$t("noPerformanceRegistered")}}</h4>
+                            <h4>{{$t("noPerformanceLossRegistered")}}</h4>
                         </template>
                         <template v-else>
                             <table class="table">
@@ -235,6 +237,8 @@
                         <th scope="col">{{$t("caper")}}</th>
                         <th scope="col">{{$t("labeller")}}</th>
                         <th scope="col">{{$t("boxWeigher")}}</th>
+                        <th scope="col">{{$t("qualityControl")}}</th>
+
 
                     </tr>
                     </thead>
@@ -255,6 +259,11 @@
                             <input type="number" id="WieghtBoxCounter" class="rcorners2" v-model="WieghtBoxCounter">
                         </td>
 
+                        <td>
+                            <input type="number" id="qualityControlCounter" class="rcorners2"
+                                   v-model="QualityControlCounter">
+                        </td>
+
                     </tr>
                     <tr>
                         <th scope="row">{{$t("rejection")}}</th>
@@ -272,6 +281,11 @@
                             <input type="number" id="WieghtBoxRejection" class="rcorners2"
                                    v-model="WieghtBoxRejection">
                         </td>
+                        <td>
+                            <input type="number" id="qualityControlRejection" class="rcorners2"
+                                   v-model="QualityControlRejection">
+                        </td>
+
 
                     </tr>
 
@@ -356,6 +370,8 @@
                     <th scope="col">{{$t("caper")}}</th>
                     <th scope="col">{{$t("labeller")}}</th>
                     <th scope="col">{{$t("boxWeigher")}}</th>
+                    <th scope="col">{{$t("qualityControl")}}</th>
+
 
                 </tr>
                 </thead>
@@ -374,6 +390,9 @@
                     <td>
                         {{WieghtBoxCounter}}
                     </td>
+                    <td>
+                        {{QualityControlCounter}}
+                    </td>
 
                 </tr>
                 <tr>
@@ -389,6 +408,9 @@
                     </td>
                     <td>
                         {{WieghtBoxRejection}}
+                    </td>
+                    <td>
+                        {{QualityControlRejection}}
                     </td>
 
                 </tr>
@@ -415,7 +437,7 @@
 
             <div class="d-flex flex-row justify-content-between align-items-center bg-white">
                 <button class="btn btn-primary d-flex align-items-center btn-danger" type="button"
-                        @click.prevent="validateInformations()">
+                        @click.prevent="backPage2()">
                     {{$t("back")}}
                 </button>
 
@@ -459,6 +481,7 @@
 
 
                 indice: sessionStorage.getItem("indice"),
+                PO: sessionStorage.getItem("pos").split(',')[this.indice],
 
                 startPO: 0,
                 /**
@@ -475,10 +498,12 @@
                 CaperCounter: 0,
                 EtiqueteuseCounter: 0,
                 WieghtBoxCounter: 0,
+                QualityControlCounter: 0,
                 FillerRejection: 0,
                 CaperRejection: 0,
                 EtiqueteuseRejection: 0,
                 WieghtBoxRejection: 0,
+                QualityControlRejection: 0,
                 availability: 0,
                 performance: 0,
 
@@ -511,6 +536,7 @@
                     comment: '',
                 },
 
+
                 totalOperatingTime: 0,
 
                 totalNetOperatingTime: 0,
@@ -535,6 +561,10 @@
 
         methods: {
 
+            backPage2: function () {
+                this.displayNumber = 2;
+
+            },
             errorMessage: function () {
                 var h1 = document.getElementsByClassName("error");
                 if (h1.length <= 0) {
@@ -587,8 +617,6 @@
 
                     time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
 
-                    this.totalOperatingTime = time2 - time1;
-
                     this.totalProductionTime = time2 - time1;
 
                     this.totalDuration = time2 - time1;
@@ -600,7 +628,6 @@
 
                     time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
 
-                    this.totalOperatingTime = time1 + time2;
 
                     this.totalProductionTime = time1 + time2;
 
@@ -618,23 +645,49 @@
 
 
                     //this.$store.dispatch('getNetOPTime', this.parameters);
-
-
-                    await this.$store.dispatch('getNetOPTime', this.GMID);
-                    await this.resolveAfter1Second();
                     console.log(this.netOP);
 
+                    /**
                     this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
 
-                    this.totalNetOperatingTime = (this.finalQuantityProduced * this.netOP.bottlesPerCase) / this.netOP.idealRate;
+
+                    var speedLosses = 0;
+                    if (this.performanceIndexes['RRF'][0].nbEvents > 0) {
+                        speedLosses += this.performanceIndexes['RRF'][0].Duration * 1;
+                    }
+
+                    if (this.performanceIndexes['RRM'][0].nbEvents > 0) {
+                        speedLosses += this.performanceIndexes['RRM'][0].Duration * 1;
+                    }
+
+                    if (this.performanceIndexes['FOS'][0].nbEvents > 0) {
+                        speedLosses += this.performanceIndexes['FOS'][0].Duration * 1;
+                    }
+
+                    if (this.performanceIndexes['FSM'][0].nbEvents > 0) {
+                        speedLosses += this.performanceIndexes['FSM'][0].Duration * 1;
+                    }
+
+                    this.totalNetOperatingTime = this.totalOperatingTime - speedLosses;
+
+
+                    this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
+
+**/
+                    this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+
+                    var numerateur = this.nbBottlesFilled / this.netOP.idealRate;
 
                     console.log('NET OP : ' + this.totalNetOperatingTime);
 
-                    this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
+                    this.performance = (numerateur / this.totalOperatingTime).toFixed(2);
+
+
 
                     console.log('Perf : ' + this.performance);
 
                     this.valider = 1;
+
                 }
 
 
@@ -653,22 +706,80 @@
             },
 
             displayQualityIndicators: function () {
-                /**
-                 this.case11 = document.getElementById('FillerCounter').value;
-                 this.case12 = document.getElementById('CaperCounter').value;
-                 this.case13 = document.getElementById('EtiqueteuseCounter').value;
-                 this.case14 = document.getElementById('WieghtBoxCounter').value;
-                 this.case21 = document.getElementById('FillerRejection').value;
-                 this.case22 = document.getElementById('CaperRejection').value;
-                 this.case23 = document.getElementById('EtiqueteuseRejection').value;
-                 this.case24 = document.getElementById('WieghtBoxRejection').value;
-                 **/
+                console.log('JE TESTE MA FONCTION');
+
+                if (this.isCompteurNull() && this.isRejectionNull()) {
+                    this.quality = 1;
+                } else {
+                    var N = this.nbBottlesFilled;
+                    var summRejection = this.FillerRejection + this.CaperRejection +
+                        this.EtiqueteuseRejection + this.WieghtBoxRejection*this.netOP.bottlesPerCase + this.QualityControlRejection;
+
+                    var summCompteur = 0;
+                    if (this.FillerCounter !== 0) {
+                        summCompteur += (this.FillerCounter - N);
+                        console.log('ICI1 : ' + summCompteur);
 
 
-                this.totalPOQuality = parseInt(this.finalQuantityProduced, 10) /
-                    ((parseInt(this.finalQuantityProduced, 10) + this.FillerCounter + this.CaperCounter + this.EtiqueteuseCounter + this.WieghtBoxCounter)
-                        + (this.FillerRejection - parseInt(this.finalQuantityProduced, 10)) + (this.CaperRejection - parseInt(this.finalQuantityProduced, 10))
-                        + (this.EtiqueteuseRejection - parseInt(this.finalQuantityProduced, 10)) + (this.WieghtBoxRejection - parseInt(this.finalQuantityProduced, 10)));
+                    }
+                    if (this.CaperCounter !== 0) {
+                        summCompteur += (this.CaperCounter - N);
+                        console.log('ICI2 : ' + summCompteur);
+
+                    }
+
+                    if (this.EtiqueteuseCounter !== 0) {
+                        summCompteur += (this.EtiqueteuseCounter - N);
+                        console.log('ICI3 : ' + summCompteur);
+
+                    }
+
+                    if (this.QualityControlCounter !== 0) {
+
+                        summCompteur += (this.QualityControlCounter - N);
+                        console.log('ICI4 : ' + summCompteur);
+
+
+                    }
+                    if (this.WieghtBoxCounter !== 0) {
+                        summCompteur += (this.WieghtBoxCounter*this.netOP.bottlesPerCase - N);
+                        console.log('ICI5 : ' + summCompteur);
+
+                    }
+
+
+                    console.log('NB BOUTEILLES : ' + N);
+                    console.log('NB BOUTEILLES REJ : ' + summRejection);
+                    console.log('NB BOUTEILLES COUNT : ' + summCompteur);
+                    //
+                    this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
+                }
+                this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
+
+                if (sessionStorage.getItem("quality") === null) {
+                    sessionStorage.quality = this.quality;
+                } else {
+                    sessionStorage.setItem("quality", this.quality);
+                }
+
+                if (sessionStorage.getItem("performance") === null) {
+                    sessionStorage.performance = this.performance;
+                } else {
+                    sessionStorage.setItem("performance", this.performance);
+                }
+
+                if (sessionStorage.getItem("availability") === null) {
+                    sessionStorage.availability = this.availability;
+                } else {
+                    sessionStorage.setItem("availability", this.availability);
+                }
+
+                if (sessionStorage.getItem("OLE") === null) {
+                    sessionStorage.OLE = this.OLE;
+                } else {
+                    sessionStorage.setItem("OLE", this.OLE);
+                }
+
 
 
                 this.displayNumber = 3;
@@ -676,7 +787,6 @@
             },
 
             saveEndPO: async function () {
-                this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
 
                 /**
                  var pos = sessionStorage.getItem("pos").split(',');
@@ -709,31 +819,41 @@
                 var array2 = [];
                 array2.push(this.endPO);
                 array2.push(this.EtiqueteuseCounter);
-                array2.push(this.WieghtBoxCounter);
+                array2.push(this.WieghtBoxCounter*this.netOP.bottlesPerCase);
                 array2.push(this.CaperCounter);
                 array2.push(this.FillerCounter);
                 array2.push(this.EtiqueteuseRejection);
-                array2.push(this.WieghtBoxRejection);
+                array2.push(this.WieghtBoxRejection*this.netOP.bottlesPerCase);
                 array2.push(this.CaperRejection);
                 array2.push(this.FillerRejection);
+                array2.push(this.QualityControlCounter);
+                array2.push(this.QualityControlRejection);
+
+                var rejection =  {
+                    po: this.endPO,
+                    fillerCounter: this.FillerCounter,
+                    caperCounter: this.CaperCounter,
+                    labelerCounter: this.EtiqueteuseCounter,
+                    weightBoxCounter: this.WieghtBoxCounter*this.netOP.bottlesPerCase,
+                    qualityControlCounter : this.QualityControlCounter,
+                    fillerRejection : this.FillerRejection,
+                    caperRejection : this.CaperRejection,
+                    labelerRejection : this.EtiqueteuseRejection,
+                    weightBoxRejection : this.WieghtBoxRejection*this.netOP.bottlesPerCase,
+                    qualityControlRejection : this.QualityControlRejection
+                };
 
 
-                this.$store.dispatch('store_Rejection', array2);
+                this.$store.dispatch('store_Rejection', rejection);
 
                 await this.resolveAfter1Second();
-
-
-                this.parameters.push(this.username);
-                this.$store.dispatch('fetchUsers', this.parameters);
-
-
                 await this.resolveAfter1Second();
 
 
                 //this.loadTable();
 
 
-                window.location.href = this.url + 'teamInfo';
+                //window.location.href = this.url + 'teamInfo';
 
 
             },
@@ -768,80 +888,18 @@
 
             isRejectionNull: function () {
                 return this.FillerRejection === 0 && this.CaperRejection === 0
-                    && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0;
+                    && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0 && this.QualityControlRejection;
             },
 
             isCompteurNull: function () {
                 return this.FillerCounter === 0 && this.CaperCounter === 0 && this.EtiqueteuseCounter === 0
-                    && this.WieghtBoxCounter === 0;
+                    && this.WieghtBoxCounter === 0 && this.QualityControlCounter == 0;
             },
 
 
             validateInformations: async function () {
 
                 this.valider = 0;
-
-                if (this.displayNumber === 0) {
-
-
-                    //this.availability = 100 * 8 * 60;
-
-                    //recuperer la ligne de production
-                    var productionLine = sessionStorage.getItem("productionName");
-
-
-                    //recuperer le nom du shift
-                    var shiftLetter = sessionStorage.typeTeam;
-
-                    //recuperer le nom du site
-                    var site = sessionStorage.site;
-
-
-                    console.log('JE TESTE MA FONCTION');
-
-                    if (this.isCompteurNull() && this.isRejectionNull()) {
-                        this.quality = 1;
-                    } else {
-
-                        var N = this.nbBottlesFilled;
-                        var summRejection = this.FillerRejection + this.CaperRejection +
-                            this.EtiqueteuseRejection + this.WieghtBoxRejection;
-                        var summCompteur = (this.FillerCounter - this.nbBottlesFilled) + (this.CaperCounter - this.nbBottlesFilled)
-                            + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
-
-                        this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
-                    }
-
-
-                    this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
-
-                    if (sessionStorage.getItem("quality") === null) {
-                        sessionStorage.quality = this.quality;
-                    } else {
-                        sessionStorage.setItem("quality", this.quality);
-                    }
-
-                    if (sessionStorage.getItem("performance") === null) {
-                        sessionStorage.performance = this.performance;
-                    } else {
-                        sessionStorage.setItem("performance", this.performance);
-                    }
-
-                    if (sessionStorage.getItem("availability") === null) {
-                        sessionStorage.availability = this.availability;
-                    } else {
-                        sessionStorage.setItem("availability", this.availability);
-                    }
-
-                    if (sessionStorage.getItem("OLE") === null) {
-                        sessionStorage.OLE = this.OLE;
-                    } else {
-                        sessionStorage.setItem("OLE", this.OLE);
-                    }
-
-
-                }
-
                 this.displayNumber = 2;
 
             },
@@ -881,7 +939,7 @@
 
         mounted() {
 
-            if(sessionStorage.getItem("language") !== null){
+            if (sessionStorage.getItem("language") !== null) {
                 this.$i18n.locale = sessionStorage.getItem("language");
             }
 
@@ -904,6 +962,10 @@
 
             this.$store.dispatch('fetchSpeedLosses', tab);
 
+            this.$store.dispatch('getNetOPTime', this.GMID);
+
+            this.$store.dispatch('getPerformanceForASite', this.PO);
+
 
         }
         ,
@@ -916,6 +978,7 @@
                     'pos',
                     'events1',
                     'netOP',
+                    'performanceIndexes'
                 ])
         }
 

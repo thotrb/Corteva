@@ -29,6 +29,8 @@ let actions = {
         })
     },
 
+
+
     fetchSites({commit}, parameters) {
 
         axios.get(`/api/sites`)
@@ -83,6 +85,21 @@ let actions = {
         axios.get(`/api/allevents/${site}/${productionLine}/${beginningDate}/${endingDate}`)
             .then(res => {
                 commit('FETCH_ALL_EVENTS', res.data);
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
+    fetchQualityLosses({commit}, parameters) {
+
+        var site = parameters[0];
+        var productionLine = parameters[1];
+        var beginningDate = parameters[2];
+        var endingDate = parameters[3];
+
+        axios.get(`/api/qualityLosses/${site}/${productionLine}/${beginningDate}/${endingDate}`)
+            .then(res => {
+                commit('FETCH_QUALITY_LOSSES', res.data);
             }).catch(err => {
             console.log(err)
         })
@@ -181,6 +198,16 @@ let actions = {
             console.log(err)
         })
     },
+
+    getPerformanceForASite({commit}, PO) {
+        axios.get(`/api/performance/${PO}`)
+            .then(res => {
+                commit('FETCH_PERFORMANCE_INDEXES', res.data)
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
 
     getProductionlineID({commit}, productionline) {
         axios.get(`/api/productionlineID/${productionline}`)
@@ -319,20 +346,23 @@ let actions = {
 
     },
 
-    store_Rejection({commit}, array) {
 
-        var PO = array[0];
-        var etiqCounter =  array[1];
-        var weigCounter =  array[2];
+    store_Rejection({commit}, rejection) {
+
+      /**  var po = array[0];
+        var labelerCounter =  array[1];
+        var weightBoxCounter =  array[2];
         var caperCounter =  array[3];
-        var fillCounter =  array[4];
-        var etiqRejection = array[5];
-        var weigRejection = array[6];
+        var fillerCounter =  array[4];
+        var labelerRejection = array[5];
+        var weightBoxRejection = array[6];
         var caperRejection = array[7];
         var fillerRejection = array[8];
+        var qualityControlCounter = array[9];
+        var qualityControlRejection = array[10];
 
-
-        axios.post(`/api/storeRejection/${PO}/${etiqCounter}/${weigCounter}/${caperCounter}/${fillCounter}/${etiqRejection}/${weigRejection}/${caperRejection}/${fillerRejection}`)
+**/
+        axios.post(`/api/storeRejection`, rejection)
             .then(res => {
                 commit('STORE_REJECTION', res.data)
             }).catch(err => {

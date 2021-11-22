@@ -375,7 +375,7 @@
                                 0.00%
                             </p>
                             <p v-else>
-                                {{(netOperatingTime / speedLosses * 100).toFixed(2)}}%
+                                {{((speedLosses / netOperatingTime) * 100).toFixed(2)}}%
                             </p>
                         </div>
 
@@ -434,7 +434,6 @@
         </div>
 
 
-
     </div>
 </template>
 
@@ -480,7 +479,7 @@
                 quality: 0,
                 OLE: 0,
 
-                speedLosses : 0,
+                speedLosses: 0,
             }
         },
 
@@ -609,28 +608,29 @@
                 var caperCounter = 0;
                 var labelerCounter = 0;
                 var wieghtBoxCounter = 0;
+                var qualityControlCounter = 0;
 
                 this.netOperatingTime = 0;
                 var sommeWorkingTime = 0;
 
                 this.speedLosses = 0;
 
-                if(this.allEvents['RRF'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['RRF'][0].Duration*1;
+                if (this.allEvents['RRF'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['RRF'][0].Duration * 1;
                 }
 
-                if(this.allEvents['RRM'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['RRM'][0].Duration*1;
+                if (this.allEvents['RRM'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['RRM'][0].Duration * 1;
                 }
 
-                if(this.allEvents['FOS'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['FOS'][0].Duration*1;
+                if (this.allEvents['FOS'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['FOS'][0].Duration * 1;
 
 
                 }
 
-                if(this.allEvents['FSM'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['FSM'][0].Duration*1;
+                if (this.allEvents['FSM'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['FSM'][0].Duration * 1;
 
                 }
 
@@ -647,6 +647,9 @@
                     caperCounter += PO.caperCounter * 1;
                     labelerCounter += PO.labelerCounter * 1;
                     wieghtBoxCounter += PO.weightBoxCounter * 1;
+                    qualityControlCounter += PO.qualityControlCounter * 1;
+
+
                     this.netOperatingTime += (this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1) / this.allEvents['SITE'][i].idealRate * 1;
                     for (let j = 0; j < this.allEvents['EVENTS'].length; j++) {
 
@@ -664,8 +667,6 @@
                         }
                     }
                 }
-
-
 
 
                 this.plannedDowntimes = sommePlannedEvents;
@@ -695,15 +696,28 @@
                 console.log(' OP TIME : ');
                 console.log(this.operatingTime);
 
-                if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0
-                    && labelerCounter === 0 && wieghtBoxCounter === 0) {
-                    this.quality = 1;
-                } else {
-                    var s = (fillerCounter - sommeQtyProduced) + (caperCounter - sommeQtyProduced)
-                        + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
-                    this.quality = (sommeQtyProduced) / (sommeQtyProduced + sommeRejection + s);
 
+                var summCompteur = 0;
+                if (fillerCounter !== 0) {
+                    summCompteur += (fillerCounter - sommeQtyProduced);
                 }
+                if (caperCounter !== 0) {
+                    summCompteur += (caperCounter - sommeQtyProduced);
+                }
+
+                if (labelerCounter !== 0) {
+                    summCompteur += (labelerCounter - sommeQtyProduced);
+                }
+
+                if (qualityControlCounter !== 0) {
+                    summCompteur += (qualityControlCounter - sommeQtyProduced);
+                }
+                if (wieghtBoxCounter !== 0) {
+                    summCompteur += (wieghtBoxCounter - sommeQtyProduced);
+                }
+
+
+                this.quality = (sommeQtyProduced) / (sommeQtyProduced + sommeRejection + summCompteur);
 
 
                 if (this.operatingTime === 0) {
@@ -752,16 +766,15 @@
 
                 console.log(data);
 
-                if(data.length === 0){
+                if (data.length === 0) {
                     obj = {
-                        name : this.$t("nothingProduced"),
-                        nbr : 1
+                        name: this.$t("nothingProduced"),
+                        nbr: 1
                     };
                     data.push(obj);
 
                     totalPieChart1 = 1;
                 }
-
 
 
                 const randomHexColorCode = () => {
@@ -838,10 +851,10 @@
                     totalPieChart2 += this.quantityArray[j];
                 }
 
-                if(data.length === 0){
+                if (data.length === 0) {
                     obj = {
-                        name : this.$t("nothingProduced"),
-                        nbr : 1
+                        name: this.$t("nothingProduced"),
+                        nbr: 1
                     };
                     data.push(obj);
 
@@ -894,11 +907,11 @@
                     let deltaY = Math.sin(theta) * 1.5 * radius;
                     let deltaX = Math.cos(theta) * 1.5 * radius;
 
-                    if(item.name !== this.$t("nothingProduced")) {
+                    if (item.name !== this.$t("nothingProduced")) {
                         txt = item.name + 'L\n';
                         pct = item.nbr / totalPieChart2 * 100;
                         txt = txt + ' ' + pct.toFixed(2) + '%';
-                    }else{
+                    } else {
                         txt = item.name + '\n';
                     }
 
@@ -909,7 +922,6 @@
 
                     startAngle = endAngle;
                 }
-
 
 
             }

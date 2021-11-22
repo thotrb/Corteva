@@ -3267,7 +3267,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "downtimesReport",
@@ -3430,6 +3429,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var caperCounter = 0;
       var labelerCounter = 0;
       var wieghtBoxCounter = 0;
+      var qualityControlCounter = 0;
       this.netOperatingTime = 0;
       var sommeWorkingTime = 0;
       this.speedLosses = 0;
@@ -3459,6 +3459,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         caperCounter += PO.caperCounter * 1;
         labelerCounter += PO.labelerCounter * 1;
         wieghtBoxCounter += PO.weightBoxCounter * 1;
+        qualityControlCounter += PO.qualityControlCounter * 1;
         this.netOperatingTime += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1 / this.allEvents['SITE'][i].idealRate * 1;
 
         for (var j = 0; j < this.allEvents['EVENTS'].length; j++) {
@@ -3493,13 +3494,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log(this.netOperatingTime);
       console.log(' OP TIME : ');
       console.log(this.operatingTime);
+      var summCompteur = 0;
 
-      if (sommeRejection === 0 && fillerCounter === 0 && caperCounter === 0 && labelerCounter === 0 && wieghtBoxCounter === 0) {
-        this.quality = 1;
-      } else {
-        var s = fillerCounter - sommeQtyProduced + (caperCounter - sommeQtyProduced) + (labelerCounter - sommeQtyProduced) + (wieghtBoxCounter - sommeQtyProduced);
-        this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + s);
+      if (fillerCounter !== 0) {
+        summCompteur += fillerCounter - sommeQtyProduced;
       }
+
+      if (caperCounter !== 0) {
+        summCompteur += caperCounter - sommeQtyProduced;
+      }
+
+      if (labelerCounter !== 0) {
+        summCompteur += labelerCounter - sommeQtyProduced;
+      }
+
+      if (qualityControlCounter !== 0) {
+        summCompteur += qualityControlCounter - sommeQtyProduced;
+      }
+
+      if (wieghtBoxCounter !== 0) {
+        summCompteur += wieghtBoxCounter - sommeQtyProduced;
+      }
+
+      this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + summCompteur);
 
       if (this.operatingTime === 0) {
         this.availability = 0;
@@ -4263,6 +4280,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4278,6 +4317,7 @@ var today = new Date();
       totalUnplannedDowtimes: sessionStorage.getItem("sommeUnplannedEvents"),
       totalPlannedDowtimes: sessionStorage.getItem("sommePlannedEvents"),
       indice: sessionStorage.getItem("indice"),
+      PO: sessionStorage.getItem("pos").split(',')[this.indice],
       startPO: 0,
 
       /**
@@ -4294,10 +4334,12 @@ var today = new Date();
       CaperCounter: 0,
       EtiqueteuseCounter: 0,
       WieghtBoxCounter: 0,
+      QualityControlCounter: 0,
       FillerRejection: 0,
       CaperRejection: 0,
       EtiqueteuseRejection: 0,
       WieghtBoxRejection: 0,
+      QualityControlRejection: 0,
       availability: 0,
       performance: 0,
       finalQuantityProduced: 0,
@@ -4327,6 +4369,9 @@ var today = new Date();
     };
   },
   methods: {
+    backPage2: function backPage2() {
+      this.displayNumber = 2;
+    },
     errorMessage: function errorMessage() {
       var h1 = document.getElementsByClassName("error");
 
@@ -4359,7 +4404,7 @@ var today = new Date();
     },
     validateCalculation: function () {
       var _validateCalculation = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var splitted1, splitted2, time1, time2;
+        var splitted1, splitted2, time1, time2, numerateur;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -4373,48 +4418,51 @@ var today = new Date();
                 if (splitted1[0] <= splitted2[0]) {
                   time1 = this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1;
                   time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
-                  this.totalOperatingTime = time2 - time1;
                   this.totalProductionTime = time2 - time1;
                   this.totalDuration = time2 - time1;
                 } else {
                   time1 = 24 * 60 - (this.startPO.toString().split(':')[0] * 60 + this.startPO.toString().split(':')[1] * 1);
                   time2 = this.endPO.toString().split(':')[0] * 60 + this.endPO.toString().split(':')[1] * 1;
-                  this.totalOperatingTime = time1 + time2;
                   this.totalProductionTime = time1 + time2;
                   this.totalDuration = time2 - time1;
                 }
 
-                if (!(isNaN(time1) || isNaN(time2))) {
-                  _context.next = 10;
-                  break;
+                if (isNaN(time1) || isNaN(time2)) {
+                  this.errorMessage();
+                } else {
+                  this.totalProductionTime -= this.totalPlannedDowtimes;
+                  this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
+                  this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2); //this.$store.dispatch('getNetOPTime', this.parameters);
+
+                  console.log(this.netOP);
+                  /**
+                  this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+                    var speedLosses = 0;
+                  if (this.performanceIndexes['RRF'][0].nbEvents > 0) {
+                      speedLosses += this.performanceIndexes['RRF'][0].Duration * 1;
+                  }
+                   if (this.performanceIndexes['RRM'][0].nbEvents > 0) {
+                      speedLosses += this.performanceIndexes['RRM'][0].Duration * 1;
+                  }
+                   if (this.performanceIndexes['FOS'][0].nbEvents > 0) {
+                      speedLosses += this.performanceIndexes['FOS'][0].Duration * 1;
+                  }
+                   if (this.performanceIndexes['FSM'][0].nbEvents > 0) {
+                      speedLosses += this.performanceIndexes['FSM'][0].Duration * 1;
+                  }
+                   this.totalNetOperatingTime = this.totalOperatingTime - speedLosses;
+                    this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
+                  **/
+
+                  this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
+                  numerateur = this.nbBottlesFilled / this.netOP.idealRate;
+                  console.log('NET OP : ' + this.totalNetOperatingTime);
+                  this.performance = (numerateur / this.totalOperatingTime).toFixed(2);
+                  console.log('Perf : ' + this.performance);
+                  this.valider = 1;
                 }
 
-                this.errorMessage();
-                _context.next = 24;
-                break;
-
-              case 10:
-                this.totalProductionTime -= this.totalPlannedDowtimes;
-                this.totalOperatingTime = this.totalProductionTime - this.totalUnplannedDowtimes;
-                this.availability = (this.totalOperatingTime / this.totalProductionTime).toFixed(2); //this.$store.dispatch('getNetOPTime', this.parameters);
-
-                _context.next = 15;
-                return this.$store.dispatch('getNetOPTime', this.GMID);
-
-              case 15:
-                _context.next = 17;
-                return this.resolveAfter1Second();
-
-              case 17:
-                console.log(this.netOP);
-                this.nbBottlesFilled = this.finalQuantityProduced * this.netOP.bottlesPerCase;
-                this.totalNetOperatingTime = this.finalQuantityProduced * this.netOP.bottlesPerCase / this.netOP.idealRate;
-                console.log('NET OP : ' + this.totalNetOperatingTime);
-                this.performance = (this.totalNetOperatingTime / this.totalOperatingTime).toFixed(2);
-                console.log('Perf : ' + this.performance);
-                this.valider = 1;
-
-              case 24:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -4438,27 +4486,82 @@ var today = new Date();
       this.displayNumber = 1;
     },
     displayQualityIndicators: function displayQualityIndicators() {
-      /**
-       this.case11 = document.getElementById('FillerCounter').value;
-       this.case12 = document.getElementById('CaperCounter').value;
-       this.case13 = document.getElementById('EtiqueteuseCounter').value;
-       this.case14 = document.getElementById('WieghtBoxCounter').value;
-       this.case21 = document.getElementById('FillerRejection').value;
-       this.case22 = document.getElementById('CaperRejection').value;
-       this.case23 = document.getElementById('EtiqueteuseRejection').value;
-       this.case24 = document.getElementById('WieghtBoxRejection').value;
-       **/
-      this.totalPOQuality = parseInt(this.finalQuantityProduced, 10) / (parseInt(this.finalQuantityProduced, 10) + this.FillerCounter + this.CaperCounter + this.EtiqueteuseCounter + this.WieghtBoxCounter + (this.FillerRejection - parseInt(this.finalQuantityProduced, 10)) + (this.CaperRejection - parseInt(this.finalQuantityProduced, 10)) + (this.EtiqueteuseRejection - parseInt(this.finalQuantityProduced, 10)) + (this.WieghtBoxRejection - parseInt(this.finalQuantityProduced, 10)));
+      console.log('JE TESTE MA FONCTION');
+
+      if (this.isCompteurNull() && this.isRejectionNull()) {
+        this.quality = 1;
+      } else {
+        var N = this.nbBottlesFilled;
+        var summRejection = this.FillerRejection + this.CaperRejection + this.EtiqueteuseRejection + this.WieghtBoxRejection * this.netOP.bottlesPerCase + this.QualityControlRejection;
+        var summCompteur = 0;
+
+        if (this.FillerCounter !== 0) {
+          summCompteur += this.FillerCounter - N;
+          console.log('ICI1 : ' + summCompteur);
+        }
+
+        if (this.CaperCounter !== 0) {
+          summCompteur += this.CaperCounter - N;
+          console.log('ICI2 : ' + summCompteur);
+        }
+
+        if (this.EtiqueteuseCounter !== 0) {
+          summCompteur += this.EtiqueteuseCounter - N;
+          console.log('ICI3 : ' + summCompteur);
+        }
+
+        if (this.QualityControlCounter !== 0) {
+          summCompteur += this.QualityControlCounter - N;
+          console.log('ICI4 : ' + summCompteur);
+        }
+
+        if (this.WieghtBoxCounter !== 0) {
+          summCompteur += this.WieghtBoxCounter * this.netOP.bottlesPerCase - N;
+          console.log('ICI5 : ' + summCompteur);
+        }
+
+        console.log('NB BOUTEILLES : ' + N);
+        console.log('NB BOUTEILLES REJ : ' + summRejection);
+        console.log('NB BOUTEILLES COUNT : ' + summCompteur); //
+
+        this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
+      }
+
+      this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
+
+      if (sessionStorage.getItem("quality") === null) {
+        sessionStorage.quality = this.quality;
+      } else {
+        sessionStorage.setItem("quality", this.quality);
+      }
+
+      if (sessionStorage.getItem("performance") === null) {
+        sessionStorage.performance = this.performance;
+      } else {
+        sessionStorage.setItem("performance", this.performance);
+      }
+
+      if (sessionStorage.getItem("availability") === null) {
+        sessionStorage.availability = this.availability;
+      } else {
+        sessionStorage.setItem("availability", this.availability);
+      }
+
+      if (sessionStorage.getItem("OLE") === null) {
+        sessionStorage.OLE = this.OLE;
+      } else {
+        sessionStorage.setItem("OLE", this.OLE);
+      }
+
       this.displayNumber = 3;
     },
     saveEndPO: function () {
       var _saveEndPO = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var array, array2;
+        var array, array2, rejection;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
                 /**
                  var pos = sessionStorage.getItem("pos").split(',');
                  pos.splice(this.indice, 1);
@@ -4467,7 +4570,6 @@ var today = new Date();
                 } else {
                     sessionStorage.setItem("pos", pos);
                 }**/
-
                 this.endPO = sessionStorage.getItem("pos").split(',')[this.indice];
                 array = [];
                 array.push(this.endPO);
@@ -4478,35 +4580,44 @@ var today = new Date();
                 array.push(this.finalQuantityProduced);
                 array.push(this.totalDuration);
                 this.$store.dispatch('stop_PO', array);
-                _context2.next = 13;
+                _context2.next = 12;
                 return this.resolveAfter1Second();
 
-              case 13:
+              case 12:
                 array2 = [];
                 array2.push(this.endPO);
                 array2.push(this.EtiqueteuseCounter);
-                array2.push(this.WieghtBoxCounter);
+                array2.push(this.WieghtBoxCounter * this.netOP.bottlesPerCase);
                 array2.push(this.CaperCounter);
                 array2.push(this.FillerCounter);
                 array2.push(this.EtiqueteuseRejection);
-                array2.push(this.WieghtBoxRejection);
+                array2.push(this.WieghtBoxRejection * this.netOP.bottlesPerCase);
                 array2.push(this.CaperRejection);
                 array2.push(this.FillerRejection);
-                this.$store.dispatch('store_Rejection', array2);
-                _context2.next = 26;
+                array2.push(this.QualityControlCounter);
+                array2.push(this.QualityControlRejection);
+                rejection = {
+                  po: this.endPO,
+                  fillerCounter: this.FillerCounter,
+                  caperCounter: this.CaperCounter,
+                  labelerCounter: this.EtiqueteuseCounter,
+                  weightBoxCounter: this.WieghtBoxCounter * this.netOP.bottlesPerCase,
+                  qualityControlCounter: this.QualityControlCounter,
+                  fillerRejection: this.FillerRejection,
+                  caperRejection: this.CaperRejection,
+                  labelerRejection: this.EtiqueteuseRejection,
+                  weightBoxRejection: this.WieghtBoxRejection * this.netOP.bottlesPerCase,
+                  qualityControlRejection: this.QualityControlRejection
+                };
+                this.$store.dispatch('store_Rejection', rejection);
+                _context2.next = 28;
                 return this.resolveAfter1Second();
 
-              case 26:
-                this.parameters.push(this.username);
-                this.$store.dispatch('fetchUsers', this.parameters);
+              case 28:
                 _context2.next = 30;
                 return this.resolveAfter1Second();
 
               case 30:
-                //this.loadTable();
-                window.location.href = this.url + 'teamInfo';
-
-              case 31:
               case "end":
                 return _context2.stop();
             }
@@ -4543,69 +4654,21 @@ var today = new Date();
       });
     },
     isRejectionNull: function isRejectionNull() {
-      return this.FillerRejection === 0 && this.CaperRejection === 0 && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0;
+      return this.FillerRejection === 0 && this.CaperRejection === 0 && this.EtiqueteuseRejection === 0 && this.WieghtBoxRejection === 0 && this.QualityControlRejection;
     },
     isCompteurNull: function isCompteurNull() {
-      return this.FillerCounter === 0 && this.CaperCounter === 0 && this.EtiqueteuseCounter === 0 && this.WieghtBoxCounter === 0;
+      return this.FillerCounter === 0 && this.CaperCounter === 0 && this.EtiqueteuseCounter === 0 && this.WieghtBoxCounter === 0 && this.QualityControlCounter == 0;
     },
     validateInformations: function () {
       var _validateInformations = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-        var productionLine, shiftLetter, site, N, summRejection, summCompteur;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
                 this.valider = 0;
-
-                if (this.displayNumber === 0) {
-                  //this.availability = 100 * 8 * 60;
-                  //recuperer la ligne de production
-                  productionLine = sessionStorage.getItem("productionName"); //recuperer le nom du shift
-
-                  shiftLetter = sessionStorage.typeTeam; //recuperer le nom du site
-
-                  site = sessionStorage.site;
-                  console.log('JE TESTE MA FONCTION');
-
-                  if (this.isCompteurNull() && this.isRejectionNull()) {
-                    this.quality = 1;
-                  } else {
-                    N = this.nbBottlesFilled;
-                    summRejection = this.FillerRejection + this.CaperRejection + this.EtiqueteuseRejection + this.WieghtBoxRejection;
-                    summCompteur = this.FillerCounter - this.nbBottlesFilled + (this.CaperCounter - this.nbBottlesFilled) + (this.EtiqueteuseCounter - this.nbBottlesFilled) + (this.WieghtBoxCounter - this.nbBottlesFilled);
-                    this.quality = (N / (N + summRejection + summCompteur)).toFixed(2);
-                  }
-
-                  this.OLE = (this.quality * this.availability * this.performance).toFixed(2);
-
-                  if (sessionStorage.getItem("quality") === null) {
-                    sessionStorage.quality = this.quality;
-                  } else {
-                    sessionStorage.setItem("quality", this.quality);
-                  }
-
-                  if (sessionStorage.getItem("performance") === null) {
-                    sessionStorage.performance = this.performance;
-                  } else {
-                    sessionStorage.setItem("performance", this.performance);
-                  }
-
-                  if (sessionStorage.getItem("availability") === null) {
-                    sessionStorage.availability = this.availability;
-                  } else {
-                    sessionStorage.setItem("availability", this.availability);
-                  }
-
-                  if (sessionStorage.getItem("OLE") === null) {
-                    sessionStorage.OLE = this.OLE;
-                  } else {
-                    sessionStorage.setItem("OLE", this.OLE);
-                  }
-                }
-
                 this.displayNumber = 2;
 
-              case 3:
+              case 2:
               case "end":
                 return _context3.stop();
             }
@@ -4693,8 +4756,10 @@ var today = new Date();
     console.log(sessionStorage.getItem("pos").split(',')[this.indice]);
     console.log(tab);
     this.$store.dispatch('fetchSpeedLosses', tab);
+    this.$store.dispatch('getNetOPTime', this.GMID);
+    this.$store.dispatch('getPerformanceForASite', this.PO);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(['speedLoss', 'user', 'pos', 'events1', 'netOP']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(['speedLoss', 'user', 'pos', 'events1', 'netOP', 'performanceIndexes']))
 });
 
 /***/ }),
@@ -7994,6 +8059,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -8002,7 +8073,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     var data = {
       currentYear: new Date().getFullYear(),
       site: '',
-      productionLine: ''
+      productionLine: '',
+      lo: this.$t("load")
     };
     return data;
   },
@@ -8077,7 +8149,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.$i18n.locale = sessionStorage.getItem("language");
     }
 
-    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
+    this.$store.dispatch('fetchSites');
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("startingPO").setAttribute("max", today);
+    document.getElementById("endingPO").setAttribute("max", today); //Load chart.js into vue component
 
     var chartJs = document.createElement('script');
     chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
@@ -8086,6 +8175,811 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss'])),
   components: {
     ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "qualityLossesDashboard",
+  data: function data() {
+    var data = {
+      currentYear: new Date().getFullYear(),
+      site: '',
+      productionLine: '',
+      lo: this.$t("load"),
+      beginningDate: "",
+      endingDate: "",
+      productionline: "",
+      show: 0,
+      totalItems: 0,
+      tableauFormats: [],
+      qtyPerMachine: [],
+      totalPerFormat: [],
+      qualityLossesPerMachineArray: [],
+      quality: 0
+    };
+    return data;
+  },
+  methods: {
+    resolveAfter: function resolveAfter(milliseconds) {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          return resolve();
+        }, milliseconds);
+      });
+    },
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
+    load: function () {
+      var _load = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+        var index, i, tab;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                index = 0;
+
+                for (i = 0; i < this.sites[1].length; i++) {
+                  if (this.sites[1][i].productionline_name === this.productionline) {
+                    index = this.sites[1][i].id;
+                  }
+                }
+
+                if (!(this.productionline !== '' && this.beginningDate !== '' && this.endingDate !== '')) {
+                  _context.next = 26;
+                  break;
+                }
+
+                tab = [];
+                tab.push(this.site);
+                tab.push(this.productionline);
+                tab.push(this.beginningDate);
+                tab.push(this.endingDate);
+                console.log(this.beginningDate);
+                this.$store.dispatch('fetchAllEvents', tab);
+                this.$store.dispatch('fetchQualityLosses', tab);
+                _context.next = 13;
+                return this.resolveAfter15Second();
+
+              case 13:
+                _context.next = 15;
+                return this.resolveAfter15Second();
+
+              case 15:
+                this.show = 1;
+                this.loadQualityLosses();
+                this.qualityLossesPerMachineArray = [];
+                this.qualityLossesPerMachineArray.push({
+                  name: "weightBox",
+                  value: this.qualityLosses['rejectionCounter'][0].sumWeightBoxCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumWeightBoxRejection * 1
+                });
+                this.qualityLossesPerMachineArray.push({
+                  name: "caper",
+                  value: this.qualityLosses['rejectionCounter'][0].sumCaperCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumCaperRejection * 1
+                });
+                this.qualityLossesPerMachineArray.push({
+                  name: "filler",
+                  value: this.qualityLosses['rejectionCounter'][0].sumFillerCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumFillerRejection * 1
+                });
+                this.qualityLossesPerMachineArray.push({
+                  name: "labeler",
+                  value: this.qualityLosses['rejectionCounter'][0].sumLabelerCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumLabelerRejection * 1
+                });
+                this.qualityLossesPerMachineArray.push({
+                  name: "qualityControl",
+                  value: this.qualityLosses['rejectionCounter'][0].sumQualityControlCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumQualityControlRejection * 1
+                });
+                this.totalItems = this.qualityLosses['rejectionCounter'][0].sumWeightBoxCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumWeightBoxRejection * 1 + this.qualityLosses['rejectionCounter'][0].sumCaperCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumCaperRejection * 1 + this.qualityLosses['rejectionCounter'][0].sumFillerCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumFillerRejection * 1 + this.qualityLosses['rejectionCounter'][0].sumLabelerCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumLabelerRejection * 1 + this.qualityLosses['rejectionCounter'][0].sumQualityControlCounter * 1 + this.qualityLosses['rejectionCounter'][0].sumQualityControlRejection * 1;
+                this.loadQualityLossesByFormat();
+                this.pieCharts();
+
+              case 26:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function load() {
+        return _load.apply(this, arguments);
+      }
+
+      return load;
+    }(),
+    loadQualityLosses: function loadQualityLosses() {
+      var sommeQtyProduced = 0;
+      var sommeRejection = 0;
+      var fillerCounter = 0;
+      var caperCounter = 0;
+      var labelerCounter = 0;
+      var wieghtBoxCounter = 0;
+      var qualityControlCounter = 0;
+
+      for (var i = 0; i < this.allEvents['SITE'].length; i++) {
+        var PO = this.allEvents['SITE'][i];
+        sommeQtyProduced += this.allEvents['SITE'][i].qtyProduced * this.allEvents['SITE'][i].bottlesPerCase * 1;
+        sommeRejection += PO.fillerRejection * 1 + PO.caperRejection * 1 + PO.labelerRejection * 1 + PO.weightBoxRejection * 1;
+        fillerCounter += PO.fillerCounter * 1;
+        caperCounter += PO.caperCounter * 1;
+        labelerCounter += PO.labelerCounter * 1;
+        wieghtBoxCounter += PO.weightBoxCounter * 1;
+        qualityControlCounter += PO.qualityControlCounter * 1;
+      }
+
+      var summCompteur = 0;
+
+      if (fillerCounter !== 0) {
+        summCompteur += fillerCounter - sommeQtyProduced;
+      }
+
+      if (caperCounter !== 0) {
+        summCompteur += caperCounter - sommeQtyProduced;
+      }
+
+      if (labelerCounter !== 0) {
+        summCompteur += labelerCounter - sommeQtyProduced;
+      }
+
+      if (qualityControlCounter !== 0) {
+        summCompteur += qualityControlCounter - sommeQtyProduced;
+      }
+
+      if (wieghtBoxCounter !== 0) {
+        summCompteur += wieghtBoxCounter - sommeQtyProduced;
+      }
+
+      this.quality = sommeQtyProduced / (sommeQtyProduced + sommeRejection + summCompteur);
+    },
+    loadQualityLossesByFormat: function loadQualityLossesByFormat() {
+      this.tableauFormats = [];
+      this.qtyPerMachine = [];
+      this.qtyPerMachine["caperCounter"] = [];
+      this.qtyPerMachine["caperRejection"] = [];
+      this.qtyPerMachine["fillerCounter"] = [];
+      this.qtyPerMachine["fillerRejection"] = [];
+      this.qtyPerMachine["weightBoxCounter"] = [];
+      this.qtyPerMachine["weightBoxRejection"] = [];
+      this.qtyPerMachine["labelerCounter"] = [];
+      this.qtyPerMachine["labelerRejection"] = [];
+      this.qtyPerMachine["controlQualityCounter"] = [];
+      this.qtyPerMachine["controlQualityRejection"] = [];
+
+      for (var i = 0; i < this.qualityLosses['formats'].length; i++) {
+        var line = this.qualityLosses['formats'][i];
+        var format = line.size;
+
+        if (!this.tableauFormats.includes(format)) {
+          this.tableauFormats.push(format);
+          this.qtyPerMachine["caperCounter"][format] = line.caperCounter;
+          this.qtyPerMachine["caperRejection"][format] = line.caperRejection;
+          this.qtyPerMachine["fillerCounter"][format] = line.fillerCounter;
+          this.qtyPerMachine["fillerRejection"][format] = line.fillerRejection;
+          this.qtyPerMachine["weightBoxCounter"][format] = line.weightBoxCounter;
+          this.qtyPerMachine["weightBoxRejection"][format] = line.weightBoxRejection;
+          this.qtyPerMachine["labelerCounter"][format] = line.labelerCounter;
+          this.qtyPerMachine["labelerRejection"][format] = line.labelerRejection;
+          this.qtyPerMachine["controlQualityCounter"][format] = line.qualityControlCounter;
+          this.qtyPerMachine["controlQualityRejection"][format] = line.qualityControlRejection;
+          this.totalPerFormat[format] = line.caperCounter + line.caperRejection + line.fillerCounter + line.fillerRejection + line.weightBoxCounter + line.weightBoxRejection + line.labelerCounter + line.labelerRejection + line.qualityControlCounter + line.qualityControlRejection;
+        } else {
+          this.qtyPerMachine["caperCounter"][format] += line.caperCounter;
+          this.qtyPerMachine["caperRejection"][format] += line.caperRejection;
+          this.qtyPerMachine["fillerCounter"][format] += line.fillerCounter;
+          this.qtyPerMachine["fillerRejection"][format] += line.fillerRejection;
+          this.qtyPerMachine["weightBoxCounter"][format] += line.weightBoxCounter;
+          this.qtyPerMachine["weightBoxRejection"][format] += line.weightBoxRejection;
+          this.qtyPerMachine["labelerCounter"][format] += line.labelerCounter;
+          this.qtyPerMachine["labelerRejection"][format] += line.labelerRejection;
+          this.qtyPerMachine["controlQualityCounter"][format] += line.qualityControlCounter;
+          this.qtyPerMachine["controlQualityRejection"][format] += line.qualityControlRejection;
+          this.totalPerFormat[format] += line.caperCounter + line.caperRejection + line.fillerCounter + line.fillerRejection + line.weightBoxCounter + line.weightBoxRejection + line.labelerCounter + line.labelerRejection + line.qualityControlCounter + line.qualityControlRejection;
+        }
+      }
+    },
+    pieCharts: function pieCharts() {
+      var obj;
+      var data = [];
+      var totalPieChart1 = 0;
+
+      for (var j = 0; j < this.qualityLossesPerMachineArray.length; j++) {
+        obj = {
+          name: this.qualityLossesPerMachineArray[j].name,
+          nbr: this.qualityLossesPerMachineArray[j].value
+        };
+        data.push(obj);
+        totalPieChart1 += this.qualityLossesPerMachineArray[j].value;
+      }
+
+      console.log('DATA');
+      console.log(data);
+
+      if (data.length === 0) {
+        obj = {
+          name: this.$t("nothingProduced"),
+          nbr: 1
+        };
+        data.push(obj);
+        totalPieChart1 = 1;
+      }
+
+      var randomHexColorCode = function randomHexColorCode() {
+        return "#" + Math.random().toString(16).slice(2, 8);
+      };
+
+      var canvas = document.getElementById("qualityLossesByMachines");
+      var ctx = canvas.getContext("2d");
+      canvas.width = 450;
+      canvas.height = 350;
+      var total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      var startAngle = 0;
+      var radius = 70;
+      var cx = canvas.width / 2;
+      var cy = canvas.height / 2;
+
+      for (var _j = 0; _j < data.length; _j++) {
+        var item = data[_j]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var endAngle = item.nbr / total * Math.PI * 2 + startAngle;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '15px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var theta = (startAngle + endAngle) / 2;
+        var deltaY = Math.sin(theta) * 1.5 * radius;
+        var deltaX = Math.cos(theta) * 1.5 * radius;
+        var txt = item.name + '\n';
+        var pct = item.nbr / totalPieChart1 * 100;
+        txt = txt + ' ' + pct.toFixed(2) + '%';
+        ctx.fillText(txt, deltaX + cx, deltaY + cy);
+        ctx.closePath();
+        startAngle = endAngle;
+      }
+
+      data = [];
+      var totalPieChart2 = 0;
+
+      for (var _j2 = 0; _j2 < this.tableauFormats.length; _j2++) {
+        var format = this.tableauFormats[_j2];
+        obj = {
+          name: format,
+          nbr: this.totalPerFormat[format]
+        };
+        data.push(obj);
+        totalPieChart2 += this.totalPerFormat[format];
+      }
+
+      if (data.length === 0) {
+        obj = {
+          name: this.$t("nothingProduced"),
+          nbr: 1
+        };
+        data.push(obj);
+        totalPieChart2 = 1;
+      }
+
+      console.log('DATA');
+      console.log(data);
+      canvas = document.getElementById("qualityLossesByFormat");
+      ctx = canvas.getContext("2d");
+      canvas.width = 450;
+      canvas.height = 350;
+      total = data.reduce(function (ttl, house) {
+        return ttl + house.nbr;
+      }, 0);
+      startAngle = 0;
+      radius = 70;
+      cx = canvas.width / 2;
+      cy = canvas.height / 2;
+
+      for (var _j3 = 0; _j3 < data.length; _j3++) {
+        var _item = data[_j3]; //set the styles before beginPath
+
+        ctx.fillStyle = randomHexColorCode();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#333';
+        ctx.beginPath(); //console.log(total, house.troops, house.troops/total);
+        // draw the pie wedges
+
+        var _endAngle = _item.nbr / total * Math.PI * 2 + startAngle;
+
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, _endAngle, false);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath(); // add the labels
+
+        ctx.beginPath();
+        ctx.font = '15px Helvetica, Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rebeccapurple'; // midpoint between the two angles
+        // 1.5 * radius is the length of the Hypotenuse
+
+        var _theta = (startAngle + _endAngle) / 2;
+
+        var _deltaY = Math.sin(_theta) * 1.5 * radius;
+
+        var _deltaX = Math.cos(_theta) * 1.5 * radius;
+
+        if (_item.name !== this.$t("nothingProduced")) {
+          txt = _item.name + 'L\n';
+          pct = _item.nbr / totalPieChart2 * 100;
+          txt = txt + ' ' + pct.toFixed(2) + '%';
+        } else {
+          txt = _item.name + '\n';
+        }
+
+        startAngle = _endAngle;
+        ctx.fillText(txt, _deltaX + cx, _deltaY + cy);
+        ctx.closePath();
+        startAngle = _endAngle;
+      }
+    }
+  },
+  mounted: function mounted() {
+    if (sessionStorage.getItem("language") !== null) {
+      this.$i18n.locale = sessionStorage.getItem("language");
+    }
+
+    this.$store.dispatch('fetchSites');
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+
+    var yyyy = today.getFullYear();
+
+    if (dd < 10) {
+      dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+      mm = '0' + mm;
+    }
+
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById("startingPO").setAttribute("max", today);
+    document.getElementById("endingPO").setAttribute("max", today);
+    var externalScript = document.createElement('script');
+    externalScript.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
+    document.head.appendChild(externalScript);
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_2__.mapGetters)(['sites', 'speedLoss', 'allEvents', 'qualityLosses', 'allEvents'])),
+  components: {
+    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_1__.default
   }
 });
 
@@ -11459,7 +12353,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.title = this.$t("unplannedDowntime");
     }
 
-    this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "Remplisseuse"); //while(this.downtimeReasons_2.length === 0){
+    this.$store.dispatch('fetchDowntimeReason_Machine_Issue', "filler"); //while(this.downtimeReasons_2.length === 0){
     //  this.resolveAfter05Second();
     //}
   },
@@ -11552,7 +12446,9 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('overallLineEffectivness', __
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeShutdowns', __webpack_require__(/*! ./components/unplannedDowntimeShutdowns.vue */ "./resources/js/components/unplannedDowntimeShutdowns.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeSpeedLosses', __webpack_require__(/*! ./components/unplannedDowntimeSpeedLosses.vue */ "./resources/js/components/unplannedDowntimeSpeedLosses.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('qualityLossesDashboard', __webpack_require__(/*! ./components/qualityLossesDashboard.vue */ "./resources/js/components/qualityLossesDashboard.vue").default);
+vue__WEBPACK_IMPORTED_MODULE_1__.default.component('qualityLossesDashboard2', __webpack_require__(/*! ./components/qualityLossesDashboard2.vue */ "./resources/js/components/qualityLossesDashboard2.vue").default);
 /**
+ *
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
@@ -11700,8 +12596,20 @@ var actions = {
       console.log(err);
     });
   },
-  fetchVolumes: function fetchVolumes(_ref7, parameters) {
+  fetchQualityLosses: function fetchQualityLosses(_ref7, parameters) {
     var commit = _ref7.commit;
+    var site = parameters[0];
+    var productionLine = parameters[1];
+    var beginningDate = parameters[2];
+    var endingDate = parameters[3];
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/qualityLosses/".concat(site, "/").concat(productionLine, "/").concat(beginningDate, "/").concat(endingDate)).then(function (res) {
+      commit('FETCH_QUALITY_LOSSES', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  fetchVolumes: function fetchVolumes(_ref8, parameters) {
+    var commit = _ref8.commit;
     var site = parameters[0];
     var productionLine = parameters[1];
     var beginningDate = parameters[2];
@@ -11712,8 +12620,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchEvents: function fetchEvents(_ref8, parameters) {
-    var commit = _ref8.commit;
+  fetchEvents: function fetchEvents(_ref9, parameters) {
+    var commit = _ref9.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/events/".concat(parameters[1], "/").concat(parameters[2])).then(function (res) {
       //console.log(res.data);
       if (parameters[0] === 1) {
@@ -11725,8 +12633,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchPO: function fetchPO(_ref9, parameters) {
-    var commit = _ref9.commit;
+  fetchPO: function fetchPO(_ref10, parameters) {
+    var commit = _ref10.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/pos/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       //console.log(res.data);
       commit('FETCH_PO', res.data);
@@ -11734,16 +12642,16 @@ var actions = {
       console.log(err);
     });
   },
-  fetchSpeedLosses: function fetchSpeedLosses(_ref10, parameters) {
-    var commit = _ref10.commit;
+  fetchSpeedLosses: function fetchSpeedLosses(_ref11, parameters) {
+    var commit = _ref11.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/speedLosses/".concat(parameters[1], "/").concat(parameters[0])).then(function (res) {
       commit('FETCH_SPEEDLOSSES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  fetchDowntimeReason: function fetchDowntimeReason(_ref11, parameters) {
-    var commit = _ref11.commit;
+  fetchDowntimeReason: function fetchDowntimeReason(_ref12, parameters) {
+    var commit = _ref12.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS', res.data);
@@ -11751,8 +12659,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref12, parameters) {
-    var commit = _ref12.commit;
+  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref13, parameters) {
+    var commit = _ref13.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
       console.log('Je passe ici');
       console.log(res.data);
@@ -11761,8 +12669,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref13, machineName) {
-    var commit = _ref13.commit;
+  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref14, machineName) {
+    var commit = _ref14.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_MACHINE_ISSUE', res.data);
@@ -11770,48 +12678,56 @@ var actions = {
       console.log(err);
     });
   },
-  getWorksiteID: function getWorksiteID(_ref14, worksite) {
-    var commit = _ref14.commit;
+  getWorksiteID: function getWorksiteID(_ref15, worksite) {
+    var commit = _ref15.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/worksiteID/".concat(worksite)).then(function (res) {
       commit('FETCH_WORKSITEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getProductionlineID: function getProductionlineID(_ref15, productionline) {
-    var commit = _ref15.commit;
+  getPerformanceForASite: function getPerformanceForASite(_ref16, PO) {
+    var commit = _ref16.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/performance/".concat(PO)).then(function (res) {
+      commit('FETCH_PERFORMANCE_INDEXES', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  getProductionlineID: function getProductionlineID(_ref17, productionline) {
+    var commit = _ref17.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/productionlineID/".concat(productionline)).then(function (res) {
       commit('FETCH_PRODUCTIONLINEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkAssignation: function checkAssignation(_ref16, assignation) {
-    var commit = _ref16.commit;
+  checkAssignation: function checkAssignation(_ref18, assignation) {
+    var commit = _ref18.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
       commit('FECTH_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkPO: function checkPO(_ref17, po) {
-    var commit = _ref17.commit;
+  checkPO: function checkPO(_ref19, po) {
+    var commit = _ref19.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/po/".concat(po)).then(function (res) {
       commit('FECTH_CHECKPO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getNetOPTime: function getNetOPTime(_ref18, GMID) {
-    var commit = _ref18.commit;
+  getNetOPTime: function getNetOPTime(_ref20, GMID) {
+    var commit = _ref20.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/netOP/".concat(GMID)).then(function (res) {
       commit('FETCH_NETOP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref19, potab) {
-    var commit = _ref19.commit;
+  create_PO: function create_PO(_ref21, potab) {
+    var commit = _ref21.commit;
 
     for (var i = 0; i < potab.length; i++) {
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/PO", potab[i]).then(function (res) {
@@ -11821,56 +12737,56 @@ var actions = {
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref20, assignation) {
-    var commit = _ref20.commit;
+  storeAssignation: function storeAssignation(_ref22, assignation) {
+    var commit = _ref22.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref21, event) {
-    var commit = _ref21.commit;
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref23, event) {
+    var commit = _ref23.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref22, event) {
-    var commit = _ref22.commit;
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref24, event) {
+    var commit = _ref24.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref23, event) {
-    var commit = _ref23.commit;
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref25, event) {
+    var commit = _ref25.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref24, event) {
-    var commit = _ref24.commit;
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref26, event) {
+    var commit = _ref26.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref25, event) {
-    var commit = _ref25.commit;
+  create_plannedEvent: function create_plannedEvent(_ref27, event) {
+    var commit = _ref27.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref26, array) {
-    var commit = _ref26.commit;
+  stop_PO: function stop_PO(_ref28, array) {
+    var commit = _ref28.commit;
     var PO = array[0];
     var availability = array[1];
     var performance = array[2];
@@ -11884,25 +12800,29 @@ var actions = {
       console.log(err);
     });
   },
-  store_Rejection: function store_Rejection(_ref27, array) {
-    var commit = _ref27.commit;
-    var PO = array[0];
-    var etiqCounter = array[1];
-    var weigCounter = array[2];
-    var caperCounter = array[3];
-    var fillCounter = array[4];
-    var etiqRejection = array[5];
-    var weigRejection = array[6];
-    var caperRejection = array[7];
-    var fillerRejection = array[8];
-    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/storeRejection/".concat(PO, "/").concat(etiqCounter, "/").concat(weigCounter, "/").concat(caperCounter, "/").concat(fillCounter, "/").concat(etiqRejection, "/").concat(weigRejection, "/").concat(caperRejection, "/").concat(fillerRejection)).then(function (res) {
+  store_Rejection: function store_Rejection(_ref29, rejection) {
+    var commit = _ref29.commit;
+
+    /**  var po = array[0];
+      var labelerCounter =  array[1];
+      var weightBoxCounter =  array[2];
+      var caperCounter =  array[3];
+      var fillerCounter =  array[4];
+      var labelerRejection = array[5];
+      var weightBoxRejection = array[6];
+      var caperRejection = array[7];
+      var fillerRejection = array[8];
+      var qualityControlCounter = array[9];
+      var qualityControlRejection = array[10];
+    **/
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/storeRejection", rejection).then(function (res) {
       commit('STORE_REJECTION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref28, event) {
-    var commit = _ref28.commit;
+  create_SpeedLoss: function create_SpeedLoss(_ref30, event) {
+    var commit = _ref30.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
@@ -11944,6 +12864,9 @@ var getters = {
   allEvents: function allEvents(state) {
     return state.allEvents;
   },
+  qualityLosses: function qualityLosses(state) {
+    return state.qualityLosses;
+  },
   unplannedDowntimeEvents: function unplannedDowntimeEvents(state) {
     return state.unplannedDowntimeEvents;
   },
@@ -11976,6 +12899,9 @@ var getters = {
   },
   netOP: function netOP(state) {
     return state.netOP;
+  },
+  performanceIndexes: function performanceIndexes(state) {
+    return state.performanceIndexes;
   },
   downtimeReasons_2: function downtimeReasons_2(state) {
     return state.downtimeReasons_2;
@@ -12084,8 +13010,14 @@ var mutations = {
   FETCH_MACHINES: function FETCH_MACHINES(state, machines) {
     return state.machines = machines;
   },
+  FETCH_PERFORMANCE_INDEXES: function FETCH_PERFORMANCE_INDEXES(state, performanceIndexes) {
+    return state.performanceIndexes = performanceIndexes;
+  },
   FETCH_ALL_EVENTS: function FETCH_ALL_EVENTS(state, events) {
     return state.allEvents = events;
+  },
+  FETCH_QUALITY_LOSSES: function FETCH_QUALITY_LOSSES(state, qualityLosses) {
+    return state.qualityLosses = qualityLosses;
   },
   FETCH_ALL_VOLUMES: function FETCH_ALL_VOLUMES(state, volumes) {
     return state.volumes = volumes;
@@ -12178,7 +13110,9 @@ var state = {
   unplannedDowntimeEvents: [],
   checkPO: [],
   REJECTION: [],
-  unplannedDowntimeMachineShutdownTypes: []
+  unplannedDowntimeMachineShutdownTypes: [],
+  qualityLosses: [],
+  performanceIndexes: []
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
 
@@ -17075,6 +18009,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-be4a0ce2] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-be4a0ce2] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-be4a0ce2] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-be4a0ce2]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-be4a0ce2] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-be4a0ce2] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-be4a0ce2] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-be4a0ce2] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-be4a0ce2] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-be4a0ce2] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-be4a0ce2],\ndiv.bottom-panel[data-v-be4a0ce2] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-be4a0ce2],\ndiv.ql-format-panel[data-v-be4a0ce2] {\n    width: 50%;\n}\ntable.table[data-v-be4a0ce2] {\n    margin: 10px 0px;\n}\n\n\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-7a9be1b3] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-7a9be1b3] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-7a9be1b3] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-7a9be1b3] {\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-7a9be1b3] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-7a9be1b3] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-7a9be1b3] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\n.content-title[data-v-7a9be1b3] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-7a9be1b3] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-7a9be1b3] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-7a9be1b3],\ndiv.bottom-panel[data-v-7a9be1b3] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-7a9be1b3],\ndiv.ql-format-panel[data-v-7a9be1b3] {\n    width: 50%;\n}\ntable.table[data-v-7a9be1b3] {\n}\nh1[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-7a9be1b3] {\n    font-size: 1em;\n    color: black;\n}\nh2[data-v-7a9be1b3] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-7a9be1b3] {\n    color: red;\n}\n.row[data-v-7a9be1b3] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-7a9be1b3] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\nh5[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-7a9be1b3] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.mainLine[data-v-7a9be1b3] {\n    border: 2px solid black;\n}\n.boxWeigher[data-v-7a9be1b3] {\n    background: palegoldenrod;\n}\n.caper[data-v-7a9be1b3] {\n    background: palegreen;\n}\n.labeler[data-v-7a9be1b3] {\n    background: paleturquoise;\n}\n.filler[data-v-7a9be1b3] {\n    background: palevioletred;\n}\n.totalQty[data-v-7a9be1b3] {\n    background: papayawhip;\n}\n.machineDiagram[data-v-7a9be1b3] {\n    background: lightblue;\n    color: white;\n    align: center;\n}\nh3[data-v-7a9be1b3] {\n    align: center;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -49625,6 +50583,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_style_index_0_id_7a9be1b3_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_style_index_0_id_7a9be1b3_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_style_index_0_id_7a9be1b3_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/teamInfo.vue?vue&type=style&index=0&id=0a8a1876&scoped=true&lang=css&":
 /*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/teamInfo.vue?vue&type=style&index=0&id=0a8a1876&scoped=true&lang=css& ***!
@@ -53225,6 +54213,47 @@ component.options.__file = "resources/js/components/qualityLossesDashboard.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/qualityLossesDashboard2.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/qualityLossesDashboard2.vue ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true& */ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true&");
+/* harmony import */ var _qualityLossesDashboard2_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./qualityLossesDashboard2.vue?vue&type=script&lang=js& */ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&");
+/* harmony import */ var _qualityLossesDashboard2_vue_vue_type_style_index_0_id_7a9be1b3_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& */ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
+  _qualityLossesDashboard2_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
+  _qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "7a9be1b3",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/qualityLossesDashboard2.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/teamInfo.vue":
 /*!**********************************************!*\
   !*** ./resources/js/components/teamInfo.vue ***!
@@ -53873,6 +54902,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard2.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
+
+/***/ }),
+
 /***/ "./resources/js/components/teamInfo.vue?vue&type=script&lang=js&":
 /*!***********************************************************************!*\
   !*** ./resources/js/components/teamInfo.vue?vue&type=script&lang=js& ***!
@@ -54244,6 +55289,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&":
+/*!**********************************************************************************************************************!*\
+  !*** ./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_style_index_0_id_7a9be1b3_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -54688,6 +55746,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true&":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true& ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard2_vue_vue_type_template_id_7a9be1b3_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true&");
 
 
 /***/ }),
@@ -56864,7 +57939,7 @@ var render = function() {
                               "\n                            " +
                                 _vm._s(
                                   (
-                                    (_vm.netOperatingTime / _vm.speedLosses) *
+                                    (_vm.speedLosses / _vm.netOperatingTime) *
                                     100
                                   ).toFixed(2)
                                 ) +
@@ -56990,6 +58065,7 @@ var render = function() {
   return _c(
     "div",
     [
+      _vm._v("\n\n    " + _vm._s(_vm.netOP) + "\n\n\n    "),
       _vm.displayNumber === 0
         ? [
             _c(
@@ -57211,7 +58287,9 @@ var render = function() {
                             ? [
                                 _c("h4", [
                                   _vm._v(
-                                    _vm._s(_vm.$t("noPerformanceRegistered"))
+                                    _vm._s(
+                                      _vm.$t("noPerformanceLossRegistered")
+                                    )
                                   )
                                 ])
                               ]
@@ -57612,6 +58690,10 @@ var render = function() {
                       _vm._v(" "),
                       _c("th", { attrs: { scope: "col" } }, [
                         _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                      ]),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("qualityControl")))
                       ])
                     ])
                   ]),
@@ -57716,6 +58798,33 @@ var render = function() {
                             }
                           }
                         })
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.QualityControlCounter,
+                              expression: "QualityControlCounter"
+                            }
+                          ],
+                          staticClass: "rcorners2",
+                          attrs: {
+                            type: "number",
+                            id: "qualityControlCounter"
+                          },
+                          domProps: { value: _vm.QualityControlCounter },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.QualityControlCounter = $event.target.value
+                            }
+                          }
+                        })
                       ])
                     ]),
                     _vm._v(" "),
@@ -57815,6 +58924,33 @@ var render = function() {
                                 return
                               }
                               _vm.WieghtBoxRejection = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.QualityControlRejection,
+                              expression: "QualityControlRejection"
+                            }
+                          ],
+                          staticClass: "rcorners2",
+                          attrs: {
+                            type: "number",
+                            id: "qualityControlRejection"
+                          },
+                          domProps: { value: _vm.QualityControlRejection },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.QualityControlRejection = $event.target.value
                             }
                           }
                         })
@@ -57975,6 +59111,10 @@ var render = function() {
                     _vm._v(" "),
                     _c("th", { attrs: { scope: "col" } }, [
                       _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                    ]),
+                    _vm._v(" "),
+                    _c("th", { attrs: { scope: "col" } }, [
+                      _vm._v(_vm._s(_vm.$t("qualityControl")))
                     ])
                   ])
                 ]),
@@ -58015,6 +59155,14 @@ var render = function() {
                           _vm._s(_vm.WieghtBoxCounter) +
                           "\n                "
                       )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.QualityControlCounter) +
+                          "\n                "
+                      )
                     ])
                   ]),
                   _vm._v(" "),
@@ -58051,6 +59199,14 @@ var render = function() {
                       _vm._v(
                         "\n                    " +
                           _vm._s(_vm.WieghtBoxRejection) +
+                          "\n                "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.QualityControlRejection) +
                           "\n                "
                       )
                     ])
@@ -58113,7 +59269,7 @@ var render = function() {
                     on: {
                       click: function($event) {
                         $event.preventDefault()
-                        return _vm.validateInformations()
+                        return _vm.backPage2()
                       }
                     }
                   },
@@ -58859,10 +60015,10 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _c("option", { attrs: { value: "monthlyLoadFactor" } }, [
+            _c("option", { attrs: { value: "qualityLossesDashboard" } }, [
               _vm._v(
                 "\n                    " +
-                  _vm._s(_vm.$t("monthlyLoadFactor")) +
+                  _vm._s(_vm.$t("qualityLossesDashboard")) +
                   "\n                "
               )
             ]),
@@ -60964,7 +62120,9 @@ var render = function() {
     _c("div", { staticClass: "d-flex selection-menu" }, [
       _c("div", { staticClass: "d-flex site-pl-selection" }, [
         _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "site-selection" } }, [_vm._v("Site: ")]),
+          _c("label", { attrs: { for: "site-selection" } }, [
+            _vm._v(_vm._s(_vm.$t("site")) + ": ")
+          ]),
           _vm._v(" "),
           _c(
             "select",
@@ -61017,7 +62175,7 @@ var render = function() {
         _vm._v(" "),
         _c("div", { staticClass: "d-flex" }, [
           _c("label", { attrs: { for: "pl-selection" } }, [
-            _vm._v("Production line: ")
+            _vm._v(_vm._s(_vm.$t("productionLine")) + ": ")
           ]),
           _vm._v(" "),
           _c(
@@ -61064,22 +62222,26 @@ var render = function() {
             ],
             2
           )
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "d-flex" }, [
+          _c("input", {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button", value: _vm.lo },
+            on: {
+              click: function($event) {
+                return _vm.load()
+              }
+            }
+          })
         ])
       ])
     ]),
     _vm._v(" "),
-    _vm._m(0)
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "content-panel" }, [
+    _c("div", { staticClass: "content-panel" }, [
       _c("div", { staticClass: "upper-panel" }, [
         _c("span", { staticClass: "content-title" }, [
-          _vm._v("Quality Losses")
+          _vm._v(_vm._s(_vm.$t("qualityLosses")))
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "chart-panel" })
@@ -61088,26 +62250,1061 @@ var staticRenderFns = [
       _c("div", { staticClass: "bottom-panel" }, [
         _c("div", { staticClass: "ql-machine-panel" }, [
           _c("span", { staticClass: "content-title" }, [
-            _vm._v("Quality Losses by Machine")
+            _vm._v(_vm._s(_vm.$t("qualityLossesByMachine")))
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "inner-content-panel" }, [
-            _c("div", { staticClass: "table-panel" }),
-            _vm._v(" "),
-            _c("div", { staticClass: "chart-panel" })
-          ])
+          _vm._m(0)
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "ql-format-panel" }, [
           _c("span", { staticClass: "content-title" }, [
-            _vm._v("Quality Losses by Format")
+            _vm._v(_vm._s(_vm.$t("qualityLossesByFormat")))
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "inner-content-panel" }, [
-            _c("div", { staticClass: "table-panel" }),
+          _vm._m(1)
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "inner-content-panel" }, [
+      _c("div", { staticClass: "table-panel" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "chart-panel" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "inner-content-panel" }, [
+      _c("div", { staticClass: "table-panel" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "chart-panel" })
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true&":
+/*!***********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true& ***!
+  \***********************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", {}, [
+          _c("form", [
+            _c("label", { attrs: { for: "site" } }, [
+              _vm._v(_vm._s(_vm.$t("site")) + " : ")
+            ]),
             _vm._v(" "),
-            _c("div", { staticClass: "chart-panel" })
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.site,
+                    expression: "site"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "site", id: "site" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.site = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[0], function(site) {
+                  return [
+                    _c("option", { domProps: { value: site.name } }, [
+                      _vm._v(
+                        "\n                                    " +
+                          _vm._s(site.name) +
+                          "\n                                "
+                      )
+                    ])
+                  ]
+                })
+              ],
+              2
+            )
+          ]),
+          _vm._v(" "),
+          _c("form", [
+            _c("label", { attrs: { for: "productionline" } }, [
+              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.productionline,
+                    expression: "productionline"
+                  }
+                ],
+                staticClass: "form-select",
+                attrs: { name: "productionline", id: "productionline" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.productionline = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _vm._l(_vm.sites[1], function(productionline) {
+                  return [
+                    productionline.name === _vm.site
+                      ? [
+                          _c(
+                            "option",
+                            {
+                              domProps: {
+                                value: productionline.productionline_name
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n                                        " +
+                                  _vm._s(productionline.productionline_name) +
+                                  "\n                                    "
+                              )
+                            ]
+                          )
+                        ]
+                      : _vm._e()
+                  ]
+                })
+              ],
+              2
+            )
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("input", {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button", value: _vm.lo },
+            on: {
+              click: function($event) {
+                return _vm.load()
+              }
+            }
+          })
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
+        _c("h1", [
+          _vm._v(
+            "\n                    " +
+              _vm._s(_vm.$t("qualityLossesDashboard")) +
+              "\n                "
+          )
+        ]),
+        _vm._v(" "),
+        _c("label", { attrs: { for: "startingPO" } }, [
+          _vm._v(_vm._s(_vm.$t("from")))
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.beginningDate,
+              expression: "beginningDate"
+            }
+          ],
+          staticClass: " ",
+          attrs: { type: "date", id: "startingPO", required: "" },
+          domProps: { value: _vm.beginningDate },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.beginningDate = $event.target.value
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("label", { attrs: { for: "endingPO" } }, [
+          _vm._v(_vm._s(_vm.$t("to")))
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.endingDate,
+              expression: "endingDate"
+            }
+          ],
+          attrs: { type: "date", id: "endingPO", required: "" },
+          domProps: { value: _vm.endingDate },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.endingDate = $event.target.value
+            }
+          }
+        })
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("span", { staticClass: "content-title" }, [
+          _vm._v(
+            "\n                    " +
+              _vm._s(_vm.$t("qualityLosses")) +
+              "\n                "
+          )
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm  border border-primary" }, [
+        _c("h3", { staticStyle: { "padding-top": "55px" } }, [
+          _vm._v(
+            "\n                    QL = " +
+              _vm._s((_vm.quality * 100).toFixed(2)) +
+              " %\n                "
+          )
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _vm._m(1),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("span", { staticClass: "content-title" }, [
+          _vm._v(_vm._s(_vm.$t("qualityLossesByMachine")))
+        ]),
+        _vm._v(" "),
+        _c("canvas", {
+          attrs: { id: "qualityLossesByMachines", width: "100", height: "100" }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
+        _c("span", { staticClass: "content-title" }, [
+          _vm._v(
+            "\n                    " +
+              _vm._s(_vm.$t("qualityLossesByFormat")) +
+              "\n                "
+          )
+        ]),
+        _vm._v(" "),
+        _c("canvas", {
+          attrs: { id: "qualityLossesByFormat", width: "100", height: "100" }
+        })
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("table", { staticClass: "table" }, [
+                  _c("thead", [
+                    _c("tr", [
+                      _c("th", { attrs: { scope: "col" } }),
+                      _vm._v(" "),
+                      _c("th", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.$t("numberOfItems")))
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c("tr", { staticClass: "filler mainLine" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("filler")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumFillerCounter *
+                              1 +
+                              _vm.qualityLosses["rejectionCounter"][0]
+                                .sumFillerRejection *
+                                1
+                          ) + "\n                            "
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "filler" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("overProcess")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumFillerCounter
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "filler" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumFillerRejection
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "caper mainLine" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("caper")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumCaperCounter *
+                              1 +
+                              _vm.qualityLosses["rejectionCounter"][0]
+                                .sumCaperRejection *
+                                1
+                          ) + "\n                            "
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "caper" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("overProcess")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumCaperCounter
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "caper" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumCaperRejection
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "labeler mainLine" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("labeler")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumLabelerCounter *
+                              1 +
+                              _vm.qualityLosses["rejectionCounter"][0]
+                                .sumLabelerRejection *
+                                1
+                          ) + "\n                            "
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "labeler" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("overProcess")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumLabelerCounter
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "labeler" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumLabelerRejection
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher mainLine" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumWeightBoxCounter *
+                              1 +
+                              _vm.qualityLosses["rejectionCounter"][0]
+                                .sumWeightBoxRejection *
+                                1
+                          ) + "\n                            "
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("overProcess")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumWeightBoxCounter
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumWeightBoxRejection
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher mainLine" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("qualityControl")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumQualityControlCounter *
+                              1 +
+                              _vm.qualityLosses["rejectionCounter"][0]
+                                .sumQualityControlRejection *
+                                1
+                          ) + "\n                            "
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("overProcess")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumQualityControlCounter
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "boxWeigher" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.qualityLosses["rejectionCounter"][0]
+                              .sumQualityControlRejection
+                          )
+                        )
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "totalQty" }, [
+                      _c("th", { attrs: { scope: "row" } }, [
+                        _vm._v(_vm._s(_vm.$t("total")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(_vm.totalItems))])
+                    ])
+                  ])
+                ])
+              ]
+            : _vm._e()
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("table", { staticClass: "table" }, [
+                  _c("thead", [
+                    _c(
+                      "tr",
+                      [
+                        _c("th", { attrs: { scope: "col" } }),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("th", { attrs: { scope: "col" } }, [
+                            _vm._v(_vm._s(format) + "L")
+                          ])
+                        })
+                      ],
+                      2
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c(
+                      "tr",
+                      { staticClass: "filler mainLine" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("filler")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["fillerCounter"][format] +
+                                    _vm.qtyPerMachine["fillerRejection"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "filler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("overProcess")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["fillerCounter"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "filler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["fillerRejection"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "caper mainLine" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("caper")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["caperCounter"][format] +
+                                    _vm.qtyPerMachine["caperRejection"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "caper" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("overProcess")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["caperCounter"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "caper" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["caperRejection"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "labeler mainLine" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("labeler")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["labelerCounter"][format] +
+                                    _vm.qtyPerMachine["labelerRejection"][
+                                      format
+                                    ]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "labeler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("overProcess")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["fillerCounter"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "labeler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["fillerRejection"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "boxWeigher mainLine" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("boxWeigher")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["weightBoxCounter"][
+                                    format
+                                  ] +
+                                    _vm.qtyPerMachine["weightBoxRejection"][
+                                      format
+                                    ]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "boxWeigher" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("overProcess")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["weightBoxCounter"][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "boxWeigher" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["weightBoxRejection"][
+                                    format
+                                  ]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "filler mainLine" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("controlQuality")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["controlQualityCounter"][
+                                    format
+                                  ] +
+                                    _vm.qtyPerMachine[
+                                      "controlQualityRejection"
+                                    ][format]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "filler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("overProcess")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["controlQualityCounter"][
+                                    format
+                                  ]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "filler" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("rejectedItems")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.qtyPerMachine["controlQualityRejection"][
+                                    format
+                                  ]
+                                ) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "tr",
+                      { staticClass: "totalQty" },
+                      [
+                        _c("th", { attrs: { scope: "row" } }, [
+                          _vm._v(_vm._s(_vm.$t("total")))
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.tableauFormats, function(format) {
+                          return _c("td", [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(_vm.totalPerFormat[format]) +
+                                "\n                            "
+                            )
+                          ])
+                        })
+                      ],
+                      2
+                    )
+                  ])
+                ])
+              ]
+            : _vm._e()
+        ],
+        2
+      )
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-sm" }, [
+      _c("img", { attrs: { src: "images/qualityLossesDiagram.png" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        {
+          staticClass: "col-sm border border-primary",
+          staticStyle: { "padding-left": "50px" }
+        },
+        [
+          _c("p", [
+            _vm._v(
+              "\n                    N = Produced Pieces in Specification during the production run "
+            ),
+            _c("br"),
+            _vm._v(
+              "\n                    RMi, RF = Rejected Pieces at the Filler or machines Mi "
+            ),
+            _c("br"),
+            _vm._v(
+              "\n                    CMi = Machine counter value at end of production run\n                "
+            )
           ])
+        ]
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm border border-primary" }, [
+        _c("p", [
+          _vm._v("\n                    M1 = telle machine "),
+          _c("br"),
+          _vm._v("\n                    M2 = telle machine "),
+          _c("br"),
+          _vm._v("\n                    M3 = telle machine "),
+          _c("br"),
+          _vm._v("\n                    M4 = telle machine "),
+          _c("br")
         ])
       ])
     ])
@@ -77481,7 +79678,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceRegistered":"No Performance Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","number":"Number","duration":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","machinesShutdowns":"Machines Shutdowns","externalShutdowns":"External Shutdowns","machineShutdown":"Machine shutdown","totalDowntime":"Total downtime","frequency":"Frequency","averageDuration":"Average duration","externalShutdown":"External shutdown","timeInMinutes":"Time in minutes","reduceRateAtFiller":"Reduce rate at filler","reduceRateAtFillerDueToAnotherMachineCapacity":"Reduce rate at filler due to another machine capacity","fillerOwnStop":"Filler own stop","fillerStopByOtherMachine":"Filler stop by other machine","productionOrder":"Production order (PO)","reduceRate":"Reduce rate (cpm)","wastedTime":"Wasted time (min)","comments/reason":"Comments/Reason","select":"Select","standardDeviation":"Standard deviation"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceLossRegistered":"No Performance Loss Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","numberOfItems":"Number of items","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","number":"Number","duration":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","qualityLossesByMachine":"Quality Losses By Machine","qualityLossesByFormat":"Quality Losses By Format","filling":"Filling","capping":"Capping","qualityLossesDashboard":"Quality Losses Dashboard","total":"Total","qualityControl":"Quality Control","machinesShutdowns":"Machines Shutdowns","externalShutdowns":"External Shutdowns","machineShutdown":"Machine shutdown","totalDowntime":"Total downtime","frequency":"Frequency","averageDuration":"Average duration","externalShutdown":"External shutdown","timeInMinutes":"Time in minutes","reduceRateAtFiller":"Reduce rate at filler","reduceRateAtFillerDueToAnotherMachineCapacity":"Reduce rate at filler due to another machine capacity","fillerOwnStop":"Filler own stop","fillerStopByOtherMachine":"Filler stop by other machine","productionOrder":"Production order (PO)","reduceRate":"Reduce rate (cpm)","wastedTime":"Wasted time (min)","comments/reason":"Comments/Reason","select":"Select","standardDeviation":"Standard deviation"}');
 
 /***/ }),
 
@@ -77492,7 +79689,7 @@ module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choic
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps de operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceRegistered":"Aucune performance enregistrée","speedLossJustification":"ustification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"à","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de production","duration":"Durée","number":"Quantité","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","machinesShutdowns":"Arrêts machines","externalShutdowns":"Arrêts externes ","machineShutdown":"Arrêt machine","totalDowntime":"Durée totale de l\'arrêt","frequency":"Fréquence","averageDuration":"Durée moyenne","externalShutdown":"Arrêt externe","timeInMinutes":"Durée en minutes","reduceRateAtFiller":"Débit de remplissage réduit","reduceRateAtFillerDueToAnotherMachineCapacity":"Débit de remplissage réduit dû à la capacité d\'une autre machine","fillerOwnStop":"Arrêt remplisseur","fillerStopByOtherMachine":"Arrêt remplisseur dû à une autre machine","productionOrder":"Ordre de production (PO)","reduceRate":"Débit réduit (cpm)","wastedTime":"Temps perdu (min)","comments/reason":"Commentaires / Raison","select":"Sélectionner","standardDeviation":"Écart-type"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceLossRegistered":"Aucune perte de performance enregistrée","speedLossJustification":"Justification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","numberOfItems":"Nombre de produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"à","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de production","duration":"Durée","number":"Quantité","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","qualityLossesByMachine":"Perte de qualité par machine","qualityLossesByFormat":"Perte de qualité par format","filling":"Remplissage","capping":"Bouchonnage","qualityLossesDashboard":"Rapport de perte de qualité","total":"Total","qualityControl":"Contrôle Qualité","machinesShutdowns":"Arrêts machines","externalShutdowns":"Arrêts externes ","machineShutdown":"Arrêt machine","totalDowntime":"Durée totale de l\'arrêt","frequency":"Fréquence","averageDuration":"Durée moyenne","externalShutdown":"Arrêt externe","timeInMinutes":"Durée en minutes","reduceRateAtFiller":"Débit de remplissage réduit","reduceRateAtFillerDueToAnotherMachineCapacity":"Débit de remplissage réduit dû à la capacité d\'une autre machine","fillerOwnStop":"Arrêt remplisseur","fillerStopByOtherMachine":"Arrêt remplisseur dû à une autre machine","productionOrder":"Ordre de production (PO)","reduceRate":"Débit réduit (cpm)","wastedTime":"Temps perdu (min)","comments/reason":"Commentaires / Raison","select":"Sélectionner","standardDeviation":"Écart-type"}');
 
 /***/ }),
 
