@@ -1,21 +1,9 @@
 <?php
 
-namespace App\Http\Middleware;
+declare(strict_types=1);
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Firebase\JWT\JWT;
 
-class Authenticate extends Middleware
-{
-    /**
-     * Get the path the user should be redirected to when they are not authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
-     */
-    protected function redirectTo($request)
-    {
-        if (! $request->expectsJson()) {
-            return route('login');
-        }
-    }
-}
+require_once("../../vendor/autoload.php");
+
+
