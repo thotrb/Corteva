@@ -85,7 +85,7 @@ class FormController extends Controller
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
             ->get();
-        
+
         $seqCips = DB::table('ole_unplanned_event_cips')
             ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
             ->whereDate('ole_unplanned_event_cips.created_at', '>=', $beginningDate)
@@ -332,15 +332,9 @@ class FormController extends Controller
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear . '-' . $beginningMonth . '-' . $beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear . '-' . $endingMonth . '-' . $endingDay)->startOfDay();
 
-<<<<<<< HEAD
-
-            $speedLossesEvents = DB::table('ole_speed_losses')
-=======
-            
 
 
             $speedLossesEvents =  DB::table('ole_speed_losses')
->>>>>>> 04322fbcf6efd8547645864cc1c8f5548c2d02c9
                 ->select('ole_speed_losses.duration', 'ole_speed_losses.reason', 'ole_speed_losses.comment', 'ole_pos.id', 'ole_pos.qtyProduced', 'ole_pos.workingDuration', 'ole_products.size', 'ole_products.idealRate')
                 ->where('ole_speed_losses.productionline', '=', $productionLine)
                 ->whereDate('ole_speed_losses.created_at', '>=', $beginningDate)

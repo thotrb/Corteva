@@ -5261,12 +5261,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbar",
   data: function data() {
     return {
       selection: 'packagingLineID',
-      url: sessionStorage.getItem("url")
+      url: sessionStorage.getItem("url"),
+      language: "en"
     };
   },
   methods: {
@@ -5281,6 +5284,13 @@ __webpack_require__.r(__webpack_exports__);
         sessionStorage.language = language;
       } else {
         sessionStorage.setItem("language", language);
+      }
+    },
+    mounted: function mounted() {
+      if (sessionStorage.getItem("language") === null) {
+        this.language = "en";
+      } else {
+        this.language = sessionStorage.getItem("language");
       }
     }
   }
@@ -59943,31 +59953,47 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "d-flex" }, [
         _c(
-          "button",
+          "select",
           {
-            staticClass: "btn btn-outline-success",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.swapLanguage("fr")
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.language,
+                expression: "language"
               }
+            ],
+            attrs: { name: "languages", id: "languages" },
+            on: {
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.language = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                },
+                function($event) {
+                  return _vm.swapLanguage(_vm.language)
+                }
+              ]
             }
           },
-          [_vm._v("\n                FR\n            ")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-outline-success",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.swapLanguage("en")
-              }
-            }
-          },
-          [_vm._v("\n                EN\n            ")]
+          [
+            _c("option", { attrs: { value: "fr" } }, [
+              _vm._v("\n                    Fr\n                ")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "en" } }, [
+              _vm._v("\n                    En\n                ")
+            ])
+          ]
         ),
         _vm._v(" "),
         _c(

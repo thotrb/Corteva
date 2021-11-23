@@ -8,12 +8,14 @@
 
             <div class="d-flex">
 
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('fr')">
-                    FR
-                </button>
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('en')">
-                    EN
-                </button>
+                <select name="languages" id="languages" v-model="language" v-on:change="swapLanguage(language)">
+                    <option value="fr">
+                        Fr
+                    </option>
+                    <option value="en" >
+                        En
+                    </option>
+                </select>
 
                 <select name="page" id="page" class="" v-model="selection">
                     <option value="packagingLineID">
@@ -72,6 +74,7 @@
             return {
                 selection: 'packagingLineID',
                 url: sessionStorage.getItem("url"),
+                language: "en",
 
             }
         },
@@ -90,8 +93,18 @@
                 }else{
                     sessionStorage.setItem("language",language);
                 }
+            },
+
+            mounted: function()
+            {
+                if(sessionStorage.getItem("language") === null){
+                    this.language = "en";
+                }else{
+                    this.language = sessionStorage.getItem("language");
+                }
             }
         },
+
     }
 </script>
 
