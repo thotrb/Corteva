@@ -303,7 +303,7 @@ class FormController extends Controller
 
 
 
-            $speedLossesEvents =  DB::table('ole_speed_losses')
+            $speedLossesEvents = DB::table('ole_speed_losses')
                 ->select('ole_speed_losses.duration', 'ole_speed_losses.reason', 'ole_speed_losses.comment', 'ole_pos.id', 'ole_pos.qtyProduced', 'ole_pos.workingDuration', 'ole_products.size', 'ole_products.idealRate')
                 ->where('ole_speed_losses.productionline', '=', $productionLine)
                 ->whereDate('ole_speed_losses.created_at', '>=', $beginningDate)

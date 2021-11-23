@@ -1,8 +1,6 @@
 import axios from "axios";
 
 let actions = {
-
-
     retrieveToken(context, credentials) {
         axios.post(`/api/log/${credentials[0]}/${credentials[1]}`)
             .then(res => {
@@ -19,8 +17,6 @@ let actions = {
         })
 
     },
-
-
 
     fetchUsers({commit}, parameters) {
 
@@ -47,7 +43,6 @@ let actions = {
     },
 
     fetchMachines({commit}, productionlineID) {
-
         axios.get(`/api/machines/${productionlineID}`)
             .then(res => {
                 commit('FETCH_MACHINES', res.data);

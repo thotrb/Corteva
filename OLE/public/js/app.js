@@ -10559,17 +10559,80 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "unplannedDowntimeDashboard",
   data: function data() {
     var data = {
-      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       unplannedDowntimesCategories: {
-        cip: 'cleaningInPlaceCIP',
-        cov: 'changeOverCOV',
-        bnc: 'batchNumberChangeBNC'
+        cip: "cleaningInPlaceCIP",
+        cov: "changeOverCOV",
+        bnc: "batchNumberChangeBNC"
       },
       downtimes: {
         cip: {},
@@ -10587,8 +10650,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         bnc: undefined,
         created: false
       },
-      site: '',
-      productionLine: '',
+      site: "",
+      productionLine: "",
       sequencesCIP: {},
       sequencesCOV: {}
     }; //Populate downtimes array
@@ -10625,19 +10688,19 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       yearlyDuration: undefined,
       yearlyNb: undefined,
       yearlyAvg: undefined,
-      downtimePercentage: '--'
+      downtimePercentage: "--"
     };
     data.downtimes.cov.general = {
       yearlyDuration: undefined,
       yearlyNb: undefined,
       yearlyAvg: undefined,
-      downtimePercentage: '--'
+      downtimePercentage: "--"
     };
     data.downtimes.bnc.general = {
       yearlyDuration: undefined,
       yearlyNb: undefined,
       yearlyAvg: undefined,
-      downtimePercentage: '--'
+      downtimePercentage: "--"
     }; //Populate years array
 
     for (var i = data.startYear; i <= data.currentYear; i++) {
@@ -10649,7 +10712,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   },
   methods: {
     calculateYearsAfterFrom: function calculateYearsAfterFrom() {
-      var selectedYear = document.getElementById('select-year-from').value;
+      var selectedYear = document.getElementById("select-year-from").value;
       this.yearsAfterFrom = [];
 
       for (var i = selectedYear; i <= this.currentYear; i++) {
@@ -10700,12 +10763,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     chargeCurrentYearData: function chargeCurrentYearData() {
       var _this2 = this;
 
-      var selectedPL = document.getElementById('pl-selection').value;
+      var selectedPL = document.getElementById("pl-selection").value;
       var currentYear = new Date().getFullYear().toString();
-      var dateFrom = currentYear + '-01-01';
-      var dateTo = currentYear + '-12-31';
+      var dateFrom = currentYear + "-01-01";
+      var dateTo = currentYear + "-12-31";
       var params = [selectedPL, dateFrom, dateTo];
-      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
+      this.$store.dispatch("fetchDowntimeEvents", params).then(function () {
         //Wait for data
         _this2.resolveAfter(1000).then(function () {
           //A new downtime object is created to delete previous data
@@ -10784,11 +10847,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _this2.chartObjects[type].update();
           };
 
-          for (var _i = 0, _arr = ['cip', 'cov', 'bnc']; _i < _arr.length; _i++) {
+          for (var _i = 0, _arr = ["cip", "cov", "bnc"]; _i < _arr.length; _i++) {
             _loop();
           }
 
-          for (var _i3 = 0, _arr2 = ['cip', 'cov', 'bnc']; _i3 < _arr2.length; _i3++) {
+          for (var _i3 = 0, _arr2 = ["cip", "cov", "bnc"]; _i3 < _arr2.length; _i3++) {
             var type = _arr2[_i3];
             var downtimePercent = totalDuration[type] / totalDowntimeDuration * 100;
 
@@ -10796,113 +10859,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               downtimePercent = downtimePercent.toFixed(2);
               _this2.downtimes[type].general.downtimePercentage = downtimePercent;
             }
-          }
-
-          _this2.sequencesCIP = {};
-
-          var _iterator4 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0].seqCIP),
-              _step4;
-
-          try {
-            for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-              var event = _step4.value;
-              var pair = event.previous_bulk + "/" + event.BULK;
-
-              if (!_this2.sequencesCIP[pair]) {
-                _this2.sequencesCIP[pair] = {
-                  totalDuration: 0,
-                  number: 0,
-                  avgDuration: 0,
-                  std: 0,
-                  durations: []
-                };
-              }
-
-              _this2.sequencesCIP[pair].durations.push(event.total_duration);
-
-              _this2.sequencesCIP[pair].totalDuration += event.total_duration;
-              _this2.sequencesCIP[pair].number++;
-              _this2.sequencesCIP[pair].avgDuration = _this2.sequencesCIP[pair].totalDuration / _this2.sequencesCIP[pair].number; //Calculate standard deviation
-
-              var std = 0;
-              var mean = _this2.sequencesCIP[pair].avgDuration;
-
-              var _iterator6 = _createForOfIteratorHelper(_this2.sequencesCIP[pair].durations),
-                  _step6;
-
-              try {
-                for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
-                  var duration = _step6.value;
-                  std += Math.pow(duration - mean, 2);
-                }
-              } catch (err) {
-                _iterator6.e(err);
-              } finally {
-                _iterator6.f();
-              }
-
-              std /= _this2.sequencesCIP[pair].durations.length;
-              std = Math.pow(std, 0.5);
-              _this2.sequencesCIP[pair].std = std;
-            }
-          } catch (err) {
-            _iterator4.e(err);
-          } finally {
-            _iterator4.f();
-          }
-
-          _this2.sequencesCOV = {};
-
-          var _iterator5 = _createForOfIteratorHelper(_this2.unplannedDowntimeEvents[0].seqCOV),
-              _step5;
-
-          try {
-            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-              var _event = _step5.value;
-
-              var _type = _event.size + "L";
-
-              if (!_this2.sequencesCOV[_type]) {
-                _this2.sequencesCOV[_type] = {
-                  totalDuration: 0,
-                  number: 0,
-                  avgDuration: 0,
-                  std: 0,
-                  durations: []
-                };
-              }
-
-              _this2.sequencesCOV[_type].durations.push(_event.total_duration);
-
-              _this2.sequencesCOV[_type].totalDuration += _event.total_duration;
-              _this2.sequencesCOV[_type].number++;
-              _this2.sequencesCOV[_type].avgDuration = _this2.sequencesCOV[_type].totalDuration / _this2.sequencesCOV[_type].number; //Calculate standard deviation
-
-              var _std = 0;
-              var _mean = _this2.sequencesCOV[_type].avgDuration;
-
-              var _iterator7 = _createForOfIteratorHelper(_this2.sequencesCOV[_type].durations),
-                  _step7;
-
-              try {
-                for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
-                  var _duration = _step7.value;
-                  _std += Math.pow(_duration - _mean, 2);
-                }
-              } catch (err) {
-                _iterator7.e(err);
-              } finally {
-                _iterator7.f();
-              }
-
-              _std /= _this2.sequencesCOV[_type].durations.length;
-              _std = Math.pow(_std, 0.5);
-              _this2.sequencesCOV[_type].std = _std;
-            }
-          } catch (err) {
-            _iterator5.e(err);
-          } finally {
-            _iterator5.f();
           }
         }).then(function () {
           return _this2.chargeGeneralData();
@@ -10912,35 +10868,141 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     chargeGeneralData: function chargeGeneralData() {
       var _this3 = this;
 
-      var selectedPL = document.getElementById('pl-selection').value;
-      var dateFrom = document.getElementById('select-date-from').value;
-      var dateTo = document.getElementById('select-date-to').value;
+      var selectedPL = document.getElementById("pl-selection").value;
+      var dateFrom = document.getElementById("select-date-from").value;
+      var dateTo = document.getElementById("select-date-to").value;
       var params = [selectedPL, dateFrom, dateTo];
-      this.$store.dispatch('fetchDowntimeEvents', params).then(function () {
+      this.$store.dispatch("fetchDowntimeEvents", params).then(function () {
         _this3.resolveAfter(1000).then(function () {
-          for (var _i4 = 0, _arr3 = ['cip', 'cov', 'bnc']; _i4 < _arr3.length; _i4++) {
+          for (var _i4 = 0, _arr3 = ["cip", "cov", "bnc"]; _i4 < _arr3.length; _i4++) {
             var cat = _arr3[_i4];
             _this3.generalData[cat] = {
               totalDuration: 0,
               totalNb: 0
             };
 
-            var _iterator8 = _createForOfIteratorHelper(_this3.unplannedDowntimeEvents[0][cat.toUpperCase()]),
-                _step8;
+            var _iterator4 = _createForOfIteratorHelper(_this3.unplannedDowntimeEvents[0][cat.toUpperCase()]),
+                _step4;
 
             try {
-              for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
-                var event = _step8.value;
+              for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+                var event = _step4.value;
                 _this3.generalData[cat].totalDuration += event.total_duration / 60;
                 _this3.generalData[cat].totalNb++;
               }
             } catch (err) {
-              _iterator8.e(err);
+              _iterator4.e(err);
             } finally {
-              _iterator8.f();
+              _iterator4.f();
             }
 
             _this3.generalData[cat].totalDuration = _this3.generalData[cat].totalDuration.toFixed(2);
+          }
+
+          _this3.sequencesCIP = {};
+
+          var _iterator5 = _createForOfIteratorHelper(_this3.unplannedDowntimeEvents[0].seqCIP),
+              _step5;
+
+          try {
+            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+              var _event = _step5.value;
+              var pair = _event.previous_bulk + "/" + _event.BULK;
+
+              if (!_this3.sequencesCIP[pair]) {
+                _this3.sequencesCIP[pair] = {
+                  totalDuration: 0,
+                  number: 0,
+                  avgDuration: 0,
+                  std: 0,
+                  durations: []
+                };
+              }
+
+              _this3.sequencesCIP[pair].durations.push(_event.total_duration);
+
+              _this3.sequencesCIP[pair].totalDuration += _event.total_duration;
+              _this3.sequencesCIP[pair].number++;
+              _this3.sequencesCIP[pair].avgDuration = _this3.sequencesCIP[pair].totalDuration / _this3.sequencesCIP[pair].number; //Calculate standard deviation
+
+              var std = 0;
+              var mean = _this3.sequencesCIP[pair].avgDuration;
+
+              var _iterator7 = _createForOfIteratorHelper(_this3.sequencesCIP[pair].durations),
+                  _step7;
+
+              try {
+                for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
+                  var duration = _step7.value;
+                  std += Math.pow(duration - mean, 2);
+                }
+              } catch (err) {
+                _iterator7.e(err);
+              } finally {
+                _iterator7.f();
+              }
+
+              std /= _this3.sequencesCIP[pair].durations.length;
+              std = Math.pow(std, 0.5);
+              _this3.sequencesCIP[pair].std = std;
+            }
+          } catch (err) {
+            _iterator5.e(err);
+          } finally {
+            _iterator5.f();
+          }
+
+          _this3.sequencesCOV = {};
+
+          var _iterator6 = _createForOfIteratorHelper(_this3.unplannedDowntimeEvents[0].seqCOV),
+              _step6;
+
+          try {
+            for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+              var _event2 = _step6.value;
+              var type = _event2.size + "L";
+
+              if (!_this3.sequencesCOV[type]) {
+                _this3.sequencesCOV[type] = {
+                  totalDuration: 0,
+                  number: 0,
+                  avgDuration: 0,
+                  std: 0,
+                  durations: []
+                };
+              }
+
+              _this3.sequencesCOV[type].durations.push(_event2.total_duration);
+
+              _this3.sequencesCOV[type].totalDuration += _event2.total_duration;
+              _this3.sequencesCOV[type].number++;
+              _this3.sequencesCOV[type].avgDuration = _this3.sequencesCOV[type].totalDuration / _this3.sequencesCOV[type].number; //Calculate standard deviation
+
+              var _std = 0;
+              var _mean = _this3.sequencesCOV[type].avgDuration;
+
+              var _iterator8 = _createForOfIteratorHelper(_this3.sequencesCOV[type].durations),
+                  _step8;
+
+              try {
+                for (_iterator8.s(); !(_step8 = _iterator8.n()).done;) {
+                  var _duration = _step8.value;
+                  _std += Math.pow(_duration - _mean, 2);
+                }
+              } catch (err) {
+                _iterator8.e(err);
+              } finally {
+                _iterator8.f();
+              }
+
+              _std /= _this3.sequencesCOV[type].durations.length;
+              _std = Math.pow(_std, 0.5);
+              _this3.sequencesCOV[type].std = _std;
+            }
+          } catch (err) {
+            _iterator6.e(err);
+          } finally {
+            _iterator6.f();
           }
         });
       });
@@ -10953,17 +11015,17 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       });
     },
     createCharts: function createCharts() {
-      for (var _i5 = 0, _arr4 = ['cip', 'cov', 'bnc']; _i5 < _arr4.length; _i5++) {
+      for (var _i5 = 0, _arr4 = ["cip", "cov", "bnc"]; _i5 < _arr4.length; _i5++) {
         var type = _arr4[_i5];
-        var chartName = type + '-chart';
+        var chartName = type + "-chart";
         this.chartObjects[type] = new Chart(chartName, {
-          type: 'bar',
+          type: "bar",
           data: {
             labels: [],
             datasets: [{
               label: type.toUpperCase(),
               data: [],
-              backgroundColor: 'rgb(112, 184, 232)'
+              backgroundColor: "rgb(112, 184, 232)"
             }]
           },
           options: {
@@ -10987,19 +11049,19 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       this.$i18n.locale = sessionStorage.getItem("language");
     }
 
-    this.$store.dispatch('fetchSites'); //Load chart.js into vue component
+    this.$store.dispatch("fetchSites"); //Load chart.js into vue component
 
-    var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
+    var chartJs = document.createElement("script");
+    chartJs.setAttribute("src", "https://cdn.jsdelivr.net/npm/chart.js");
     document.head.appendChild(chartJs);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'unplannedDowntimeEvents', 'allEvents'])),
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(["sites", "unplannedDowntimeEvents", "allEvents"])),
   components: {
     ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
   },
   watch: {
-    '$i18n.locale': function $i18nLocale() {
-      for (var _i6 = 0, _arr5 = ['cip', 'cov', 'bnc']; _i6 < _arr5.length; _i6++) {
+    "$i18n.locale": function $i18nLocale() {
+      for (var _i6 = 0, _arr5 = ["cip", "cov", "bnc"]; _i6 < _arr5.length; _i6++) {
         var type = _arr5[_i6];
 
         if (this.chartObjects[type]) {
@@ -17944,7 +18006,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n    justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n    font-size: 30px;\n    font-weight: bold;\n    color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n    align-items: center;\n    justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n    color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n    flex-direction: column;\n    justify-content: space-around;\n    align-items: center;\n    margin: 0px 30px;\n    padding-left: 10px;\n    border: solid 1px;\n    border-radius: 5px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n    flex-direction: column;\n    margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n    text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n    margin-top: 20px;\n    display: flex;\n    justify-content: center;\n    height: 350px;\n    border-bottom: 1px solid;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n    width: 25% !important;\n    height: 300px;\n    margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n    text-align: center;\n    margin: 10px 0px;\n    font-size: 16px;\n}\ndiv.production-window-container[data-v-5f72b0a5] {\n    display: flex;\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    margin-top: 10px;\n    width: 800px;\n}\ntr.subrow > td[data-v-5f72b0a5] {\n    padding: 0px !important;\n    border: none;\n    color: gray;\n    font-weight: bold;\n}\ntr.last-subrow > td[data-v-5f72b0a5] {\n    padding: 0px 0px 0.75rem 0px !important;\n}\ntr.t-row > td[data-v-5f72b0a5] {\n    padding: 0.75rem 0px 0px 0px;\n    color: black;\n    font-weight: bold;\n}\ndiv.pw-table-container[data-v-5f72b0a5] {\n    padding: 0px 10px;\n}\ndiv.table-ya-container thead[data-v-5f72b0a5],\ndiv.seq-tables-container thead[data-v-5f72b0a5] {\n    color: white;\n    background: #56baed;\n}\ndiv.pw-table-container th[data-v-5f72b0a5] {\n    border: none;\n}\ndiv.pw-table-container table.table[data-v-5f72b0a5] {\n    margin: 0px 10px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n    border: none !important;\n}\ndiv.container-table th[data-v-5f72b0a5] {\n    border-top: none;\n    border-bottom: none;\n}\ndiv.container-table th[data-v-5f72b0a5]:first-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:first-of-type {\n    border-top-left-radius: 7px;\n    border-bottom-left-radius: 7px;\n}\ndiv.container-table th[data-v-5f72b0a5]:last-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:last-of-type\n{\n    border-top-right-radius: 7px;\n    border-bottom-right-radius: 7px;\n}\ndiv.seq-tables-container table[data-v-5f72b0a5] {\n    text-align: center;\n}\ntable.seq-cip[data-v-5f72b0a5] {\n    margin-top: 20px;\n    margin-bottom: 20px;\n}\n\n\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-5f72b0a5] {\n  flex-direction: column;\n  background-color: white;\n  padding: 20px;\n  min-width: 1000px;\n  border-radius: 5px;\n  margin: 20px 0px;\n}\ndiv.container-title[data-v-5f72b0a5] {\n  justify-content: center;\n}\ndiv.container-title > span[data-v-5f72b0a5] {\n  font-size: 30px;\n  font-weight: bold;\n  color: black;\n}\ndiv.selection-menu[data-v-5f72b0a5] {\n  flex-direction: row;\n  padding: 20px 0px;\n  border-bottom: solid 1px;\n  align-items: center;\n  justify-content: space-evenly;\n}\ndiv.site-pl-selection > div[data-v-5f72b0a5] {\n  align-items: center;\n}\ndiv.site-pl-selection select[data-v-5f72b0a5] {\n  width: 100%;\n}\ndiv.site-pl-selection label[data-v-5f72b0a5] {\n  margin: 0px 10px 0px 0px;\n}\ndiv.table-ya-container[data-v-5f72b0a5] {\n  margin-top: 20px;\n  justify-content: center;\n}\ndiv.container-table tr.table-sub-row[data-v-5f72b0a5] {\n  color: gray;\n}\ndiv.container-yearly-avg-info[data-v-5f72b0a5] {\n  flex-direction: column;\n  justify-content: space-around;\n  align-items: center;\n  margin: 0px 30px;\n  padding-left: 10px;\n  border: solid 1px;\n  border-radius: 5px;\n}\ndiv.container-yearly-avg-info div.ya-info-row > div[data-v-5f72b0a5] {\n  flex-direction: column;\n  margin: 0px 50px 15px 0px;\n}\ndiv.container-table td.table-data > tr[data-v-5f72b0a5] {\n  text-align: center;\n}\ndiv.main-chart-container[data-v-5f72b0a5] {\n  margin-top: 20px;\n  display: flex;\n  justify-content: center;\n  height: 350px;\n  border-bottom: 1px solid;\n}\ndiv.chart-container[data-v-5f72b0a5] {\n  width: 25% !important;\n  height: 300px;\n  margin: 0px 10px;\n}\np.downtime-percent[data-v-5f72b0a5] {\n  text-align: center;\n  margin: 10px 0px;\n  font-size: 16px;\n}\ndiv.production-window-container[data-v-5f72b0a5] {\n  display: flex;\n  flex-direction: column;\n  border: solid 1px;\n  border-radius: 5px;\n  margin-top: 10px;\n  width: 800px;\n  align-self: center;\n}\ntr.subrow > td[data-v-5f72b0a5] {\n  padding: 0px !important;\n  border: none;\n  color: gray;\n  font-weight: bold;\n}\ntr.last-subrow > td[data-v-5f72b0a5] {\n  padding: 0px 0px 0.75rem 0px !important;\n}\ntr.t-row > td[data-v-5f72b0a5] {\n  padding: 0.75rem 0px 0px 0px;\n  color: black;\n  font-weight: bold;\n}\ndiv.pw-table-container[data-v-5f72b0a5] {\n  padding: 0px 10px;\n}\ndiv.table-ya-container thead[data-v-5f72b0a5],\ndiv.seq-tables-container thead[data-v-5f72b0a5] {\n  color: white;\n  background: #56baed;\n}\ndiv.pw-table-container th[data-v-5f72b0a5] {\n  border: none;\n}\ndiv.pw-table-container table.table[data-v-5f72b0a5] {\n  margin: 0px 10px;\n}\ndiv.production-window[data-v-5f72b0a5] {\n  border: none !important;\n}\ndiv.container-table th[data-v-5f72b0a5] {\n  border-top: none;\n  border-bottom: none;\n}\ndiv.container-table th[data-v-5f72b0a5]:first-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:first-of-type {\n  border-top-left-radius: 7px;\n  border-bottom-left-radius: 7px;\n}\ndiv.container-table th[data-v-5f72b0a5]:last-of-type,\ndiv.seq-tables-container th[data-v-5f72b0a5]:last-of-type {\n  border-top-right-radius: 7px;\n  border-bottom-right-radius: 7px;\n}\ndiv.seq-tables-container table[data-v-5f72b0a5] {\n  text-align: center;\n}\ntable.seq-cip[data-v-5f72b0a5] {\n  margin-top: 20px;\n  margin-bottom: 20px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -64181,7 +64243,11 @@ var render = function() {
                 _c(
                   "option",
                   { key: site.name, domProps: { value: site.name } },
-                  [_vm._v(_vm._s(site.name))]
+                  [
+                    _vm._v(
+                      "\n            " + _vm._s(site.name) + "\n          "
+                    )
+                  ]
                 )
               ]
             })
@@ -64222,9 +64288,9 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n                                " +
+                            "\n              " +
                               _vm._s(productionLine.productionline_name) +
-                              "\n                            "
+                              "\n            "
                           )
                         ]
                       )
@@ -64235,69 +64301,7 @@ var render = function() {
           ],
           2
         )
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "d-flex production-window-container" },
-        [
-          _c("production-window", {
-            attrs: { yearSelectedFunction: _vm.chargeGeneralData }
-          }),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "d-flex pw-table-container" },
-            [
-              _vm._l(Object.keys(_vm.unplannedDowntimesCategories), function(
-                cat
-              ) {
-                return [
-                  _c("table", { key: cat, staticClass: "table" }, [
-                    _c("thead"),
-                    _vm._v(" "),
-                    _c("tbody", [
-                      _c("tr", { staticClass: "t-row" }, [
-                        _c("td", { attrs: { scope: "col" } }, [
-                          _vm._v(
-                            _vm._s(
-                              _vm.$t(_vm.unplannedDowntimesCategories[cat])
-                            )
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { attrs: { scope: "col" } })
-                      ]),
-                      _vm._v(" "),
-                      _c("tr", { staticClass: "subrow" }, [
-                        _c("td", { attrs: { scope: "col" } }, [
-                          _vm._v(" " + _vm._s(_vm.$t("duration")))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { attrs: { scope: "col" } }, [
-                          _vm._v(_vm._s(_vm.generalData[cat].totalDuration))
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("tr", { staticClass: "subrow last-subrow" }, [
-                        _c("td", { attrs: { scope: "col" } }, [
-                          _vm._v(" " + _vm._s(_vm.$t("number")))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { attrs: { scope: "col" } }, [
-                          _vm._v(_vm._s(_vm.generalData[cat].totalNb))
-                        ])
-                      ])
-                    ])
-                  ])
-                ]
-              })
-            ],
-            2
-          )
-        ],
-        1
-      )
+      ])
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "d-flex table-ya-container" }, [
@@ -64338,18 +64342,28 @@ var render = function() {
                         [
                           _c("tr", { staticClass: "table-row-title" }, [
                             _vm._v(
-                              _vm._s(
-                                _vm.$t(_vm.unplannedDowntimesCategories[cat])
-                              )
+                              "\n                  " +
+                                _vm._s(
+                                  _vm.$t(_vm.unplannedDowntimesCategories[cat])
+                                ) +
+                                "\n                "
                             )
                           ]),
                           _vm._v(" "),
                           _c("tr", { staticClass: "table-sub-row" }, [
-                            _vm._v(" " + _vm._s(_vm.$t("duration")))
+                            _vm._v(
+                              "\n                   " +
+                                _vm._s(_vm.$t("duration")) +
+                                "\n                "
+                            )
                           ]),
                           _vm._v(" "),
                           _c("tr", { staticClass: "table-sub-row" }, [
-                            _vm._v(" " + _vm._s(_vm.$t("number")))
+                            _vm._v(
+                              "\n                   " +
+                                _vm._s(_vm.$t("number")) +
+                                "\n                "
+                            )
                           ])
                         ]
                       ),
@@ -64360,23 +64374,33 @@ var render = function() {
                             _c(
                               "tr",
                               { staticStyle: { visibility: "hidden" } },
-                              [_vm._v("-----")]
+                              [
+                                _vm._v(
+                                  "\n                    -----\n                  "
+                                )
+                              ]
                             ),
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
                               _vm._v(
-                                _vm._s(
-                                  _vm.downtimes[cat][month].totalDuration
-                                    ? _vm.downtimes[cat][
-                                        month
-                                      ].totalDuration.toFixed(2)
-                                    : undefined
-                                )
+                                "\n                    " +
+                                  _vm._s(
+                                    _vm.downtimes[cat][month].totalDuration
+                                      ? _vm.downtimes[cat][
+                                          month
+                                        ].totalDuration.toFixed(2)
+                                      : undefined
+                                  ) +
+                                  "\n                  "
                               )
                             ]),
                             _vm._v(" "),
                             _c("tr", { staticClass: "table-sub-row" }, [
-                              _vm._v(_vm._s(_vm.downtimes[cat][month].totalNb))
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(_vm.downtimes[cat][month].totalNb) +
+                                  "\n                  "
+                              )
                             ])
                           ])
                         ]
@@ -64408,7 +64432,7 @@ var render = function() {
                     _vm._v(
                       " " +
                         _vm._s(_vm.downtimes[cat].general.yearlyDuration) +
-                        " " +
+                        "\n              " +
                         _vm._s(_vm.$t("hours"))
                     )
                   ]),
@@ -64417,7 +64441,7 @@ var render = function() {
                     _vm._v(
                       " " +
                         _vm._s(_vm.downtimes[cat].general.yearlyNb) +
-                        " " +
+                        "\n              " +
                         _vm._s(cat.toUpperCase())
                     )
                   ])
@@ -64432,7 +64456,7 @@ var render = function() {
                     _vm._v(
                       " " +
                         _vm._s(_vm.downtimes[cat].general.yearlyAvg) +
-                        " " +
+                        "\n              " +
                         _vm._s(_vm.$t("hours"))
                     )
                   ])
@@ -64459,7 +64483,7 @@ var render = function() {
                   _vm.downtimes.cip.general
                     ? _vm.downtimes.cip.general.downtimePercentage
                     : "--"
-                ) + " % "
+                ) + "\n          %\n        "
               )
             ]),
             _vm._v(" "),
@@ -64483,7 +64507,7 @@ var render = function() {
                   _vm.downtimes.cov.general
                     ? _vm.downtimes.cov.general.downtimePercentage
                     : "--"
-                ) + " % "
+                ) + "\n          %\n        "
               )
             ]),
             _vm._v(" "),
@@ -64507,7 +64531,7 @@ var render = function() {
                   _vm.downtimes.bnc.general
                     ? _vm.downtimes.bnc.general.downtimePercentage
                     : "--"
-                ) + " % "
+                ) + "\n          %\n        "
               )
             ]),
             _vm._v(" "),
@@ -64518,6 +64542,66 @@ var render = function() {
         )
       ])
     ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "d-flex production-window-container" },
+      [
+        _c("production-window", {
+          attrs: { yearSelectedFunction: _vm.chargeGeneralData }
+        }),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "d-flex pw-table-container" },
+          [
+            _vm._l(Object.keys(_vm.unplannedDowntimesCategories), function(
+              cat
+            ) {
+              return [
+                _c("table", { key: cat, staticClass: "table" }, [
+                  _c("thead"),
+                  _vm._v(" "),
+                  _c("tbody", [
+                    _c("tr", { staticClass: "t-row" }, [
+                      _c("td", { attrs: { scope: "col" } }, [
+                        _vm._v(
+                          _vm._s(_vm.$t(_vm.unplannedDowntimesCategories[cat]))
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { attrs: { scope: "col" } })
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "subrow" }, [
+                      _c("td", { attrs: { scope: "col" } }, [
+                        _vm._v(" " + _vm._s(_vm.$t("duration")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.generalData[cat].totalDuration))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", { staticClass: "subrow last-subrow" }, [
+                      _c("td", { attrs: { scope: "col" } }, [
+                        _vm._v(" " + _vm._s(_vm.$t("number")))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { attrs: { scope: "col" } }, [
+                        _vm._v(_vm._s(_vm.generalData[cat].totalNb))
+                      ])
+                    ])
+                  ])
+                ])
+              ]
+            })
+          ],
+          2
+        )
+      ],
+      1
+    ),
     _vm._v(" "),
     _c(
       "div",
