@@ -179,5 +179,10 @@
     "wastedTime": "Temps perdu (min)",
     "comments/reason": "Commentaires / Raison",
     "select": "Sélectionner",
-    "standardDeviation": "Écart-type"
+    "standardDeviation": "Écart-type",
+    "overProcess" : "Sur le processus",
+    "rejectedItems" : "Produits rejetés",
+    "boxWeigher" : "Peseur de caisse",
+    "weightBox" : "Peseur de caisse",
+    "labeler" : "Etiquetteur"
 }

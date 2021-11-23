@@ -1,67 +1,64 @@
 <template>
     <div class="" id="component">
-        <div class="row">
+
+        <div class="row dataInput">
             <div class="col-sm">
-                <div class="">
+                <div class="data">
+                    <div class="">
 
-                    <form>
-                        <label class="" for="site">{{$t("site")}} : </label>
-                        <select name="site" id="site" class="form-select" v-model="site">
-                            <template v-for="site in sites[0]">
-                                <option v-bind:value="site.name">
-                                    {{site.name}}
-                                </option>
-                            </template>
-                        </select>
-                    </form>
-
-
-                </div>
-
-
-                <div class="">
-                    <form>
-                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                            <template v-for="productionline in sites[1]">
-                                <template v-if="productionline.name === site">
-                                    <option v-bind:value="productionline.productionline_name">
-                                        {{productionline.productionline_name}}
+                        <form>
+                            <label class="" for="site">{{$t("site")}} : </label>
+                            <select name="site" id="site" class="form-select" v-model="site">
+                                <template v-for="site in sites[0]">
+                                    <option v-bind:value="site.name">
+                                        {{site.name}}
                                     </option>
                                 </template>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <form>
+                            <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                            <select name="productionline" id="productionline" class="form-select"
+                                    v-model="productionline">
+                                <template v-for="productionline in sites[1]">
+                                    <template v-if="productionline.name === site">
+                                        <option v-bind:value="productionline.productionline_name">
+                                            {{productionline.productionline_name}}
+                                        </option>
+                                    </template>
 
-                            </template>
+                                </template>
 
-                        </select>
-                    </form>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                    </div>
+
                 </div>
-
-
-                <br/>
-                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
-
-                <br/>
-
             </div>
 
-
             <div class="col-sm">
-                <h1>
-                    {{$t("productionDashboard")}}
-                </h1>
+                <div class=data>
+                    <div>
 
-                <br/>
-                <div class="">
-                    <label class="" for="startingPO">{{$t("from")}}</label>
-                    <input type="date" id="startingPO" class=" " required v-model="beginningDate">
+                        <h1>
+                            {{$t("productionDashboard")}}
+                        </h1>
+                    </div>
+                    <div>
+                        <label class="" for="startingPO">{{$t("from")}}</label>
+                        <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
 
-                    <label class="" for="endingPO">{{$t("to")}}</label>
-                    <input type="date" id="endingPO" class=""
-                           required v-model="endingDate">
+                        <label class="" for="endingPO">{{$t("to")}}</label>
+                        <input type="date" id="endingPO" class=""
+                               required v-model="endingDate">
+                    </div>
                 </div>
-
-
             </div>
         </div>
 
@@ -69,12 +66,14 @@
         <div class="row">
             <div class="col-sm">
                 <template v-if="show===1">
-                    <h1>
-                        {{$t("formulationSplit")}}
-                    </h1>
+                    <div>
+                        <h1>
+                            {{$t("formulationSplit")}}
+                        </h1>
+                    </div>
 
 
-                    <div class="table-info-data" width="400">
+                    <div class="table-info-data dataInput" width="400">
                         <table class="table">
                             <thead>
                             <tr>
@@ -133,26 +132,25 @@
                     </div>
                 </template>
 
+                <div class="">
+                    <canvas class="diagram"  id="myChart4"></canvas>
+                </div>
+
             </div>
 
             <div class="col-sm">
 
-
                 <template v-if="show===1">
-                    <h1>
-                        {{$t("formulationSplit")}} (%)
-                    </h1>
+                    <div>
+                        <h1>
+                            {{$t("formulationSplit")}} (%)
+                        </h1>
+                    </div>
+
                 </template>
-                <canvas id="formulationSplit" width="100" height="100"/>
+                <canvas class="pieChart"  id="formulationSplit" width="100" height="100"/>
 
 
-            </div>
-        </div>
-
-        <div class="row">
-
-            <div class="wrapper">
-                <canvas id="myChart4"></canvas>
             </div>
         </div>
 
@@ -162,12 +160,14 @@
 
                 <template v-if="show===1">
 
+                    <div>
+                        <h1>
+                            {{$t("packSizeSplit")}}
+                        </h1>
+                    </div>
 
-                    <h1>
-                        {{$t("packSizeSplit")}}
-                    </h1>
 
-                    <div class="table-info-data" width="400">
+                    <div class="table-info-data dataInput" width="400">
                         <table class="table">
                             <thead>
                             <tr>
@@ -224,9 +224,11 @@
                         </table>
 
                     </div>
-
-
                 </template>
+
+                <div class="">
+                    <canvas class="diagram" id="myChart5"></canvas>
+                </div>
 
                 <br/>
 
@@ -234,21 +236,18 @@
             <div class="col-sm">
 
                 <template v-if="show===1">
-                    <h1>
-                        {{$t("formatSplit")}} (%)
-                    </h1>
+                    <div>
+                        <h1>
+                            {{$t("formatSplit")}} (%)
+                        </h1>
+                    </div>
                 </template>
-                <canvas id="packsizeSplit" width="100" height="100"/>
+                <canvas class="pieChart" id="packsizeSplit" width="100" height="100"/>
 
             </div>
         </div>
 
-        <div class="row">
 
-            <div class="wrapper">
-                <canvas id="myChart5"></canvas>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -418,8 +417,8 @@
 
                 var canvas = document.getElementById("formulationSplit");
                 var ctx = canvas.getContext("2d");
-                canvas.width = 450;
-                canvas.height = 450;
+                canvas.width = 500;
+                canvas.height = 500;
                 let total = data.reduce((ttl, house) => {
                     return ttl + house.nbr
                 }, 0);
@@ -575,8 +574,8 @@
 
                 var canvas = document.getElementById("packsizeSplit");
                 var ctx = canvas.getContext("2d");
-                canvas.width = 450;
-                canvas.height = 450;
+                canvas.width = 500;
+                canvas.height = 500;
                 let total = data.reduce((ttl, house) => {
                     return ttl + house.nbr
                 }, 0);
@@ -810,12 +809,15 @@
         margin-left: 60px;
     }
 
+    /**
+        .table-info-data {
+            overflow: scroll;
+            max-height: 450px;
+            max-width: 400px;
+        }
 
-    .table-info-data {
-        overflow: scroll;
-        max-height: 450px;
-        max-width: 400px;
-    }
+
+     */
 
 
     .wrapper {
@@ -828,9 +830,31 @@
         border-radius: 4px;
     }
 
-    canvas {
+    canvas.diagram {
         background: #fff;
-        height: 400px;
+    }
+
+    canvas.piechart{
+
+    }
+
+    div.data {
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 10px 5px;
+    }
+
+    div.dataInput {
+        border-bottom: solid 1px;
+
+    }
+
+
+    div {
+        padding: 15px;
+        background-color: #fff;
+
     }
 
 

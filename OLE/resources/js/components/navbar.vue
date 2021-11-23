@@ -3,7 +3,7 @@
 
         <nav class="navbar">
             <a class="navbar-brand" v-bind:href="url + 'packagingLineID' ">
-                <img src="images/icon.png" alt="" width="200" height="130">
+                <img src="images/icon.png" alt="" width="150" height="100">
             </a>
 
             <div class="d-flex">
@@ -111,7 +111,8 @@
 <style scoped>
 
     .nv {
-        background: white;
+        background: lightblue;
         width: 100%;
+
     }
 </style>

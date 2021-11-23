@@ -95,8 +95,6 @@ Vue.component('unplannedDowntimeShutdowns', require('./components/unplannedDownt
 
 Vue.component('unplannedDowntimeSpeedLosses', require('./components/unplannedDowntimeSpeedLosses.vue').default);
 
-Vue.component('qualityLossesDashboard', require('./components/qualityLossesDashboard.vue').default);
-
 Vue.component('qualityLossesDashboard2', require('./components/qualityLossesDashboard2.vue').default);
 
 /**

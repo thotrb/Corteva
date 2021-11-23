@@ -1,45 +1,55 @@
 <template>
     <div class="" id="component">
-        <!--{{allEvents['RRF']}}-->
+        <!--{{allEvents['RRF']}}
+
+        <div class="production-window-container">
+            <production-window />
+        </div>
+
+        -->
+
+
         <div class="row">
             <div class="col-sm">
-                <div class="">
+                <div class="data">
+                    <div class="">
 
-                    <form>
-                        <label class="" for="site">{{$t("site")}} : </label>
-                        <select name="site" id="site" class="form-select" v-model="site">
-                            <template v-for="site in sites[0]">
-                                <option v-bind:value="site.name">
-                                    {{site.name}}
-                                </option>
-                            </template>
-                        </select>
-                    </form>
-
-
-                </div>
-
-
-                <div class="">
-                    <form>
-                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                            <template v-for="productionline in sites[1]">
-                                <template v-if="productionline.name === site">
-                                    <option v-bind:value="productionline.productionline_name">
-                                        {{productionline.productionline_name}}
+                        <form>
+                            <label class="" for="site">{{$t("site")}} : </label>
+                            <select name="site" id="site" class="form-select" v-model="site">
+                                <template v-for="site in sites[0]">
+                                    <option v-bind:value="site.name">
+                                        {{site.name}}
                                     </option>
                                 </template>
+                            </select>
+                        </form>
 
-                            </template>
 
-                        </select>
-                    </form>
+                    </div>
+
+
+                    <div class="">
+                        <form>
+                            <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                            <select name="productionline" id="productionline" class="form-select"
+                                    v-model="productionline">
+                                <template v-for="productionline in sites[1]">
+                                    <template v-if="productionline.name === site">
+                                        <option v-bind:value="productionline.productionline_name">
+                                            {{productionline.productionline_name}}
+                                        </option>
+                                    </template>
+
+                                </template>
+
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                    </div>
                 </div>
-
-
-                <br/>
-                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
 
                 <br/>
 
@@ -294,19 +304,24 @@
             </div>
 
             <div class="col-sm">
-                <h1>
-                    {{$t("downtimesReport")}}
-                </h1>
+                <div class="data">
 
-                <br/>
-                <div class="">
-                    <label class="" for="startingPO">{{$t("from")}}</label>
-                    <input type="date" id="startingPO" class=" " required v-model="beginningDate">
+                    <div>
+                        <h1>
+                            {{$t("downtimesReport")}}
+                        </h1>
+                    </div>
+
+                    <div class="">
+                        <label class="" for="startingPO">{{$t("from")}}</label>
+                        <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
 
-                    <label class="" for="endingPO">{{$t("to")}}</label>
-                    <input type="date" id="endingPO" class=""
-                           required v-model="endingDate">
+                        <label class="" for="endingPO">{{$t("to")}}</label>
+                        <input type="date" id="endingPO" class=""
+                               required v-model="endingDate">
+                    </div>
+
                 </div>
 
 
@@ -438,12 +453,14 @@
 </template>
 
 <script>
-
+    import ProductionWindow from './productionWindow.vue';
     import {mapGetters} from "vuex";
 
     export default {
         name: "downtimesReport",
-
+        components: {
+            ProductionWindow
+        },
         data() {
             return {
                 lo: this.$t("load"),
@@ -1153,6 +1170,13 @@
 
     .rect {
         margin-bottom: -40px;
+    }
+
+    div.data {
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 10px 5px;
     }
 
 

@@ -2815,7 +2815,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -3267,9 +3268,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "downtimesReport",
+  components: {
+    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_1__.default
+  },
   data: function data() {
     return {
       lo: this.$t("load"),
@@ -3813,7 +3833,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     externalScript.setAttribute('src', 'https://canvasjs.com/assets/script/canvasjs.min.js');
     document.head.appendChild(externalScript);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'allEvents']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_2__.mapGetters)(['sites', 'allEvents']))
 });
 
 /***/ }),
@@ -5333,10 +5353,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "navbarSaisie",
   data: function data() {
-    return {};
+    return {
+      url: sessionStorage.getItem("url"),
+      language: "en"
+    };
   },
   methods: {
     swapLanguage: function swapLanguage(language) {
@@ -5379,10 +5403,6 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-//
-//
-//
-//
 //
 //
 //
@@ -6036,18 +6056,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log("SPEEDLOSS PER MONTH");
       console.log(this.speedLossesPerMonth);
       /**
-      * QTY : 1800 ok
+       * QTY : 1800 ok
        * SPEEDLOSS : 10 ok
-      * PERF : 0.928
+       * PERF : 0.928
        * QUALITY : 1
        * A
-      * WORKING : 230 ok
-      * NET OPERATING : 75 - 130 ko
-      * PLANNED DOWNTIME : 90 ok
-      * UNPANNED : 0 - 0 ok
-      * PLANNED PRODUCTION : 140 ok
-      * OPERATING TIME : 140 - 140 ok
-      * **/
+       * WORKING : 230 ok
+       * NET OPERATING : 75 - 130 ko
+       * PLANNED DOWNTIME : 90 ok
+       * UNPANNED : 0 - 0 ok
+       * PLANNED PRODUCTION : 140 ok
+       * OPERATING TIME : 140 - 140 ok
+       * **/
     },
     loadProductionTime2: function loadProductionTime2() {
       var sommeWorkingTimePerMonth = [];
@@ -6416,6 +6436,19 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -7228,7 +7261,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "productionDashboard",
@@ -7402,8 +7434,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       var canvas = document.getElementById("formulationSplit");
       var ctx = canvas.getContext("2d");
-      canvas.width = 450;
-      canvas.height = 450;
+      canvas.width = 500;
+      canvas.height = 500;
       var total = data.reduce(function (ttl, house) {
         return ttl + house.nbr;
       }, 0);
@@ -7548,8 +7580,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       var canvas = document.getElementById("packsizeSplit");
       var ctx = canvas.getContext("2d");
-      canvas.width = 450;
-      canvas.height = 450;
+      canvas.width = 500;
+      canvas.height = 500;
       var total = data.reduce(function (ttl, house) {
         return ttl + house.nbr;
       }, 0);
@@ -7982,214 +8014,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./productionWindow.vue */ "./resources/js/components/productionWindow.vue");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "qualityLossesDashboard",
-  data: function data() {
-    var data = {
-      currentYear: new Date().getFullYear(),
-      site: '',
-      productionLine: '',
-      lo: this.$t("load")
-    };
-    return data;
-  },
-  methods: {
-    resolveAfter: function resolveAfter(milliseconds) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
-          return resolve();
-        }, milliseconds);
-      });
-    },
-    productionLineSelected: function productionLineSelected() {
-      if (document.getElementById("pl-selection").value) {}
-    },
-    createDowntimeObject: function createDowntimeObject() {},
-    chargeData: function chargeData(dateFrom, dateTo) {
-      var selectedPL = document.getElementById('pl-selection').value;
-    },
-    createCharts: function createCharts() {
-      this.chartObjects.created = true;
-
-      for (var _i = 0, _arr = ['own-stop', 'otherMachine']; _i < _arr.length; _i++) {
-        var stopCause = _arr[_i];
-        this.chartObjects[stopCause] = new Chart(stopCause + '-shutdown-chart', {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Time in minutes',
-              backgroundColor: 'rgb(112, 184, 232)',
-              data: []
-            }, {
-              label: 'Number',
-              backgroundColor: 'rgb(246, 184, 192)',
-              data: [],
-              yAxisID: "freq"
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              time: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Time in minutes'
-                },
-                position: 'left'
-              },
-              freq: {
-                axis: 'y',
-                title: {
-                  display: true,
-                  text: 'Number'
-                },
-                position: 'right'
-              }
-            },
-            plugins: {
-              legend: {
-                display: true
-              }
-            }
-          }
-        });
-      }
-    }
-  },
-  mounted: function mounted() {
-    if (sessionStorage.getItem("language") !== null) {
-      this.$i18n.locale = sessionStorage.getItem("language");
-    }
-
-    this.$store.dispatch('fetchSites');
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1; //January is 0!
-
-    var yyyy = today.getFullYear();
-
-    if (dd < 10) {
-      dd = '0' + dd;
-    }
-
-    if (mm < 10) {
-      mm = '0' + mm;
-    }
-
-    today = yyyy + '-' + mm + '-' + dd;
-    document.getElementById("startingPO").setAttribute("max", today);
-    document.getElementById("endingPO").setAttribute("max", today); //Load chart.js into vue component
-
-    var chartJs = document.createElement('script');
-    chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
-    document.head.appendChild(chartJs);
-  },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss'])),
-  components: {
-    ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
-  }
-});
-
-/***/ }),
-
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js& ***!
@@ -8217,6 +8041,13 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -8871,7 +8702,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var theta = (startAngle + endAngle) / 2;
         var deltaY = Math.sin(theta) * 1.5 * radius;
         var deltaX = Math.cos(theta) * 1.5 * radius;
-        var txt = item.name + '\n';
+        var txt = this.$t(item.name) + '\n';
         var pct = item.nbr / totalPieChart1 * 100;
         txt = txt + ' ' + pct.toFixed(2) + '%';
         ctx.fillText(txt, deltaX + cx, deltaY + cy);
@@ -12455,7 +12286,6 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.component('productionDashboard', __webp
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('overallLineEffectivness', __webpack_require__(/*! ./components/overallLineEffectivness */ "./resources/js/components/overallLineEffectivness.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeShutdowns', __webpack_require__(/*! ./components/unplannedDowntimeShutdowns.vue */ "./resources/js/components/unplannedDowntimeShutdowns.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('unplannedDowntimeSpeedLosses', __webpack_require__(/*! ./components/unplannedDowntimeSpeedLosses.vue */ "./resources/js/components/unplannedDowntimeSpeedLosses.vue").default);
-vue__WEBPACK_IMPORTED_MODULE_1__.default.component('qualityLossesDashboard', __webpack_require__(/*! ./components/qualityLossesDashboard.vue */ "./resources/js/components/qualityLossesDashboard.vue").default);
 vue__WEBPACK_IMPORTED_MODULE_1__.default.component('qualityLossesDashboard2', __webpack_require__(/*! ./components/qualityLossesDashboard2.vue */ "./resources/js/components/qualityLossesDashboard2.vue").default);
 /**
  *
@@ -17706,7 +17536,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-2123a6bd] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-2123a6bd] {\n    color: red;\n}\ndiv[data-v-2123a6bd] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-2123a6bd] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-2123a6bd] {\n    margin-left: 60px;\n}\nh5[data-v-2123a6bd] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-2123a6bd] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.rcorners2[data-v-2123a6bd] {\n    border: 2px solid lightgray;\n    padding: 20px;\n}\n.blueBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: #0056ff;\n    padding: 10px;\n    width: 60%;\n}\n.greenBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: #71FA23;\n    padding: 10px;\n    width: 30%;\n}\n.redBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: red;\n    padding: 10px;\n    width: 30%;\n}\n#rect1[data-v-2123a6bd] {\n    margin-right: 10px;\n}\n#rect2[data-v-2123a6bd] {\n    margin-right: 40px;\n}\n#rect3[data-v-2123a6bd] {\n    margin-right: 70px;\n}\n#rect4[data-v-2123a6bd] {\n    margin-right: 100px;\n}\n.rect[data-v-2123a6bd] {\n    margin-bottom: -40px;\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-2123a6bd] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-2123a6bd] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-2123a6bd] {\n    color: red;\n}\ndiv[data-v-2123a6bd] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-2123a6bd] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-2123a6bd] {\n    margin-left: 60px;\n}\nh5[data-v-2123a6bd] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-2123a6bd] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.rcorners2[data-v-2123a6bd] {\n    border: 2px solid lightgray;\n    padding: 20px;\n}\n.blueBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: #0056ff;\n    padding: 10px;\n    width: 60%;\n}\n.greenBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: #71FA23;\n    padding: 10px;\n    width: 30%;\n}\n.redBack[data-v-2123a6bd] {\n    font-size: 20px;\n    color: white;\n    background: red;\n    padding: 10px;\n    width: 30%;\n}\n#rect1[data-v-2123a6bd] {\n    margin-right: 10px;\n}\n#rect2[data-v-2123a6bd] {\n    margin-right: 40px;\n}\n#rect3[data-v-2123a6bd] {\n    margin-right: 70px;\n}\n#rect4[data-v-2123a6bd] {\n    margin-right: 100px;\n}\n.rect[data-v-2123a6bd] {\n    margin-bottom: -40px;\n}\ndiv.data[data-v-2123a6bd] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17802,7 +17632,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.nv[data-v-11e733ca] {\n    background: white;\n    width: 100%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.nv[data-v-11e733ca] {\n    background: lightblue;\n    width: 100%;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17850,7 +17680,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-a4f0ea4a] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-a4f0ea4a] {\n    color: red;\n}\ndiv[data-v-a4f0ea4a] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-a4f0ea4a] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\nh5[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-a4f0ea4a] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.wrapper[data-v-a4f0ea4a] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-a4f0ea4a] {\n    background: #fff;\n    height: 400px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-a4f0ea4a] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-a4f0ea4a] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-a4f0ea4a] {\n    color: red;\n}\ndiv[data-v-a4f0ea4a] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-a4f0ea4a] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\nh5[data-v-a4f0ea4a] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-a4f0ea4a] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.wrapper[data-v-a4f0ea4a] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-a4f0ea4a] {\n    background: #fff;\n    height: 400px;\n}\ndiv.data[data-v-a4f0ea4a] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-a4f0ea4a] {\n    border-bottom: solid 1px;\n}\ndiv[data-v-a4f0ea4a] {\n    padding: 15px;\n    background-color: #fff;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17874,7 +17704,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-bac3c612] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-bac3c612] {\n    font-size: 1.2em;\n    color: #56baed;\n}\ndiv[data-v-bac3c612] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-bac3c612] {\n    color: white;\n    background: #56baed;\n}\n.table-info-data[data-v-bac3c612] {\n    overflow: scroll;\n    max-height: 200px;\n}\n#d1[data-v-bac3c612], #d2[data-v-bac3c612] {\n    height: 50px;\n}\n#d1[data-v-bac3c612] {\n\n    background-color: green;\n}\n#d2[data-v-bac3c612] {\n    background-color: blue;\n}\n.machine[data-v-bac3c612] {\n    background-color: lightblue;\n    color: white;\n}\n.arrow[data-v-bac3c612] {\n    padding-top : 15px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-bac3c612] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-bac3c612] {\n    font-size: 1.2em;\n    color: #56baed;\n}\ndiv[data-v-bac3c612] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-bac3c612] {\n    color: white;\n    background: #56baed;\n}\n.table-info-data[data-v-bac3c612] {\n    overflow: scroll;\n    max-height: 200px;\n}\n#d1[data-v-bac3c612], #d2[data-v-bac3c612] {\n    height: 50px;\n}\n#d1[data-v-bac3c612] {\n\n    background-color: green;\n}\n#d2[data-v-bac3c612] {\n    background-color: blue;\n}\n.machine[data-v-bac3c612] {\n    background-color: lightblue;\n    color: white;\n}\n.arrow[data-v-bac3c612] {\n    padding-top: 15px;\n}\ndiv.data[data-v-bac3c612] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-bac3c612] {\n    border-bottom: solid 1px;\n}\ndiv[data-v-bac3c612] {\n    padding: 15px;\n    background-color: #fff;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17922,7 +17752,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-09ddfa60] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-09ddfa60] {\n    color: red;\n}\ndiv[data-v-09ddfa60] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-09ddfa60] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-09ddfa60] {\n    margin-left: 60px;\n}\nh5[data-v-09ddfa60] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-09ddfa60] {\n    overflow: scroll;\n    max-height: 450px;\n    max-width: 400px;\n}\n.wrapper[data-v-09ddfa60] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas[data-v-09ddfa60] {\n    background: #fff;\n    height: 400px;\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nh1[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-09ddfa60] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nh2[data-v-09ddfa60] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-09ddfa60] {\n    color: red;\n}\ndiv[data-v-09ddfa60] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-09ddfa60] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-09ddfa60] {\n    margin-left: 60px;\n}\nh5[data-v-09ddfa60] {\n    margin-left: 60px;\n}\n\n/**\n    .table-info-data {\n        overflow: scroll;\n        max-height: 450px;\n        max-width: 400px;\n    }\n\n\n */\n.wrapper[data-v-09ddfa60] {\n    width: 60%;\n    display: block;\n    overflow: hidden;\n    margin: 0 auto;\n    padding: 60px 50px;\n    background: #fff;\n    border-radius: 4px;\n}\ncanvas.diagram[data-v-09ddfa60] {\n    background: #fff;\n}\ncanvas.piechart[data-v-09ddfa60]{\n}\ndiv.data[data-v-09ddfa60] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-09ddfa60] {\n    border-bottom: solid 1px;\n}\ndiv[data-v-09ddfa60] {\n    padding: 15px;\n    background-color: #fff;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -18001,30 +17831,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.productionName[data-v-28b3bb30] {\n
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-// Imports
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-be4a0ce2] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-be4a0ce2] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-be4a0ce2] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-be4a0ce2]{\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-be4a0ce2] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-be4a0ce2] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-be4a0ce2] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\nspan.content-title[data-v-be4a0ce2] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-be4a0ce2] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-be4a0ce2] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-be4a0ce2],\ndiv.bottom-panel[data-v-be4a0ce2] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-be4a0ce2],\ndiv.ql-format-panel[data-v-be4a0ce2] {\n    width: 50%;\n}\ntable.table[data-v-be4a0ce2] {\n    margin: 10px 0px;\n}\n\n\n\n", ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& ***!
@@ -18042,7 +17848,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv.main-container[data-v-7a9be1b3] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-7a9be1b3] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-7a9be1b3] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-7a9be1b3] {\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-7a9be1b3] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-7a9be1b3] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-7a9be1b3] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\n.content-title[data-v-7a9be1b3] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-7a9be1b3] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-7a9be1b3] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-7a9be1b3],\ndiv.bottom-panel[data-v-7a9be1b3] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-7a9be1b3],\ndiv.ql-format-panel[data-v-7a9be1b3] {\n    width: 50%;\n}\ntable.table[data-v-7a9be1b3] {\n}\nh1[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-7a9be1b3] {\n    font-size: 1em;\n    color: black;\n}\nh2[data-v-7a9be1b3] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-7a9be1b3] {\n    color: red;\n}\n.row[data-v-7a9be1b3] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-7a9be1b3] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\nh5[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-7a9be1b3] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.mainLine[data-v-7a9be1b3] {\n    border: 2px solid black;\n}\n.boxWeigher[data-v-7a9be1b3] {\n    background: palegoldenrod;\n}\n.caper[data-v-7a9be1b3] {\n    background: palegreen;\n}\n.labeler[data-v-7a9be1b3] {\n    background: paleturquoise;\n}\n.filler[data-v-7a9be1b3] {\n    background: palevioletred;\n}\n.totalQty[data-v-7a9be1b3] {\n    background: papayawhip;\n}\n.machineDiagram[data-v-7a9be1b3] {\n    background: lightblue;\n    color: white;\n    align: center;\n}\nh3[data-v-7a9be1b3] {\n    align: center;\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv[data-v-7a9be1b3] {\n    padding: 15px;\n    background-color: #fff;\n}\ndiv.main-container[data-v-7a9be1b3] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-7a9be1b3] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-7a9be1b3] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-7a9be1b3] {\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-7a9be1b3] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-7a9be1b3] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-7a9be1b3] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\n.content-title[data-v-7a9be1b3] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-7a9be1b3] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-7a9be1b3] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-7a9be1b3],\ndiv.bottom-panel[data-v-7a9be1b3] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-7a9be1b3],\ndiv.ql-format-panel[data-v-7a9be1b3] {\n    width: 50%;\n}\ntable.table[data-v-7a9be1b3] {\n}\nh1[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-7a9be1b3] {\n    font-size: 1em;\n    color: black;\n}\nh2[data-v-7a9be1b3] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-7a9be1b3] {\n    color: red;\n}\n.row[data-v-7a9be1b3] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-7a9be1b3] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\nh5[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-7a9be1b3] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.mainLine[data-v-7a9be1b3] {\n    border: 2px solid black;\n}\n.boxWeigher[data-v-7a9be1b3] {\n    background: palegoldenrod;\n}\n.caper[data-v-7a9be1b3] {\n    background: palegreen;\n}\n.labeler[data-v-7a9be1b3] {\n    background: paleturquoise;\n}\n.filler[data-v-7a9be1b3] {\n    background: palevioletred;\n}\n.qualityControl[data-v-7a9be1b3] {\n    background: lightpink;\n}\n.totalQty[data-v-7a9be1b3] {\n    background: papayawhip;\n}\n.machineDiagram[data-v-7a9be1b3] {\n    background: lightblue;\n    color: white;\n    align: center;\n}\nh3[data-v-7a9be1b3] {\n    align: center;\n}\ndiv.data[data-v-7a9be1b3] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-7a9be1b3]{\n    border-bottom: solid 1px;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -50563,36 +50369,6 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&");
-
-            
-
-var options = {};
-
-options.insert = "head";
-options.singleton = false;
-
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default, options);
-
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
-
-/***/ }),
-
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css&":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=style&index=0&id=7a9be1b3&scoped=true&lang=css& ***!
@@ -54182,47 +53958,6 @@ component.options.__file = "resources/js/components/qualityIndicators.vue"
 
 /***/ }),
 
-/***/ "./resources/js/components/qualityLossesDashboard.vue":
-/*!************************************************************!*\
-  !*** ./resources/js/components/qualityLossesDashboard.vue ***!
-  \************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true& */ "./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true&");
-/* harmony import */ var _qualityLossesDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./qualityLossesDashboard.vue?vue&type=script&lang=js& */ "./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js&");
-/* harmony import */ var _qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& */ "./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-;
-
-
-/* normalize component */
-
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__.default)(
-  _qualityLossesDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__.default,
-  _qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
-  _qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
-  false,
-  null,
-  "be4a0ce2",
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/qualityLossesDashboard.vue"
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
-
-/***/ }),
-
 /***/ "./resources/js/components/qualityLossesDashboard2.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/components/qualityLossesDashboard2.vue ***!
@@ -54896,22 +54631,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************!*\
-  !*** ./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=script&lang=js&");
- /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); 
-
-/***/ }),
-
 /***/ "./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/qualityLossesDashboard2.vue?vue&type=script&lang=js& ***!
@@ -55286,19 +55005,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityIndicators_vue_vue_type_style_index_0_id_28b3bb30_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityIndicators.vue?vue&type=style&index=0&id=28b3bb30&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityIndicators.vue?vue&type=style&index=0&id=28b3bb30&scoped=true&lang=css&");
-
-
-/***/ }),
-
-/***/ "./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&":
-/*!*********************************************************************************************************************!*\
-  !*** ./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& ***!
-  \*********************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_style_index_0_id_be4a0ce2_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=style&index=0&id=be4a0ce2&scoped=true&lang=css&");
 
 
 /***/ }),
@@ -55739,23 +55445,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityIndicators_vue_vue_type_template_id_28b3bb30_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityIndicators_vue_vue_type_template_id_28b3bb30_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityIndicators.vue?vue&type=template&id=28b3bb30&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityIndicators.vue?vue&type=template&id=28b3bb30&scoped=true&");
-
-
-/***/ }),
-
-/***/ "./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true&":
-/*!*******************************************************************************************************!*\
-  !*** ./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true& ***!
-  \*******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_qualityLossesDashboard_vue_vue_type_template_id_be4a0ce2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true&");
 
 
 /***/ }),
@@ -57008,135 +56697,139 @@ var render = function() {
         "div",
         { staticClass: "col-sm" },
         [
-          _c("div", {}, [
-            _c("form", [
-              _c("label", { attrs: { for: "site" } }, [
-                _vm._v(_vm._s(_vm.$t("site")) + " : ")
-              ]),
-              _vm._v(" "),
-              _c(
-                "select",
-                {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.site,
-                      expression: "site"
+          _c("div", { staticClass: "data" }, [
+            _c("div", {}, [
+              _c("form", [
+                _c("label", { attrs: { for: "site" } }, [
+                  _vm._v(_vm._s(_vm.$t("site")) + " : ")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.site,
+                        expression: "site"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { name: "site", id: "site" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.site = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
                     }
+                  },
+                  [
+                    _vm._l(_vm.sites[0], function(site) {
+                      return [
+                        _c("option", { domProps: { value: site.name } }, [
+                          _vm._v(
+                            "\n                                    " +
+                              _vm._s(site.name) +
+                              "\n                                "
+                          )
+                        ])
+                      ]
+                    })
                   ],
-                  staticClass: "form-select",
-                  attrs: { name: "site", id: "site" },
-                  on: {
-                    change: function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.site = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
+                  2
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", {}, [
+              _c("form", [
+                _c("label", { attrs: { for: "productionline" } }, [
+                  _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.productionline,
+                        expression: "productionline"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { name: "productionline", id: "productionline" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.productionline = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
                     }
+                  },
+                  [
+                    _vm._l(_vm.sites[1], function(productionline) {
+                      return [
+                        productionline.name === _vm.site
+                          ? [
+                              _c(
+                                "option",
+                                {
+                                  domProps: {
+                                    value: productionline.productionline_name
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                                        " +
+                                      _vm._s(
+                                        productionline.productionline_name
+                                      ) +
+                                      "\n                                    "
+                                  )
+                                ]
+                              )
+                            ]
+                          : _vm._e()
+                      ]
+                    })
+                  ],
+                  2
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c("input", {
+                staticClass: "btn btn-outline-info",
+                attrs: { type: "button", value: _vm.lo },
+                on: {
+                  click: function($event) {
+                    return _vm.load()
                   }
-                },
-                [
-                  _vm._l(_vm.sites[0], function(site) {
-                    return [
-                      _c("option", { domProps: { value: site.name } }, [
-                        _vm._v(
-                          "\n                                " +
-                            _vm._s(site.name) +
-                            "\n                            "
-                        )
-                      ])
-                    ]
-                  })
-                ],
-                2
-              )
+                }
+              })
             ])
           ]),
-          _vm._v(" "),
-          _c("div", {}, [
-            _c("form", [
-              _c("label", { attrs: { for: "productionline" } }, [
-                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
-              ]),
-              _vm._v(" "),
-              _c(
-                "select",
-                {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.productionline,
-                      expression: "productionline"
-                    }
-                  ],
-                  staticClass: "form-select",
-                  attrs: { name: "productionline", id: "productionline" },
-                  on: {
-                    change: function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.productionline = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
-                    }
-                  }
-                },
-                [
-                  _vm._l(_vm.sites[1], function(productionline) {
-                    return [
-                      productionline.name === _vm.site
-                        ? [
-                            _c(
-                              "option",
-                              {
-                                domProps: {
-                                  value: productionline.productionline_name
-                                }
-                              },
-                              [
-                                _vm._v(
-                                  "\n                                    " +
-                                    _vm._s(productionline.productionline_name) +
-                                    "\n                                "
-                                )
-                              ]
-                            )
-                          ]
-                        : _vm._e()
-                    ]
-                  })
-                ],
-                2
-              )
-            ])
-          ]),
-          _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "btn btn-outline-info",
-            attrs: { type: "button", value: _vm.lo },
-            on: {
-              click: function($event) {
-                return _vm.load()
-              }
-            }
-          }),
           _vm._v(" "),
           _c("br"),
           _vm._v(" "),
@@ -57744,67 +57437,69 @@ var render = function() {
         "div",
         { staticClass: "col-sm" },
         [
-          _c("h1", [
-            _vm._v(
-              "\n                " +
-                _vm._s(_vm.$t("downtimesReport")) +
-                "\n            "
-            )
-          ]),
-          _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("div", {}, [
-            _c("label", { attrs: { for: "startingPO" } }, [
-              _vm._v(_vm._s(_vm.$t("from")))
+          _c("div", { staticClass: "data" }, [
+            _c("div", [
+              _c("h1", [
+                _vm._v(
+                  "\n                        " +
+                    _vm._s(_vm.$t("downtimesReport")) +
+                    "\n                    "
+                )
+              ])
             ]),
             _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.beginningDate,
-                  expression: "beginningDate"
-                }
-              ],
-              staticClass: " ",
-              attrs: { type: "date", id: "startingPO", required: "" },
-              domProps: { value: _vm.beginningDate },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+            _c("div", {}, [
+              _c("label", { attrs: { for: "startingPO" } }, [
+                _vm._v(_vm._s(_vm.$t("from")))
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.beginningDate,
+                    expression: "beginningDate"
                   }
-                  _vm.beginningDate = $event.target.value
-                }
-              }
-            }),
-            _vm._v(" "),
-            _c("label", { attrs: { for: "endingPO" } }, [
-              _vm._v(_vm._s(_vm.$t("to")))
-            ]),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.endingDate,
-                  expression: "endingDate"
-                }
-              ],
-              attrs: { type: "date", id: "endingPO", required: "" },
-              domProps: { value: _vm.endingDate },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+                ],
+                staticClass: " ",
+                attrs: { type: "date", id: "startingPO", required: "" },
+                domProps: { value: _vm.beginningDate },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.beginningDate = $event.target.value
                   }
-                  _vm.endingDate = $event.target.value
                 }
-              }
-            })
+              }),
+              _vm._v(" "),
+              _c("label", { attrs: { for: "endingPO" } }, [
+                _vm._v(_vm._s(_vm.$t("to")))
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.endingDate,
+                    expression: "endingDate"
+                  }
+                ],
+                attrs: { type: "date", id: "endingPO", required: "" },
+                domProps: { value: _vm.endingDate },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.endingDate = $event.target.value
+                  }
+                }
+              })
+            ])
           ]),
           _vm._v(" "),
           _vm.show === 1
@@ -59944,8 +59639,8 @@ var render = function() {
             attrs: {
               src: "images/icon.png",
               alt: "",
-              width: "200",
-              height: "130"
+              width: "150",
+              height: "100"
             }
           })
         ]
@@ -60135,31 +59830,47 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "d-flex" }, [
         _c(
-          "button",
+          "select",
           {
-            staticClass: "btn btn-outline-success",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.swapLanguage("fr")
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.language,
+                expression: "language"
               }
+            ],
+            attrs: { name: "languages", id: "languages" },
+            on: {
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.language = $event.target.multiple
+                    ? $$selectedVal
+                    : $$selectedVal[0]
+                },
+                function($event) {
+                  return _vm.swapLanguage(_vm.language)
+                }
+              ]
             }
           },
-          [_vm._v("\n                FR\n            ")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-outline-success",
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.swapLanguage("en")
-              }
-            }
-          },
-          [_vm._v("\n                EN\n            ")]
+          [
+            _c("option", { attrs: { value: "fr" } }, [
+              _vm._v("\n                    Fr\n                ")
+            ]),
+            _vm._v(" "),
+            _c("option", { attrs: { value: "en" } }, [
+              _vm._v("\n                    En\n                ")
+            ])
+          ]
         )
       ])
     ])
@@ -60189,63 +59900,158 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "d-flex" }, [
-      _c("div", { staticClass: "col" }, [
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "site" } }, [_vm._v("Site : ")]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.site,
-                    expression: "site"
+    _c("div", { staticClass: "row dataInput" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", { staticClass: "data" }, [
+          _c("div", {}, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [
+                _vm._v(_vm._s(_vm.$t("site")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
+                        _vm._v(
+                          "\n                                        " +
+                            _vm._s(site.name) +
+                            "\n                                    "
+                        )
+                      ])
+                    ]
+                  })
                 ],
-                staticClass: "form-select",
-                attrs: { name: "site", id: "site" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                            " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                        "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
+                ],
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c("input", {
+              staticClass: "btn btn-outline-info",
+              attrs: { type: "button", value: _vm.lo },
+              on: {
+                click: function($event) {
+                  return _vm.load()
                 }
-              },
-              [
-                _vm._l(_vm.sites[0], function(site) {
-                  return [
-                    _c("option", { domProps: { value: site.name } }, [
-                      _vm._v(
-                        "\n                                    " +
-                          _vm._s(site.name) +
-                          "\n                                "
-                      )
-                    ])
-                  ]
-                })
-              ],
-              2
-            )
+              }
+            })
           ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("form", [
-            _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", { staticClass: "data" }, [
+          _c("div", [
+            _c("h1", [
+              _vm._v(
+                "\n                            " +
+                  _vm._s(_vm.$t("productionShift")) +
+                  "\n                        "
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("br"),
+          _vm._v(" "),
+          _c("div", [
+            _c("label", { attrs: { for: "startYear" } }, [
+              _vm._v(_vm._s(_vm.$t("year")))
             ]),
             _vm._v(" "),
             _c(
@@ -60255,12 +60061,11 @@ var render = function() {
                   {
                     name: "model",
                     rawName: "v-model",
-                    value: _vm.productionline,
-                    expression: "productionline"
+                    value: _vm.year,
+                    expression: "year"
                   }
                 ],
-                staticClass: "form-select",
-                attrs: { name: "productionline", id: "productionline" },
+                attrs: { id: "startYear" },
                 on: {
                   change: function($event) {
                     var $$selectedVal = Array.prototype.filter
@@ -60271,116 +60076,24 @@ var render = function() {
                         var val = "_value" in o ? o._value : o.value
                         return val
                       })
-                    _vm.productionline = $event.target.multiple
+                    _vm.year = $event.target.multiple
                       ? $$selectedVal
                       : $$selectedVal[0]
                   }
                 }
               },
               [
-                _vm._l(_vm.sites[1], function(productionline) {
+                _vm._l(_vm.years, function(year) {
                   return [
-                    productionline.name === _vm.site
-                      ? [
-                          _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: productionline.productionline_name
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                                        " +
-                                  _vm._s(productionline.productionline_name) +
-                                  "\n                                    "
-                              )
-                            ]
-                          )
-                        ]
-                      : _vm._e()
+                    _c("option", { key: year, domProps: { value: year } }, [
+                      _vm._v(_vm._s(year))
+                    ])
                   ]
                 })
               ],
               2
             )
           ])
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: _vm.lo },
-          on: {
-            click: function($event) {
-              return _vm.load()
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("br")
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col" }, [
-        _c("h1", [
-          _vm._v(
-            "\n                    " +
-              _vm._s(_vm.$t("productionShift")) +
-              "\n                "
-          )
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "startYear" } }, [
-            _vm._v(_vm._s(_vm.$t("year")))
-          ]),
-          _vm._v(" "),
-          _c(
-            "select",
-            {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.year,
-                  expression: "year"
-                }
-              ],
-              attrs: { id: "startYear" },
-              on: {
-                change: function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.year = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                }
-              }
-            },
-            [
-              _vm._l(_vm.years, function(year) {
-                return [
-                  _c("option", { key: year, domProps: { value: year } }, [
-                    _vm._v(_vm._s(year))
-                  ])
-                ]
-              })
-            ],
-            2
-          )
         ])
       ])
     ]),
@@ -60715,14 +60428,10 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "d-flex" }, [
-      _c("br"),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "col" },
-        [
-          _c("div", { staticClass: "d-flex" }, [
+    _c("div", { staticClass: "row dataInput" }, [
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", { staticClass: "data" }, [
+          _c("div", {}, [
             _c("form", [
               _c("label", { attrs: { for: "site" } }, [
                 _vm._v(_vm._s(_vm.$t("site")) + " : ")
@@ -60762,9 +60471,9 @@ var render = function() {
                     return [
                       _c("option", { domProps: { value: site.name } }, [
                         _vm._v(
-                          "\n                                " +
+                          "\n                                    " +
                             _vm._s(site.name) +
-                            "\n                            "
+                            "\n                                "
                         )
                       ])
                     ]
@@ -60775,9 +60484,7 @@ var render = function() {
             ])
           ]),
           _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("div", { staticClass: "d-flex" }, [
+          _c("div", [
             _c("form", [
               _c("label", { attrs: { for: "productionline" } }, [
                 _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
@@ -60826,9 +60533,9 @@ var render = function() {
                               },
                               [
                                 _vm._v(
-                                  "\n                                    " +
+                                  "\n                                        " +
                                     _vm._s(productionline.productionline_name) +
-                                    "\n                                "
+                                    "\n                                    "
                                 )
                               ]
                             )
@@ -60842,182 +60549,202 @@ var render = function() {
             ])
           ]),
           _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "btn btn-outline-info",
-            attrs: { type: "button", value: _vm.lo },
-            on: {
-              click: function($event) {
-                return _vm.load()
+          _c("div", [
+            _c("input", {
+              staticClass: "btn btn-outline-info",
+              attrs: { type: "button", value: _vm.lo },
+              on: {
+                click: function($event) {
+                  return _vm.load()
+                }
               }
-            }
-          }),
-          _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
+            })
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-sm" }, [
+        _c("div", { staticClass: "data" }, [
+          _c("div", [
+            _c("h1", [
+              _vm._v(
+                "\n                        " +
+                  _vm._s(_vm.$t("packagingLineID")) +
+                  "\n                    "
+              )
+            ])
+          ])
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
           _vm.show === 1
             ? [
-                _c("h2", { staticStyle: { "padding-bottom": "-30px" } }, [
-                  _vm._v(_vm._s(_vm.$t("flowDiagram")))
+                _c("div", { attrs: { align: "center" } }, [
+                  _c("h2", { attrs: { align: "center" } }, [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("flowDiagram")) +
+                        "\n                    "
+                    )
+                  ])
                 ])
+              ]
+            : _vm._e(),
+          _vm._v(" "),
+          _c("div", { attrs: { id: "flowDiagram" } })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "col-sm" },
+        [
+          _vm.show === 1
+            ? [
+                _c("div", [
+                  _c("h2", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("machineList")) +
+                        "\n                    "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "table-info-data" }, [
+                  _c("table", { staticClass: "table" }, [
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("machine")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("operation")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("provider")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("model")))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      [
+                        _vm._l(_vm.machines[0], function(machine) {
+                          return [
+                            _c("tr", [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(machine.denomination_ordre))
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(machine.name))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(machine.operation))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(machine.fabricant))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(machine.modele))])
+                            ])
+                          ]
+                        })
+                      ],
+                      2
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
+                _c("div", [
+                  _c("h2", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("formatList")) +
+                        "\n                    "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "table-info-data" }, [
+                  _c("table", { staticClass: "table" }, [
+                    _c("thead", [
+                      _c("tr", [
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("format")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("form")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("mat1")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("mat2")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("mat3")))
+                        ]),
+                        _vm._v(" "),
+                        _c("th", { attrs: { scope: "col" } }, [
+                          _vm._v(_vm._s(_vm.$t("designRate")))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      [
+                        _vm._l(_vm.machines[1], function(format) {
+                          return [
+                            _c("tr", [
+                              _c("th", { attrs: { scope: "row" } }, [
+                                _vm._v(_vm._s(format.format))
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(_vm.$t(format.shape)))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(format.mat1))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(format.mat2))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(format.mat3))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(format.design_rate))])
+                            ])
+                          ]
+                        })
+                      ],
+                      2
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("br")
               ]
             : _vm._e()
         ],
         2
       )
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "d-flex", staticStyle: { "margin-top": "-30px" } },
-      [
-        _c("div", { attrs: { id: "flowDiagram" } }),
-        _vm._v(" "),
-        _c(
-          "div",
-          { attrs: { align: "center" } },
-          [
-            _vm.show === 1
-              ? [
-                  _c("h2", [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(_vm.$t("machineList")) +
-                        "\n                "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "table-info-data" }, [
-                    _c("table", { staticClass: "table" }, [
-                      _c("thead", [
-                        _c("tr", [
-                          _c("th", { attrs: { scope: "col" } }),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("machine")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("operation")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("provider")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("model")))
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "tbody",
-                        [
-                          _vm._l(_vm.machines[0], function(machine) {
-                            return [
-                              _c("tr", [
-                                _c("th", { attrs: { scope: "row" } }, [
-                                  _vm._v(_vm._s(machine.denomination_ordre))
-                                ]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(machine.name))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(machine.operation))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(machine.fabricant))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(machine.modele))])
-                              ])
-                            ]
-                          })
-                        ],
-                        2
-                      )
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("br"),
-                  _vm._v(" "),
-                  _c("h2", [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(_vm.$t("formatList")) +
-                        "\n                "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "table-info-data" }, [
-                    _c("table", { staticClass: "table" }, [
-                      _c("thead", [
-                        _c("tr", [
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("format")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("form")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("mat1")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("mat2")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("mat3")))
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { attrs: { scope: "col" } }, [
-                            _vm._v(_vm._s(_vm.$t("designRate")))
-                          ])
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "tbody",
-                        [
-                          _vm._l(_vm.machines[1], function(format) {
-                            return [
-                              _c("tr", [
-                                _c("th", { attrs: { scope: "row" } }, [
-                                  _vm._v(_vm._s(format.format))
-                                ]),
-                                _vm._v(" "),
-                                _c("td", [
-                                  _vm._v(_vm._s(_vm.$t(format.shape)))
-                                ]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(format.mat1))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(format.mat2))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(format.mat3))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(format.design_rate))])
-                              ])
-                            ]
-                          })
-                        ],
-                        2
-                      )
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("br")
-                ]
-              : _vm._e()
-          ],
-          2
-        )
-      ]
-    )
+    ])
   ])
 }
 var staticRenderFns = []
@@ -61290,203 +61017,205 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { attrs: { id: "component" } }, [
-    _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "row dataInput" }, [
       _c("div", { staticClass: "col-sm" }, [
-        _c("div", {}, [
-          _c("form", [
-            _c("label", { attrs: { for: "site" } }, [
-              _vm._v(_vm._s(_vm.$t("site")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.site,
-                    expression: "site"
+        _c("div", { staticClass: "data" }, [
+          _c("div", {}, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [
+                _vm._v(_vm._s(_vm.$t("site")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
+                        _vm._v(
+                          "\n                                    " +
+                            _vm._s(site.name) +
+                            "\n                                "
+                        )
+                      ])
+                    ]
+                  })
                 ],
-                staticClass: "form-select",
-                attrs: { name: "site", id: "site" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
-                }
-              },
-              [
-                _vm._l(_vm.sites[0], function(site) {
-                  return [
-                    _c("option", { domProps: { value: site.name } }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(site.name) +
-                          "\n                            "
-                      )
-                    ])
-                  ]
-                })
-              ],
-              2
-            )
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", {}, [
-          _c("form", [
-            _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.productionline,
-                    expression: "productionline"
-                  }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                        " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                    "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
                 ],
-                staticClass: "form-select",
-                attrs: { name: "productionline", id: "productionline" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.productionline = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
+                2
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c("input", {
+              staticClass: "btn btn-outline-info",
+              attrs: { type: "button", value: _vm.lo },
+              on: {
+                click: function($event) {
+                  return _vm.load()
                 }
-              },
-              [
-                _vm._l(_vm.sites[1], function(productionline) {
-                  return [
-                    productionline.name === _vm.site
-                      ? [
-                          _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: productionline.productionline_name
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                                    " +
-                                  _vm._s(productionline.productionline_name) +
-                                  "\n                                "
-                              )
-                            ]
-                          )
-                        ]
-                      : _vm._e()
-                  ]
-                })
-              ],
-              2
-            )
+              }
+            })
           ])
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("input", {
-          staticClass: "btn btn-outline-info",
-          attrs: { type: "button", value: _vm.lo },
-          on: {
-            click: function($event) {
-              return _vm.load()
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("br")
+        ])
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-sm" }, [
-        _c("h1", [
-          _vm._v(
-            "\n                " +
-              _vm._s(_vm.$t("productionDashboard")) +
-              "\n            "
-          )
-        ]),
-        _vm._v(" "),
-        _c("br"),
-        _vm._v(" "),
-        _c("div", {}, [
-          _c("label", { attrs: { for: "startingPO" } }, [
-            _vm._v(_vm._s(_vm.$t("from")))
+        _c("div", { staticClass: "data" }, [
+          _c("div", [
+            _c("h1", [
+              _vm._v(
+                "\n                        " +
+                  _vm._s(_vm.$t("productionDashboard")) +
+                  "\n                    "
+              )
+            ])
           ]),
           _vm._v(" "),
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.beginningDate,
-                expression: "beginningDate"
-              }
-            ],
-            staticClass: " ",
-            attrs: { type: "date", id: "startingPO", required: "" },
-            domProps: { value: _vm.beginningDate },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
+          _c("div", [
+            _c("label", { attrs: { for: "startingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("from")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.beginningDate,
+                  expression: "beginningDate"
                 }
-                _vm.beginningDate = $event.target.value
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c("label", { attrs: { for: "endingPO" } }, [
-            _vm._v(_vm._s(_vm.$t("to")))
-          ]),
-          _vm._v(" "),
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.endingDate,
-                expression: "endingDate"
-              }
-            ],
-            attrs: { type: "date", id: "endingPO", required: "" },
-            domProps: { value: _vm.endingDate },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
+              ],
+              staticClass: " ",
+              attrs: { type: "date", id: "startingPO", required: "" },
+              domProps: { value: _vm.beginningDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.beginningDate = $event.target.value
                 }
-                _vm.endingDate = $event.target.value
               }
-            }
-          })
+            }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "endingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("to")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.endingDate,
+                  expression: "endingDate"
+                }
+              ],
+              attrs: { type: "date", id: "endingPO", required: "" },
+              domProps: { value: _vm.endingDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.endingDate = $event.target.value
+                }
+              }
+            })
+          ])
         ])
       ])
     ]),
@@ -61498,17 +61227,22 @@ var render = function() {
         [
           _vm.show === 1
             ? [
-                _c("h1", [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm.$t("formulationSplit")) +
-                      "\n                "
-                  )
+                _c("div", [
+                  _c("h1", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("formulationSplit")) +
+                        "\n                    "
+                    )
+                  ])
                 ]),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  {
+                    staticClass: "table-info-data dataInput",
+                    attrs: { width: "400" }
+                  },
                   [
                     _c("table", { staticClass: "table" }, [
                       _vm._m(0),
@@ -61673,7 +61407,9 @@ var render = function() {
                   ]
                 )
               ]
-            : _vm._e()
+            : _vm._e(),
+          _vm._v(" "),
+          _vm._m(1)
         ],
         2
       ),
@@ -61684,25 +61420,26 @@ var render = function() {
         [
           _vm.show === 1
             ? [
-                _c("h1", [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm.$t("formulationSplit")) +
-                      " (%)\n                "
-                  )
+                _c("div", [
+                  _c("h1", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("formulationSplit")) +
+                        " (%)\n                    "
+                    )
+                  ])
                 ])
               ]
             : _vm._e(),
           _vm._v(" "),
           _c("canvas", {
+            staticClass: "pieChart",
             attrs: { id: "formulationSplit", width: "100", height: "100" }
           })
         ],
         2
       )
     ]),
-    _vm._v(" "),
-    _vm._m(1),
     _vm._v(" "),
     _c("div", { staticClass: "row" }, [
       _c(
@@ -61711,17 +61448,22 @@ var render = function() {
         [
           _vm.show === 1
             ? [
-                _c("h1", [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm.$t("packSizeSplit")) +
-                      "\n                "
-                  )
+                _c("div", [
+                  _c("h1", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("packSizeSplit")) +
+                        "\n                    "
+                    )
+                  ])
                 ]),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "table-info-data", attrs: { width: "400" } },
+                  {
+                    staticClass: "table-info-data dataInput",
+                    attrs: { width: "400" }
+                  },
                   [
                     _c("table", { staticClass: "table" }, [
                       _vm._m(2),
@@ -61875,6 +61617,8 @@ var render = function() {
               ]
             : _vm._e(),
           _vm._v(" "),
+          _vm._m(3),
+          _vm._v(" "),
           _c("br")
         ],
         2
@@ -61886,25 +61630,26 @@ var render = function() {
         [
           _vm.show === 1
             ? [
-                _c("h1", [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm.$t("formatSplit")) +
-                      " (%)\n                "
-                  )
+                _c("div", [
+                  _c("h1", [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(_vm.$t("formatSplit")) +
+                        " (%)\n                    "
+                    )
+                  ])
                 ])
               ]
             : _vm._e(),
           _vm._v(" "),
           _c("canvas", {
+            staticClass: "pieChart",
             attrs: { id: "packsizeSplit", width: "100", height: "100" }
           })
         ],
         2
       )
-    ]),
-    _vm._v(" "),
-    _vm._m(3)
+    ])
   ])
 }
 var staticRenderFns = [
@@ -61946,10 +61691,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "wrapper" }, [
-        _c("canvas", { attrs: { id: "myChart4" } })
-      ])
+    return _c("div", {}, [
+      _c("canvas", { staticClass: "diagram", attrs: { id: "myChart4" } })
     ])
   },
   function() {
@@ -61990,10 +61733,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "wrapper" }, [
-        _c("canvas", { attrs: { id: "myChart5" } })
-      ])
+    return _c("div", {}, [
+      _c("canvas", { staticClass: "diagram", attrs: { id: "myChart5" } })
     ])
   }
 ]
@@ -62126,201 +61867,6 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true&":
-/*!**********************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard.vue?vue&type=template&id=be4a0ce2&scoped=true& ***!
-  \**********************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* binding */ render),
-/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
-/* harmony export */ });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "d-flex main-container" }, [
-    _c("div", { staticClass: "d-flex selection-menu" }, [
-      _c("div", { staticClass: "d-flex site-pl-selection" }, [
-        _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "site-selection" } }, [
-            _vm._v(_vm._s(_vm.$t("site")) + ": ")
-          ]),
-          _vm._v(" "),
-          _c(
-            "select",
-            {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.site,
-                  expression: "site"
-                }
-              ],
-              attrs: { id: "site-selection" },
-              on: {
-                change: function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.site = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                }
-              }
-            },
-            [
-              _c(
-                "option",
-                { attrs: { disabled: "", selected: "", value: "" } },
-                [_vm._v("-- Select --")]
-              ),
-              _vm._v(" "),
-              _vm._l(_vm.sites[0], function(site) {
-                return [
-                  _c(
-                    "option",
-                    { key: site.name, domProps: { value: site.name } },
-                    [_vm._v(_vm._s(site.name))]
-                  )
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("label", { attrs: { for: "pl-selection" } }, [
-            _vm._v(_vm._s(_vm.$t("productionLine")) + ": ")
-          ]),
-          _vm._v(" "),
-          _c(
-            "select",
-            {
-              attrs: { id: "pl-selection" },
-              on: {
-                change: function($event) {
-                  return _vm.productionLineSelected()
-                }
-              }
-            },
-            [
-              _c(
-                "option",
-                { attrs: { disabled: "", selected: "", value: "" } },
-                [_vm._v("-- Select --")]
-              ),
-              _vm._v(" "),
-              _vm._l(_vm.sites[1], function(productionLine) {
-                return [
-                  productionLine.name === _vm.site
-                    ? [
-                        _c(
-                          "option",
-                          {
-                            key: productionLine.productionline_name,
-                            domProps: {
-                              value: productionLine.productionline_name
-                            }
-                          },
-                          [
-                            _vm._v(
-                              "\n                                " +
-                                _vm._s(productionLine.productionline_name) +
-                                "\n                            "
-                            )
-                          ]
-                        )
-                      ]
-                    : _vm._e()
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "d-flex" }, [
-          _c("input", {
-            staticClass: "btn btn-outline-info",
-            attrs: { type: "button", value: _vm.lo },
-            on: {
-              click: function($event) {
-                return _vm.load()
-              }
-            }
-          })
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "content-panel" }, [
-      _c("div", { staticClass: "upper-panel" }, [
-        _c("span", { staticClass: "content-title" }, [
-          _vm._v(_vm._s(_vm.$t("qualityLosses")))
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "chart-panel" })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "bottom-panel" }, [
-        _c("div", { staticClass: "ql-machine-panel" }, [
-          _c("span", { staticClass: "content-title" }, [
-            _vm._v(_vm._s(_vm.$t("qualityLossesByMachine")))
-          ]),
-          _vm._v(" "),
-          _vm._m(0)
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "ql-format-panel" }, [
-          _c("span", { staticClass: "content-title" }, [
-            _vm._v(_vm._s(_vm.$t("qualityLossesByFormat")))
-          ]),
-          _vm._v(" "),
-          _vm._m(1)
-        ])
-      ])
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "inner-content-panel" }, [
-      _c("div", { staticClass: "table-panel" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "chart-panel" })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "inner-content-panel" }, [
-      _c("div", { staticClass: "table-panel" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "chart-panel" })
-    ])
-  }
-]
-render._withStripped = true
-
-
-
-/***/ }),
-
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true&":
 /*!***********************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/qualityLossesDashboard2.vue?vue&type=template&id=7a9be1b3&scoped=true& ***!
@@ -62338,196 +61884,206 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "row" }, [
+    _c("div", { staticClass: "row dataInput" }, [
       _c("div", { staticClass: "col-sm" }, [
-        _c("div", {}, [
-          _c("form", [
-            _c("label", { attrs: { for: "site" } }, [
-              _vm._v(_vm._s(_vm.$t("site")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.site,
-                    expression: "site"
+        _c("div", { staticClass: "data" }, [
+          _c("div", {}, [
+            _c("form", [
+              _c("label", { attrs: { for: "site" } }, [
+                _vm._v(_vm._s(_vm.$t("site")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.site,
+                      expression: "site"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "site", id: "site" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.site = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
+                },
+                [
+                  _vm._l(_vm.sites[0], function(site) {
+                    return [
+                      _c("option", { domProps: { value: site.name } }, [
+                        _vm._v(
+                          "\n                                    " +
+                            _vm._s(site.name) +
+                            "\n                                "
+                        )
+                      ])
+                    ]
+                  })
                 ],
-                staticClass: "form-select",
-                attrs: { name: "site", id: "site" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.site = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[0], function(site) {
-                  return [
-                    _c("option", { domProps: { value: site.name } }, [
-                      _vm._v(
-                        "\n                                    " +
-                          _vm._s(site.name) +
-                          "\n                                "
-                      )
-                    ])
-                  ]
-                })
-              ],
-              2
-            )
+                2
+              )
+            ])
           ]),
           _vm._v(" "),
-          _c("form", [
-            _c("label", { attrs: { for: "productionline" } }, [
-              _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
-            ]),
-            _vm._v(" "),
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.productionline,
-                    expression: "productionline"
+          _c("div", [
+            _c("form", [
+              _c("label", { attrs: { for: "productionline" } }, [
+                _vm._v(_vm._s(_vm.$t("productionLine")) + " : ")
+              ]),
+              _vm._v(" "),
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.productionline,
+                      expression: "productionline"
+                    }
+                  ],
+                  staticClass: "form-select",
+                  attrs: { name: "productionline", id: "productionline" },
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.productionline = $event.target.multiple
+                        ? $$selectedVal
+                        : $$selectedVal[0]
+                    }
                   }
+                },
+                [
+                  _vm._l(_vm.sites[1], function(productionline) {
+                    return [
+                      productionline.name === _vm.site
+                        ? [
+                            _c(
+                              "option",
+                              {
+                                domProps: {
+                                  value: productionline.productionline_name
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                        " +
+                                    _vm._s(productionline.productionline_name) +
+                                    "\n                                    "
+                                )
+                              ]
+                            )
+                          ]
+                        : _vm._e()
+                    ]
+                  })
                 ],
-                staticClass: "form-select",
-                attrs: { name: "productionline", id: "productionline" },
-                on: {
-                  change: function($event) {
-                    var $$selectedVal = Array.prototype.filter
-                      .call($event.target.options, function(o) {
-                        return o.selected
-                      })
-                      .map(function(o) {
-                        var val = "_value" in o ? o._value : o.value
-                        return val
-                      })
-                    _vm.productionline = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
-                  }
-                }
-              },
-              [
-                _vm._l(_vm.sites[1], function(productionline) {
-                  return [
-                    productionline.name === _vm.site
-                      ? [
-                          _c(
-                            "option",
-                            {
-                              domProps: {
-                                value: productionline.productionline_name
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n                                        " +
-                                  _vm._s(productionline.productionline_name) +
-                                  "\n                                    "
-                              )
-                            ]
-                          )
-                        ]
-                      : _vm._e()
-                  ]
-                })
-              ],
-              2
-            )
+                2
+              )
+            ])
           ]),
           _vm._v(" "),
-          _c("br"),
-          _vm._v(" "),
-          _c("input", {
-            staticClass: "btn btn-outline-info",
-            attrs: { type: "button", value: _vm.lo },
-            on: {
-              click: function($event) {
-                return _vm.load()
+          _c("div", [
+            _c("input", {
+              staticClass: "btn btn-outline-info",
+              attrs: { type: "button", value: _vm.lo },
+              on: {
+                click: function($event) {
+                  return _vm.load()
+                }
               }
-            }
-          })
+            })
+          ])
         ])
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-sm" }, [
-        _c("h1", [
-          _vm._v(
-            "\n                    " +
-              _vm._s(_vm.$t("qualityLossesDashboard")) +
-              "\n                "
-          )
-        ]),
-        _vm._v(" "),
-        _c("label", { attrs: { for: "startingPO" } }, [
-          _vm._v(_vm._s(_vm.$t("from")))
-        ]),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.beginningDate,
-              expression: "beginningDate"
-            }
-          ],
-          staticClass: " ",
-          attrs: { type: "date", id: "startingPO", required: "" },
-          domProps: { value: _vm.beginningDate },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+        _c("div", { staticClass: "data" }, [
+          _c("div", [
+            _c("h1", [
+              _vm._v(
+                "\n                        " +
+                  _vm._s(_vm.$t("qualityLossesDashboard")) +
+                  "\n                    "
+              )
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", [
+            _c("label", { attrs: { for: "startingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("from")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.beginningDate,
+                  expression: "beginningDate"
+                }
+              ],
+              staticClass: " ",
+              attrs: { type: "date", id: "startingPO", required: "" },
+              domProps: { value: _vm.beginningDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.beginningDate = $event.target.value
+                }
               }
-              _vm.beginningDate = $event.target.value
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("label", { attrs: { for: "endingPO" } }, [
-          _vm._v(_vm._s(_vm.$t("to")))
-        ]),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.endingDate,
-              expression: "endingDate"
-            }
-          ],
-          attrs: { type: "date", id: "endingPO", required: "" },
-          domProps: { value: _vm.endingDate },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+            }),
+            _vm._v(" "),
+            _c("label", { attrs: { for: "endingPO" } }, [
+              _vm._v(_vm._s(_vm.$t("to")))
+            ]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.endingDate,
+                  expression: "endingDate"
+                }
+              ],
+              attrs: { type: "date", id: "endingPO", required: "" },
+              domProps: { value: _vm.endingDate },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.endingDate = $event.target.value
+                }
               }
-              _vm.endingDate = $event.target.value
-            }
-          }
-        })
+            })
+          ])
+        ])
       ])
     ]),
     _vm._v(" "),
@@ -62535,9 +62091,9 @@ var render = function() {
       _c("div", { staticClass: "col-sm" }, [
         _c("span", { staticClass: "content-title" }, [
           _vm._v(
-            "\n                    " +
+            "\n                " +
               _vm._s(_vm.$t("qualityLosses")) +
-              "\n                "
+              "\n            "
           )
         ])
       ])
@@ -62549,9 +62105,9 @@ var render = function() {
       _c("div", { staticClass: "col-sm  border border-primary" }, [
         _c("h3", { staticStyle: { "padding-top": "55px" } }, [
           _vm._v(
-            "\n                    QL = " +
+            "\n                QL = " +
               _vm._s((_vm.quality * 100).toFixed(2)) +
-              " %\n                "
+              " %\n            "
           )
         ])
       ])
@@ -62573,9 +62129,9 @@ var render = function() {
       _c("div", { staticClass: "col-sm" }, [
         _c("span", { staticClass: "content-title" }, [
           _vm._v(
-            "\n                    " +
+            "\n                " +
               _vm._s(_vm.$t("qualityLossesByFormat")) +
-              "\n                "
+              "\n            "
           )
         ]),
         _vm._v(" "),
@@ -62618,7 +62174,7 @@ var render = function() {
                               _vm.qualityLosses["rejectionCounter"][0]
                                 .sumFillerRejection *
                                 1
-                          ) + "\n                            "
+                          ) + "\n                        "
                         )
                       ])
                     ]),
@@ -62667,7 +62223,7 @@ var render = function() {
                               _vm.qualityLosses["rejectionCounter"][0]
                                 .sumCaperRejection *
                                 1
-                          ) + "\n                            "
+                          ) + "\n                        "
                         )
                       ])
                     ]),
@@ -62716,7 +62272,7 @@ var render = function() {
                               _vm.qualityLosses["rejectionCounter"][0]
                                 .sumLabelerRejection *
                                 1
-                          ) + "\n                            "
+                          ) + "\n                        "
                         )
                       ])
                     ]),
@@ -62765,7 +62321,7 @@ var render = function() {
                               _vm.qualityLosses["rejectionCounter"][0]
                                 .sumWeightBoxRejection *
                                 1
-                          ) + "\n                            "
+                          ) + "\n                        "
                         )
                       ])
                     ]),
@@ -62800,7 +62356,7 @@ var render = function() {
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("tr", { staticClass: "boxWeigher mainLine" }, [
+                    _c("tr", { staticClass: "qualityControl mainLine" }, [
                       _c("th", { attrs: { scope: "row" } }, [
                         _vm._v(_vm._s(_vm.$t("qualityControl")))
                       ]),
@@ -62814,12 +62370,12 @@ var render = function() {
                               _vm.qualityLosses["rejectionCounter"][0]
                                 .sumQualityControlRejection *
                                 1
-                          ) + "\n                            "
+                          ) + "\n                        "
                         )
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("tr", { staticClass: "boxWeigher" }, [
+                    _c("tr", { staticClass: "qualityControl" }, [
                       _c("th", { attrs: { scope: "row" } }, [
                         _vm._v(_vm._s(_vm.$t("overProcess")))
                       ]),
@@ -62834,7 +62390,7 @@ var render = function() {
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("tr", { staticClass: "boxWeigher" }, [
+                    _c("tr", { staticClass: "qualityControl" }, [
                       _c("th", { attrs: { scope: "row" } }, [
                         _vm._v(_vm._s(_vm.$t("rejectedItems")))
                       ]),
@@ -62899,12 +62455,12 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["fillerCounter"][format] +
                                     _vm.qtyPerMachine["fillerRejection"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -62923,11 +62479,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["fillerCounter"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -62946,11 +62502,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["fillerRejection"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -62969,12 +62525,12 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["caperCounter"][format] +
                                     _vm.qtyPerMachine["caperRejection"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -62993,11 +62549,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["caperCounter"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63016,11 +62572,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["caperRejection"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63039,14 +62595,14 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["labelerCounter"][format] +
                                     _vm.qtyPerMachine["labelerRejection"][
                                       format
                                     ]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63065,11 +62621,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["fillerCounter"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63088,11 +62644,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["fillerRejection"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63111,7 +62667,7 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["weightBoxCounter"][
                                     format
@@ -63120,7 +62676,7 @@ var render = function() {
                                       format
                                     ]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63139,11 +62695,11 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["weightBoxCounter"][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63162,13 +62718,13 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["weightBoxRejection"][
                                     format
                                   ]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63178,16 +62734,16 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tr",
-                      { staticClass: "filler mainLine" },
+                      { staticClass: "qualityControl mainLine" },
                       [
                         _c("th", { attrs: { scope: "row" } }, [
-                          _vm._v(_vm._s(_vm.$t("controlQuality")))
+                          _vm._v(_vm._s(_vm.$t("qualityControl")))
                         ]),
                         _vm._v(" "),
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["controlQualityCounter"][
                                     format
@@ -63196,7 +62752,7 @@ var render = function() {
                                       "controlQualityRejection"
                                     ][format]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63206,7 +62762,7 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tr",
-                      { staticClass: "filler" },
+                      { staticClass: "qualityControl" },
                       [
                         _c("th", { attrs: { scope: "row" } }, [
                           _vm._v(_vm._s(_vm.$t("overProcess")))
@@ -63215,13 +62771,13 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["controlQualityCounter"][
                                     format
                                   ]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63231,7 +62787,7 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tr",
-                      { staticClass: "filler" },
+                      { staticClass: "qualityControl" },
                       [
                         _c("th", { attrs: { scope: "row" } }, [
                           _vm._v(_vm._s(_vm.$t("rejectedItems")))
@@ -63240,13 +62796,13 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(
                                   _vm.qtyPerMachine["controlQualityRejection"][
                                     format
                                   ]
                                 ) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63265,9 +62821,9 @@ var render = function() {
                         _vm._l(_vm.tableauFormats, function(format) {
                           return _c("td", [
                             _vm._v(
-                              "\n                                " +
+                              "\n                            " +
                                 _vm._s(_vm.totalPerFormat[format]) +
-                                "\n                            "
+                                "\n                        "
                             )
                           ])
                         })
@@ -63307,15 +62863,15 @@ var staticRenderFns = [
         [
           _c("p", [
             _vm._v(
-              "\n                    N = Produced Pieces in Specification during the production run "
+              "\n                N = Produced Pieces in Specification during the production run "
             ),
             _c("br"),
             _vm._v(
-              "\n                    RMi, RF = Rejected Pieces at the Filler or machines Mi "
+              "\n                RMi, RF = Rejected Pieces at the Filler or machines Mi "
             ),
             _c("br"),
             _vm._v(
-              "\n                    CMi = Machine counter value at end of production run\n                "
+              "\n                CMi = Machine counter value at end of production run\n            "
             )
           ])
         ]
@@ -63323,13 +62879,13 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("div", { staticClass: "col-sm border border-primary" }, [
         _c("p", [
-          _vm._v("\n                    M1 = telle machine "),
+          _vm._v("\n                M1 = telle machine "),
           _c("br"),
-          _vm._v("\n                    M2 = telle machine "),
+          _vm._v("\n                M2 = telle machine "),
           _c("br"),
-          _vm._v("\n                    M3 = telle machine "),
+          _vm._v("\n                M3 = telle machine "),
           _c("br"),
-          _vm._v("\n                    M4 = telle machine "),
+          _vm._v("\n                M4 = telle machine "),
           _c("br")
         ])
       ])
@@ -79704,7 +79260,7 @@ var index = {
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceLossRegistered":"No Performance Loss Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","numberOfItems":"Number of items","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","number":"Number","duration":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","qualityLossesByMachine":"Quality Losses By Machine","qualityLossesByFormat":"Quality Losses By Format","filling":"Filling","capping":"Capping","qualityLossesDashboard":"Quality Losses Dashboard","total":"Total","qualityControl":"Quality Control","machinesShutdowns":"Machines Shutdowns","externalShutdowns":"External Shutdowns","machineShutdown":"Machine shutdown","totalDowntime":"Total downtime","frequency":"Frequency","averageDuration":"Average duration","externalShutdown":"External shutdown","timeInMinutes":"Time in minutes","reduceRateAtFiller":"Reduce rate at filler","reduceRateAtFillerDueToAnotherMachineCapacity":"Reduce rate at filler due to another machine capacity","fillerOwnStop":"Filler own stop","fillerStopByOtherMachine":"Filler stop by other machine","productionOrder":"Production order (PO)","reduceRate":"Reduce rate (cpm)","wastedTime":"Wasted time (min)","comments/reason":"Comments/Reason","select":"Select","standardDeviation":"Standard deviation"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choiceLoginSupervisor":"Supervisor connection","choiceLoginAdministrator":"Supervisor connection","user":"Username","password":"Password","connection":"Login","site":"Site","crewLeader":"Crew leader","typeTeam":"Team Type","startTime":"Start time","endTime":"End time","line":"Line","type":"Type","entryTime":"Entry time","duration(Minutes)":"Duration (minutes)","expectedDuration(Minutes)":"Expected Duration (minutes)","totalDuration(Minutes)":"Total Duration (minutes)","comments":"Comments","endPO":"End PO","endTeam":"End team","back":"Back","plannedDowntime":"Planned Downtime","unplannedDowntime":"Unplanned downtime","downtimesHistory":"Downtimes history","cancel":"Cancel","validate":"Validate","addAReason":"Add a reason","reason":"Reason","previousBulk":"Previous bulk","yes":"Yes","POStartTime":"PO start time","POEndTime":"PO end time","finalQuantityProduced(Cases)":"Final quantity produced (number of cases)","performance":"Performance","totalPOProductionTime":"Total PO Production Time","totalPOOperatingTime":"Total PO Operating Time","difference":"Difference","totalPOPerformance":"Total PO Performance","noPerformanceLossRegistered":"No Performance Loss Registered","speedLossJustification":"Speedloss Justification","speedLoss":"Speedloss","fillerOwnStoppage":"Filler own stoppage","reducedRateAtAnOtherMachine":"Reduced Rate At An Other Machine","reducedRateAtFiller":"Reduced Rate At Filler","fillerOwnStoppageByAnOtherMachine":"Filler Own Stoppage By An Other Machine","quality":"Quality","filler":"Filler","caper":"Caper","labeller":"Labeller","bowWeigher":"Box weigher","counter":"Counter","rejection":"Rejection","summary":"Summary","speedlosses":"Speedlosses","speedLosses":"Speedlosses","indicators":"Indicators","availability":"Availability","productionLine":"Production line","load":"Load","plantOperatingTime":"Plant Operating Time","plantOperatingTimeOverview":"Plant Operating Time overview","plannedProductionTime":"Planned Production Time","loadFactor":"Load Factor","volumePacked":"Volume Packed","numberOfProductionOrder":"Number of Production Order","numberOfItemsProduced":"Number of items Produced","numberOfItems":"Number of items","bottles":"Bottles","prioritizeList":"Prioritize list","noProductionPlanned":"No Production Planned","plannedMaintenanceActivites":"Planned Maintenance Activites","capitalProjectImplementation":"Capital Project Implementation","breaksMeetingShiftChange":"Breaks, meeting, shift change","numberOfEvents":"Number of Events","cleaningInPlace":"Cleaning In Place","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Unplanned Shutdown of Machine","fillerUnplannedShutdown":"Filler Unplanned Shutdown","productionShift":"Production Shift","from":"From","to":"To","formVolumeSplit":"Form Volume Split","packSizeSplit":"Pack Size Split","formulationSplit":"Formulation Split","operatingTime":"Operating Time","netOperatingTime":"Net Operating Time","valuableOperatingTime":"Valuable Operating Time","qualityLosses":"Quality Losses","flowDiagram":"Flow Diagram","packagingLineID":"Packaging Line ID","machineList":"Machine List","machine":"Machine","operation":"Operation","provider":"Provider","model":"Model","formatList":"Format List","format":"Format","form":"Form","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Design Rate","open":"Open","downtimesReport":"Downtimes Report","monthlyLoadFactor":"Monthly Load Factor","productionDashboard":"Production Dashboard","peakSeason":"Peak Season","allYear":"All Year","trendVersusPreviousYear":"Trend versus previous year","break":"Break","lunch":"Lunch","emergency":"Emergency","meeting":"Meeting","maintenance":"Maintenance","projectImplementation":"Project Implementation","formatChanging":"Format Changing","packNumberChanging":"Pack Number Changing","CIP":"CIP","errorInput":"Inputs requiered","other":"Other","bowlStopper":"Bowl Stopper","missingBottle":"Missing Bottle","downstreamSaturation":"Downstream Saturation","dosingTurret":"Dosing Turret","screwingTurret":"Screwing Tuerret","year":"Year","square":"Square","round":"Round","formatSplit":"Format split","nothingProduced":"Nothing produced","unplannedDowntimeDashboard":"Unplanned Downtime Dashboard","productionWindow":"Production Window","number":"Number","duration":"Duration","yearlyCIP":"Yearly CIP","yearlyCOV":"Yearly COV","yearlyBNC":"Yearly BNC","average":"Average","hours":"Hours","of":"of","cleaningInPlaceCIP":"Cleaning in Place (CIP)","changeOverCOV":"Change over (COV)","batchNumberChangeBNC":"Batch number change (BNC)","Jan":"Jan","Feb":"Feb","Mar":"Mar","Apr":"Apr","May":"May","Jun":"Jun","Jul":"Jul","Aug":"Aug","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Dec","qualityLossesByMachine":"Quality Losses By Machine","qualityLossesByFormat":"Quality Losses By Format","filling":"Filling","capping":"Capping","qualityLossesDashboard":"Quality Losses Dashboard","total":"Total","qualityControl":"Quality Control","machinesShutdowns":"Machines Shutdowns","externalShutdowns":"External Shutdowns","machineShutdown":"Machine shutdown","totalDowntime":"Total downtime","frequency":"Frequency","averageDuration":"Average duration","externalShutdown":"External shutdown","timeInMinutes":"Time in minutes","reduceRateAtFiller":"Reduce rate at filler","reduceRateAtFillerDueToAnotherMachineCapacity":"Reduce rate at filler due to another machine capacity","fillerOwnStop":"Filler own stop","fillerStopByOtherMachine":"Filler stop by other machine","productionOrder":"Production order (PO)","reduceRate":"Reduce rate (cpm)","wastedTime":"Wasted time (min)","comments/reason":"Comments/Reason","select":"Select","standardDeviation":"Standard deviation","overProcess":"Over process","rejectedItems":"Rejected items","boxWeigher":"Box weigher","weightBox":"Box weigher","labeler":"Labeler"}');
 
 /***/ }),
 
@@ -79715,7 +79271,7 @@ module.exports = JSON.parse('{"choiceLoginOperator":"Operator connection","choic
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceLossRegistered":"Aucune perte de performance enregistrée","speedLossJustification":"Justification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","numberOfItems":"Nombre de produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"à","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de production","duration":"Durée","number":"Quantité","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","qualityLossesByMachine":"Perte de qualité par machine","qualityLossesByFormat":"Perte de qualité par format","filling":"Remplissage","capping":"Bouchonnage","qualityLossesDashboard":"Rapport de perte de qualité","total":"Total","qualityControl":"Contrôle Qualité","machinesShutdowns":"Arrêts machines","externalShutdowns":"Arrêts externes ","machineShutdown":"Arrêt machine","totalDowntime":"Durée totale de l\'arrêt","frequency":"Fréquence","averageDuration":"Durée moyenne","externalShutdown":"Arrêt externe","timeInMinutes":"Durée en minutes","reduceRateAtFiller":"Débit de remplissage réduit","reduceRateAtFillerDueToAnotherMachineCapacity":"Débit de remplissage réduit dû à la capacité d\'une autre machine","fillerOwnStop":"Arrêt remplisseur","fillerStopByOtherMachine":"Arrêt remplisseur dû à une autre machine","productionOrder":"Ordre de production (PO)","reduceRate":"Débit réduit (cpm)","wastedTime":"Temps perdu (min)","comments/reason":"Commentaires / Raison","select":"Sélectionner","standardDeviation":"Écart-type"}');
+module.exports = JSON.parse('{"choiceLoginOperator":"Connexion opérateur","choiceLoginSupervisor":"Connexion superviseur","choiceLoginAdministrator":"Connexion administrateur","user":"Nom d\'utilisateur","password":"Mot de passe","connection":"Se connecter","site":"Site","crewLeader":"Chef d\'équipe","typeTeam":"Type d\'équipe","startTime":"Heure de début","endTime":"Heure de fin","line":"Ligne","type":"Type","entryTime":"Heure de saisie","duration(Minutes)":"Durée (minutes)","expectedDuration(Minutes)":"Durée prévue (minutes)","totalDuration(Minutes)":"Durée effective (minutes)","comments":"Commentaires","endPO":"Fin de PO","endTeam":"Fin d\'équipe","back":"Retour","plannedDowntime":"Arrêt de production planifié","unplannedDowntime":"Arrêt de production non planifié","downtimesHistory":"Historique des arrêts","cancel":"Annuler","validate":"Valider","addAReason":"Ajouter une raison","reason":"Raison","previousBulk":"Bulk précédent","yes":"Oui","POStartTime":"Heure de début de PO","POEndTime":"Heure de fin de PO","finalQuantityProduced(Cases)":"Quantité finale produite (nombre de caisses)","performance":"Performance","totalPOProductionTime":"Temps de production total du PO","totalPOOperatingTime":"Temps operationnel total du PO","difference":"Difference","totalPOPerformance":"Performance totale du PO","noPerformanceLossRegistered":"Aucune perte de performance enregistrée","speedLossJustification":"Justification de perte de performance","speedLoss":"Perte de performance","fillerOwnStoppage":"Arrêt de la remplisseuse","reducedRateAtAnOtherMachine":"Vitesse réduite d\'une autre machine","reducedRateAtFiller":"Vitesse réduite de la remplisseuse","fillerOwnStoppageByAnOtherMachine":"Arrêt de la remplisseuse à cause d\'une autre machine","quality":"Qualité","filler":"Remplisseuse","caper":"Visseuse","labeller":"Etiqueteuse","bowWeigher":"Poids des caisses","counter":"Compteur","rejection":"Rejet","summary":"Récapitulatif","speedlosses":"Pertes de vitesse","speedLosses":"Pertes de vitesse","indicators":"Indicateurs","availability":"Disponibilité","productionLine":"Ligne de production","load":"Charger","plantOperatingTime":"Temps Opérationnel de l\'Usine","plantOperatingTimeOverview":"Aperçu du Temps Opérationnel de l\'Usine","plannedProductionTime":"Temps de Production Planifié","loadFactor":"Facteur de Charge","volumePacked":"Volume emballé","numberOfProductionOrder":"Nombre d\'Ordre de Production","numberOfItemsProduced":"Nombre d\'objets produits","numberOfItems":"Nombre de produits","bottles":"Bouteilles","prioritizeList":"Liste priorisée","noProductionPlanned":"Pas de Production Planifié","plannedMaintenanceActivites":"Activités de Maintenance Planifiées","capitalProjectImplementation":"Implémentation Capitale de Projet","breaksMeetingShiftChange":"Pauses, réunions, changements d\'équipe","numberOfEvents":"Nombre d\'évènements","cleaningInPlace":"Nettoyage","changeOver":"Change-Over","batchNumberChange":"Batch Number Change","unplannedExternalEvents":"Unplanned External Events","unplannedShutdownOfMachine":"Arrêt de Machine Non Planifié","fillerUnplannedShutdown":"Arrêt de la Remplisseuse Non Planifié","productionShift":"Fenêtre de production","from":"De","to":"à","formVolumeSplit":"Répartition des volumes","packSizeSplit":"Répartition des tailles d\'emballage","formulationSplit":"Répartition des formulations","operatingTime":"Temps Opérationnel","netOperatingTime":"Temps Opérationnel Net","valuableOperatingTime":"Temps Opérationnel Valué","qualityLosses":"Pertes de Qualité","flowDiagram":"Diagramme de Flux","packagingLineID":"ID de Ligne d\'Emballage","machineList":"Liste des machines","provider":"Fournisseur","model":"Modèle","formatList":"Liste des Formats","format":"Format","form":"Forme","mat1":"Mat1","mat2":"Mat2","mat3":"Mat3","designRate":"Débit de Conception","open":"Ouvrir","downtimesReport":"Rapport d\'arrêts","monthlyLoadFactor":"Facteur de Charge Mensuel","productionDashboard":"Rapport de Production","peakSeason":"Pic de Saison","allYear":"Toute l\'année","trendVersusPreviousYear":"Tendance actuelle par rapport à l\'année précédente","break":"Pause","lunch":"Repas","emergency":"Urgence","meeting":"Réunion","maintenance":"Maintenance","projectImplementation":"Implementation de projet","formatChanging":"Changement de format","packNumberChanging":"Changement de numéro de lot","CIP":"CIP","errorInput":"Champs incomplets","other":"Autre","bowlStopper":"Bol Bouchon","missingBottle":"Manque Bouteille","downstreamSaturation":"Saturation Aval","dosingTurret":"Tourelle de Dosage","screwingTurret":"Tourelle de Vissage","year":"Année","square":"Carré","round":"Rond","formatSplit":"Répartition des formats","nothingProduced":"Pas de production","unplannedDowntimeDashboard":"Tableau de bord des arrêts non planifiés","productionWindow":"Fenêtre de production","duration":"Durée","number":"Quantité","yearlyCIP":"CIP Annuel","yearlyCOV":"COV Annuel","yearlyBNC":"BNC Annuel","average":"Moyenne","hours":"Heures","of":"de","cleaningInPlaceCIP":"CIP","changeOverCOV":"Changements de format (COV)","batchNumberChangeBNC":"Changements de lot (BNC)","Jan":"Janv","Feb":"Févr","Mar":"Mars","Apr":"Avr","May":"Mai","Jun":"Juin","Jul":"Juill","Aug":"Août","Sep":"Sep","Oct":"Oct","Nov":"Nov","Dec":"Déc","qualityLossesByMachine":"Perte de qualité par machine","qualityLossesByFormat":"Perte de qualité par format","filling":"Remplissage","capping":"Bouchonnage","qualityLossesDashboard":"Rapport de perte de qualité","total":"Total","qualityControl":"Contrôle Qualité","machinesShutdowns":"Arrêts machines","externalShutdowns":"Arrêts externes ","machineShutdown":"Arrêt machine","totalDowntime":"Durée totale de l\'arrêt","frequency":"Fréquence","averageDuration":"Durée moyenne","externalShutdown":"Arrêt externe","timeInMinutes":"Durée en minutes","reduceRateAtFiller":"Débit de remplissage réduit","reduceRateAtFillerDueToAnotherMachineCapacity":"Débit de remplissage réduit dû à la capacité d\'une autre machine","fillerOwnStop":"Arrêt remplisseur","fillerStopByOtherMachine":"Arrêt remplisseur dû à une autre machine","productionOrder":"Ordre de production (PO)","reduceRate":"Débit réduit (cpm)","wastedTime":"Temps perdu (min)","comments/reason":"Commentaires / Raison","select":"Sélectionner","standardDeviation":"Écart-type","overProcess":"Sur le processus","rejectedItems":"Produits rejetés","boxWeigher":"Peseur de caisse","weightBox":"Peseur de caisse","labeler":"Etiquetteur"}');
 
 /***/ }),
 
