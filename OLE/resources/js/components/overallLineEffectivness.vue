@@ -3,73 +3,72 @@
         <!--
         {{allEvents['SITE']}}
 -->
-        <div class="d-flex">
-            <div class="col">
 
-                <div class="d-flex">
+        <div class="row dataInput">
+            <div class="col-sm">
+                <div class="data">
+                    <div class="">
 
-                    <form>
-                        <label class="" for="site">Site : </label>
-                        <select name="site" id="site" class="form-select" v-model="site">
-                            <template v-for="site in sites[0]">
-                                <option v-bind:value="site.name">
-                                    {{site.name}}
-                                </option>
-                            </template>
-                        </select>
-                    </form>
-
-
-                </div>
-
-
-                <div class="d-flex">
-                    <form>
-                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                            <template v-for="productionline in sites[1]">
-                                <template v-if="productionline.name === site">
-                                    <option v-bind:value="productionline.productionline_name">
-                                        {{productionline.productionline_name}}
+                        <form>
+                            <label class="" for="site">{{$t("site")}} : </label>
+                            <select name="site" id="site" class="form-select" v-model="site">
+                                <template v-for="site in sites[0]">
+                                    <option v-bind:value="site.name">
+                                        {{site.name}}
                                     </option>
                                 </template>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <form>
+                            <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                            <select name="productionline" id="productionline" class="form-select"
+                                    v-model="productionline">
+                                <template v-for="productionline in sites[1]">
+                                    <template v-if="productionline.name === site">
+                                        <option v-bind:value="productionline.productionline_name">
+                                            {{productionline.productionline_name}}
+                                        </option>
+                                    </template>
 
+                                </template>
+
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-sm">
+                <div class=data>
+                    <div>
+                        <h1>
+                            {{$t("productionShift")}}
+                        </h1>
+                    </div>
+                    <br/>
+
+                    <div>
+                        <label class="" for="startYear">{{$t("year")}}</label>
+
+                        <select id="startYear" v-model="year">
+                            <template v-for="year of years">
+                                <option v-bind:key="year" v-bind:value="year">{{year}}</option>
                             </template>
-
                         </select>
-                    </form>
-                </div>
-
-                <br/>
-
-                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
-
-                <br/>
-                <br/>
-                <br/>
-            </div>
-
-            <div class="col">
-                <h1>
-                    {{$t("productionShift")}}
-                </h1>
-                <br/>
-
-                <div class="d-flex">
-                    <label class="" for="startYear">{{$t("year")}}</label>
-
-                    <select id="startYear" v-model="year">
-                        <template v-for="year of years">
-                            <option v-bind:key="year" v-bind:value="year">{{year}}</option>
-                        </template>
-                    </select>
 
 
+                    </div>
                 </div>
             </div>
-
-
         </div>
+
+
         <div align="center">
             <template v-if="show===1">
 
@@ -164,8 +163,6 @@
                                 </td>
 
 
-
-
                             </tr>
                             <tr>
                                 <th scope="row">{{$t("quality")}}</th>
@@ -177,7 +174,6 @@
                                 <td v-else>
                                     {{((quality - quality2)*100).toFixed(2)}} %
                                 </td>
-
 
 
                             </tr>
@@ -239,7 +235,7 @@
                 unplannedDowntimesPerMonth: [],
                 plannedProductionTimePerMonth: [],
                 operatingTimePerMonth: [],
-                speedLossesPerMonth : [],
+                speedLossesPerMonth: [],
 
                 OLEPerMonth2: [],
                 AvailabilityPerMonth2: [],
@@ -250,7 +246,7 @@
                 unplannedDowntimesPerMonth2: [],
                 plannedProductionTimePerMonth2: [],
                 operatingTimePerMonth2: [],
-                speedLossesPerMonth2 : [],
+                speedLossesPerMonth2: [],
 
                 peakSeason: 0,
 
@@ -274,7 +270,7 @@
                 quality2: 0,
                 OLE2: 0,
 
-                lo : this.$t("load"),
+                lo: this.$t("load"),
             }
         },
 
@@ -319,7 +315,7 @@
 
             },
 
-            loadProductionTimePreviousYear : function(){
+            loadProductionTimePreviousYear: function () {
                 var sommePlannedEvents = 0;
                 var sommeUnplannedEvents = 0;
 
@@ -411,7 +407,7 @@
 
             },
 
-            loadProductionTimeThisYear : function(){
+            loadProductionTimeThisYear: function () {
 
 
                 var sommePlannedEvents = 0;
@@ -430,22 +426,22 @@
 
                 this.speedLosses = 0;
 
-                if(this.allEvents['RRF'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['RRF'][0].Duration*1;
+                if (this.allEvents['RRF'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['RRF'][0].Duration * 1;
                 }
 
-                if(this.allEvents['RRM'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['RRM'][0].Duration*1;
+                if (this.allEvents['RRM'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['RRM'][0].Duration * 1;
                 }
 
-                if(this.allEvents['FOS'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['FOS'][0].Duration*1;
+                if (this.allEvents['FOS'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['FOS'][0].Duration * 1;
 
 
                 }
 
-                if(this.allEvents['FSM'][0].nbEvents > 0){
-                    this.speedLosses += this.allEvents['FSM'][0].Duration*1;
+                if (this.allEvents['FSM'][0].nbEvents > 0) {
+                    this.speedLosses += this.allEvents['FSM'][0].Duration * 1;
 
                 }
 
@@ -479,8 +475,6 @@
                         }
                     }
                 }
-
-
 
 
                 this.plannedDowntimes = sommePlannedEvents;
@@ -594,7 +588,6 @@
                     this.speedLossesPerMonth[i] = 0;
 
 
-
                 }
 
                 var month = 0;
@@ -622,12 +615,10 @@
                     weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
 
 
-
-
                     var max = -1;
-                    for(let l=0; l<sommeWorkingTimePerMonth.length; l++){
+                    for (let l = 0; l < sommeWorkingTimePerMonth.length; l++) {
 
-                        if(sommeWorkingTimePerMonth[l] > max){
+                        if (sommeWorkingTimePerMonth[l] > max) {
                             max = sommeWorkingTimePerMonth[l];
                             this.peakSeason = l;
                         }
@@ -653,28 +644,25 @@
                 }
 
 
-
-                for(let k=0; k< this.allEvents['RRFMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['RRFMonth'].length; k++) {
                     currentMonth = this.allEvents['RRFMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth[currentMonth] += this.allEvents['RRFMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['RRMMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['RRMMonth'].length; k++) {
                     currentMonth = this.allEvents['RRMMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth[currentMonth] += this.allEvents['RRMMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['FOSMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['FOSMonth'].length; k++) {
                     currentMonth = this.allEvents['FOSMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth[currentMonth] += this.allEvents['FOSMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['FSMMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['FSMMonth'].length; k++) {
                     currentMonth = this.allEvents['FSMMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth[currentMonth] += this.allEvents['FSMMonth'][k].duration;
                 }
-
-
 
 
                 for (let m = 0; m < this.plannedProductionTimePerMonth.length; m++) {
@@ -690,8 +678,6 @@
                 }
 
 
-
-
                 for (let j = 0; j < this.AvailabilityPerMonth.length; j++) {
                     if (this.operatingTimePerMonth[j] === 0 || this.plannedProductionTimePerMonth[j] === 0) {
                         this.AvailabilityPerMonth[j] = 0;
@@ -702,7 +688,7 @@
                 }
 
                 for (let j = 0; j < this.PerformancePerMonth.length; j++) {
-                    if (this.netOperatingTimePerMonth[j] === 0 || this.operatingTimePerMonth[j]===0) {
+                    if (this.netOperatingTimePerMonth[j] === 0 || this.operatingTimePerMonth[j] === 0) {
                         this.PerformancePerMonth[j] = 0;
                     } else {
                         this.PerformancePerMonth[j] = this.netOperatingTimePerMonth[j] / this.operatingTimePerMonth[j];
@@ -742,7 +728,7 @@
                 console.log(this.netOperatingTimePerMonth);
 
                 console.log("PLANNED DOWNTIME  PER MONTH");
-                console.log(this.plannedDowntimesPerMonth );
+                console.log(this.plannedDowntimesPerMonth);
                 console.log("UNPLANNED DOWNTIME PER MONTH");
                 console.log(this.unplannedDowntimesPerMonth);
                 console.log("PLannedProduction PER MONTH");
@@ -756,18 +742,18 @@
 
 
                 /**
- * QTY : 1800 ok
+                 * QTY : 1800 ok
                  * SPEEDLOSS : 10 ok
- * PERF : 0.928
+                 * PERF : 0.928
                  * QUALITY : 1
                  * A
- * WORKING : 230 ok
- * NET OPERATING : 75 - 130 ko
- * PLANNED DOWNTIME : 90 ok
- * UNPANNED : 0 - 0 ok
- * PLANNED PRODUCTION : 140 ok
- * OPERATING TIME : 140 - 140 ok
- * **/
+                 * WORKING : 230 ok
+                 * NET OPERATING : 75 - 130 ko
+                 * PLANNED DOWNTIME : 90 ok
+                 * UNPANNED : 0 - 0 ok
+                 * PLANNED PRODUCTION : 140 ok
+                 * OPERATING TIME : 140 - 140 ok
+                 * **/
             },
 
             loadProductionTime2: function () {
@@ -805,8 +791,6 @@
                     this.speedLossesPerMonth2[i] = 0;
 
 
-
-
                 }
 
                 var month = 0;
@@ -834,12 +818,10 @@
                     weightBoxCounterPerMonth[month] += PO.weightBoxCounter * 1;
 
 
-
-
                     var max = -1;
-                    for(let l=0; l<sommeWorkingTimePerMonth.length; l++){
+                    for (let l = 0; l < sommeWorkingTimePerMonth.length; l++) {
 
-                        if(sommeWorkingTimePerMonth[l] > max){
+                        if (sommeWorkingTimePerMonth[l] > max) {
                             max = sommeWorkingTimePerMonth[l];
                             this.peakSeason = l;
                         }
@@ -865,28 +847,25 @@
                 }
 
 
-
-                for(let k=0; k< this.allEvents['RRFMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['RRFMonth'].length; k++) {
                     currentMonth = this.allEvents['RRFMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth2[currentMonth] += this.allEvents['RRFMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['RRMMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['RRMMonth'].length; k++) {
                     currentMonth = this.allEvents['RRMMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth2[currentMonth] += this.allEvents['RRMMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['FOSMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['FOSMonth'].length; k++) {
                     currentMonth = this.allEvents['FOSMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth2[currentMonth] += this.allEvents['FOSMonth'][k].duration;
                 }
 
-                for(let k=0; k< this.allEvents['FSMMonth'].length; k++){
+                for (let k = 0; k < this.allEvents['FSMMonth'].length; k++) {
                     currentMonth = this.allEvents['FSMMonth'][k].created_at.split('-')[1] - 1;
                     this.speedLossesPerMonth2[currentMonth] += this.allEvents['FSMMonth'][k].duration;
                 }
-
-
 
 
                 for (let m = 0; m < this.plannedProductionTimePerMonth2.length; m++) {
@@ -902,8 +881,6 @@
                 }
 
 
-
-
                 for (let j = 0; j < this.AvailabilityPerMonth2.length; j++) {
                     if (this.operatingTimePerMonth2[j] === 0 || this.plannedProductionTimePerMonth2[j] === 0) {
                         this.AvailabilityPerMonth2[j] = 0;
@@ -914,7 +891,7 @@
                 }
 
                 for (let j = 0; j < this.PerformancePerMonth2.length; j++) {
-                    if (this.netOperatingTimePerMonth2[j] === 0 || this.operatingTimePerMonth2[j]===0) {
+                    if (this.netOperatingTimePerMonth2[j] === 0 || this.operatingTimePerMonth2[j] === 0) {
                         this.PerformancePerMonth2[j] = 0;
                     } else {
                         this.PerformancePerMonth2[j] = this.netOperatingTimePerMonth2[j] / this.operatingTimePerMonth2[j];
@@ -969,18 +946,18 @@
                             xValueFormatString: "MMMM YYYY",
                             yValueFormatString: "#,##0",
                             dataPoints: [
-                                {x: new Date(this.year, 0), y: this.OLEPerMonth[0]*100},
-                                {x: new Date(this.year, 1), y: this.OLEPerMonth[1]*100},
-                                {x: new Date(this.year, 2), y: this.OLEPerMonth[2]*100},
-                                {x: new Date(this.year, 3), y: this.OLEPerMonth[3]*100},
-                                {x: new Date(this.year, 4), y: this.OLEPerMonth[4]*100},
-                                {x: new Date(this.year, 5), y: this.OLEPerMonth[5]*100},
-                                {x: new Date(this.year, 6), y: this.OLEPerMonth[6]*100},
-                                {x: new Date(this.year, 7), y: this.OLEPerMonth[7]*100},
-                                {x: new Date(this.year, 8), y: this.OLEPerMonth[8]*100},
-                                {x: new Date(this.year, 9), y: this.OLEPerMonth[9]*100},
-                                {x: new Date(this.year, 10), y: this.OLEPerMonth[10]*100},
-                                {x: new Date(this.year, 11), y: this.OLEPerMonth[11]*100}
+                                {x: new Date(this.year, 0), y: this.OLEPerMonth[0] * 100},
+                                {x: new Date(this.year, 1), y: this.OLEPerMonth[1] * 100},
+                                {x: new Date(this.year, 2), y: this.OLEPerMonth[2] * 100},
+                                {x: new Date(this.year, 3), y: this.OLEPerMonth[3] * 100},
+                                {x: new Date(this.year, 4), y: this.OLEPerMonth[4] * 100},
+                                {x: new Date(this.year, 5), y: this.OLEPerMonth[5] * 100},
+                                {x: new Date(this.year, 6), y: this.OLEPerMonth[6] * 100},
+                                {x: new Date(this.year, 7), y: this.OLEPerMonth[7] * 100},
+                                {x: new Date(this.year, 8), y: this.OLEPerMonth[8] * 100},
+                                {x: new Date(this.year, 9), y: this.OLEPerMonth[9] * 100},
+                                {x: new Date(this.year, 10), y: this.OLEPerMonth[10] * 100},
+                                {x: new Date(this.year, 11), y: this.OLEPerMonth[11] * 100}
                             ]
                         },
                         {
@@ -989,18 +966,18 @@
                             showInLegend: true,
                             yValueFormatString: "#,##0",
                             dataPoints: [
-                                {x: new Date(this.year, 0), y: this.PerformancePerMonth[0]*100},
-                                {x: new Date(this.year, 1), y: this.PerformancePerMonth[1]*100},
-                                {x: new Date(this.year, 2), y: this.PerformancePerMonth[2]*100},
-                                {x: new Date(this.year, 3), y: this.PerformancePerMonth[3]*100},
-                                {x: new Date(this.year, 4), y: this.PerformancePerMonth[4]*100},
-                                {x: new Date(this.year, 5), y: this.PerformancePerMonth[5]*100},
-                                {x: new Date(this.year, 6), y: this.PerformancePerMonth[6]*100},
-                                {x: new Date(this.year, 7), y: this.PerformancePerMonth[7]*100},
-                                {x: new Date(this.year, 8), y: this.PerformancePerMonth[8]*100},
-                                {x: new Date(this.year, 9), y: this.PerformancePerMonth[9]*100},
-                                {x: new Date(this.year, 10), y: this.PerformancePerMonth[10]*100},
-                                {x: new Date(this.year, 11), y: this.PerformancePerMonth[11]*100}
+                                {x: new Date(this.year, 0), y: this.PerformancePerMonth[0] * 100},
+                                {x: new Date(this.year, 1), y: this.PerformancePerMonth[1] * 100},
+                                {x: new Date(this.year, 2), y: this.PerformancePerMonth[2] * 100},
+                                {x: new Date(this.year, 3), y: this.PerformancePerMonth[3] * 100},
+                                {x: new Date(this.year, 4), y: this.PerformancePerMonth[4] * 100},
+                                {x: new Date(this.year, 5), y: this.PerformancePerMonth[5] * 100},
+                                {x: new Date(this.year, 6), y: this.PerformancePerMonth[6] * 100},
+                                {x: new Date(this.year, 7), y: this.PerformancePerMonth[7] * 100},
+                                {x: new Date(this.year, 8), y: this.PerformancePerMonth[8] * 100},
+                                {x: new Date(this.year, 9), y: this.PerformancePerMonth[9] * 100},
+                                {x: new Date(this.year, 10), y: this.PerformancePerMonth[10] * 100},
+                                {x: new Date(this.year, 11), y: this.PerformancePerMonth[11] * 100}
                             ]
                         },
                         {
@@ -1009,18 +986,18 @@
                             showInLegend: true,
                             yValueFormatString: "#,##0",
                             dataPoints: [
-                                {x: new Date(this.year, 0), y: this.AvailabilityPerMonth[0]*100},
-                                {x: new Date(this.year, 1), y: this.AvailabilityPerMonth[1]*100},
-                                {x: new Date(this.year, 2), y: this.AvailabilityPerMonth[2]*100},
-                                {x: new Date(this.year, 3), y: this.AvailabilityPerMonth[3]*100},
-                                {x: new Date(this.year, 4), y: this.AvailabilityPerMonth[4]*100},
-                                {x: new Date(this.year, 5), y: this.AvailabilityPerMonth[5]*100},
-                                {x: new Date(this.year, 6), y: this.AvailabilityPerMonth[6]*100},
-                                {x: new Date(this.year, 7), y: this.AvailabilityPerMonth[7]*100},
-                                {x: new Date(this.year, 8), y: this.AvailabilityPerMonth[8]*100},
-                                {x: new Date(this.year, 9), y: this.AvailabilityPerMonth[9]*100},
-                                {x: new Date(this.year, 10), y: this.AvailabilityPerMonth[10]*100},
-                                {x: new Date(this.year, 11), y: this.AvailabilityPerMonth[11]*100}
+                                {x: new Date(this.year, 0), y: this.AvailabilityPerMonth[0] * 100},
+                                {x: new Date(this.year, 1), y: this.AvailabilityPerMonth[1] * 100},
+                                {x: new Date(this.year, 2), y: this.AvailabilityPerMonth[2] * 100},
+                                {x: new Date(this.year, 3), y: this.AvailabilityPerMonth[3] * 100},
+                                {x: new Date(this.year, 4), y: this.AvailabilityPerMonth[4] * 100},
+                                {x: new Date(this.year, 5), y: this.AvailabilityPerMonth[5] * 100},
+                                {x: new Date(this.year, 6), y: this.AvailabilityPerMonth[6] * 100},
+                                {x: new Date(this.year, 7), y: this.AvailabilityPerMonth[7] * 100},
+                                {x: new Date(this.year, 8), y: this.AvailabilityPerMonth[8] * 100},
+                                {x: new Date(this.year, 9), y: this.AvailabilityPerMonth[9] * 100},
+                                {x: new Date(this.year, 10), y: this.AvailabilityPerMonth[10] * 100},
+                                {x: new Date(this.year, 11), y: this.AvailabilityPerMonth[11] * 100}
                             ]
                         },
                         {
@@ -1029,18 +1006,18 @@
                             showInLegend: true,
                             yValueFormatString: "#,##0",
                             dataPoints: [
-                                {x: new Date(this.year, 0), y: this.QualityPerMonth[0]*100},
-                                {x: new Date(this.year, 1), y: this.QualityPerMonth[1]*100},
-                                {x: new Date(this.year, 2), y: this.QualityPerMonth[2]*100},
-                                {x: new Date(this.year, 3), y: this.QualityPerMonth[3]*100},
-                                {x: new Date(this.year, 4), y: this.QualityPerMonth[4]*100},
-                                {x: new Date(this.year, 5), y: this.QualityPerMonth[5]*100},
-                                {x: new Date(this.year, 6), y: this.QualityPerMonth[6]*100},
-                                {x: new Date(this.year, 7), y: this.QualityPerMonth[7]*100},
-                                {x: new Date(this.year, 8), y: this.QualityPerMonth[8]*100},
-                                {x: new Date(this.year, 9), y: this.QualityPerMonth[9]*100},
-                                {x: new Date(this.year, 10), y: this.QualityPerMonth[10]*100},
-                                {x: new Date(this.year, 11), y: this.QualityPerMonth[11]*100}
+                                {x: new Date(this.year, 0), y: this.QualityPerMonth[0] * 100},
+                                {x: new Date(this.year, 1), y: this.QualityPerMonth[1] * 100},
+                                {x: new Date(this.year, 2), y: this.QualityPerMonth[2] * 100},
+                                {x: new Date(this.year, 3), y: this.QualityPerMonth[3] * 100},
+                                {x: new Date(this.year, 4), y: this.QualityPerMonth[4] * 100},
+                                {x: new Date(this.year, 5), y: this.QualityPerMonth[5] * 100},
+                                {x: new Date(this.year, 6), y: this.QualityPerMonth[6] * 100},
+                                {x: new Date(this.year, 7), y: this.QualityPerMonth[7] * 100},
+                                {x: new Date(this.year, 8), y: this.QualityPerMonth[8] * 100},
+                                {x: new Date(this.year, 9), y: this.QualityPerMonth[9] * 100},
+                                {x: new Date(this.year, 10), y: this.QualityPerMonth[10] * 100},
+                                {x: new Date(this.year, 11), y: this.QualityPerMonth[11] * 100}
                             ]
                         }]
                 });
@@ -1053,7 +1030,7 @@
 
 
         mounted() {
-            if(sessionStorage.getItem("language") !== null){
+            if (sessionStorage.getItem("language") !== null) {
                 this.$i18n.locale = sessionStorage.getItem("language");
             }
             this.$store.dispatch('fetchSites');
@@ -1142,5 +1119,25 @@
         background: #fff;
         height: 400px;
     }
+
+    div.data {
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 10px 5px;
+    }
+
+    div.dataInput {
+        border-bottom: solid 1px;
+
+    }
+
+
+    div {
+        padding: 15px;
+        background-color: #fff;
+
+    }
+
 
 </style>

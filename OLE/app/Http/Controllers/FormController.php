@@ -85,7 +85,7 @@ class FormController extends Controller
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '>=', $beginningDate)
             ->whereDate('ole_unplanned_event_unplanned_downtimes.created_at', '<=', $endingDate)
             ->get();
-        
+
         $seqCips = DB::table('ole_unplanned_event_cips')
             ->where('ole_unplanned_event_cips.productionline', '=', $productionLine)
             ->whereDate('ole_unplanned_event_cips.created_at', '>=', $beginningDate)
@@ -131,7 +131,7 @@ class FormController extends Controller
         $endDate = Carbon::createFromFormat('Y-m-d', $endingYear . '-' . $endingMonth . '-' . $endingDay)->startOfDay();
 
         $site = DB::table('ole_productionline')
-            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('worksite', 'worksite.name', '=', 'ole_productionline.worksite_name')
             ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
             ->join('ole_products', 'ole_pos.GMIDCode', '=', 'ole_products.GMID')
             ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
@@ -141,22 +141,6 @@ class FormController extends Controller
                     ->whereBetween(DB::raw('DATE(ole_pos.created_at)'), [$startDate, $endDate]);
             })
             ->get();
-
-
-        /**
-         * $formulations = DB::table('ole_productionline')
-         * ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
-         * ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
-         * ->join('ole_products', 'ole_pos.GMID-Code', '=', 'ole_products.GMID')
-         * ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
-         * ->where(function($query) use ($startDate, $endingDate, $site, $productionLine) {
-         * $query->where('worksite.name', '=', $site)
-         * ->where('ole_productionline.productionline_name', '=', $productionLine)
-         * -> whereBetween(DB::raw('DATE(ole_pos.created_at)'), [$startDate, $endingDate]);
-         * })
-         * //->select(DB::raw('distinct (ole_products.formulationType)'))
-         * ->get();
-         * **/
 
 
         if (count($site) > 0) {
@@ -182,7 +166,7 @@ class FormController extends Controller
     public function getQualityLossesPeriod($site, $productionLine, $beginningDate, $endingDate)
     {
         $site = DB::table('ole_productionline')
-            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('worksite', 'worksite.name', '=', 'ole_productionline.worksite_name')
             ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
             ->join('ole_products', 'ole_pos.GMIDCode', '=', 'ole_products.GMID')
             ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
@@ -205,22 +189,7 @@ class FormController extends Controller
 
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear . '-' . $beginningMonth . '-' . $beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear . '-' . $endingMonth . '-' . $endingDay)->startOfDay();
-/**
-            $rejectionCounter = DB::table('ole_productionline')
-                ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
-                ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
-                ->join('ole_products', 'ole_pos.GMIDCode', '=', 'ole_products.GMID')
-                ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
-                ->where('worksite.name', '=', $site)
-                ->where('ole_productionline.productionline_name', '=', $productionLine)
-                ->whereDate('ole_pos.created_at', '>=', $beginningDate)
-                ->whereDate('ole_pos.created_at', '<=', $endingDate)
-                ->select(DB::raw('SUM(ole_rejection_counters.fillerCounter) as sumFillerCounter'), DB::raw('SUM(ole_rejection_counters.caperCounter) as sumCaperCounter'), DB::raw('SUM(ole_rejection_counters.labelerCounter) as sumLabelerCounter'),
-                      DB::raw('SUM(ole_rejection_counters.weightBoxCounter) as sumWeightBoxCounter'), DB::raw('SUM(ole_rejection_counters.fillerRejection) as sumFillerRejection'), DB::raw('SUM(ole_rejection_counters.caperRejection) as sumCaperRejection'),
-                    DB::raw('SUM(ole_rejection_counters.labelerRejection) as sumLabelerRejection'), DB::raw('SUM(ole_rejection_counters.weightBoxRejection) as sumWeightBoxRejection'), DB::raw('SUM(ole_rejection_counters.qualityControlCounter) as sumQualityControlCounter'),
-                    DB::raw('SUM(ole_rejection_counters.qualityControlRejection) as sumQualityControlRejection'))
-                ->get();
-**/
+
 
             $rejectionCounter = DB::table('ole_rejection_counters')
                 ->join('ole_pos', 'ole_pos.number', '=', 'ole_rejection_counters.po')
@@ -305,7 +274,7 @@ class FormController extends Controller
     public function getAllEventsPeriod($site, $productionLine, $beginningDate, $endingDate)
     {
         $site = DB::table('ole_productionline')
-            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('worksite', 'worksite.name', '=', 'ole_productionline.worksite_name')
             ->join('ole_pos', 'ole_pos.productionline_name', '=', 'ole_productionline.productionline_name')
             ->join('ole_products', 'ole_pos.GMIDCode', '=', 'ole_products.GMID')
             ->join('ole_rejection_counters', 'ole_rejection_counters.po', '=', 'ole_pos.number')
@@ -331,6 +300,7 @@ class FormController extends Controller
 
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear . '-' . $beginningMonth . '-' . $beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear . '-' . $endingMonth . '-' . $endingDay)->startOfDay();
+
 
 
             $speedLossesEvents = DB::table('ole_speed_losses')
@@ -719,28 +689,27 @@ class FormController extends Controller
     public function getMachines($productionlineID)
     {
         $machines = DB::table('ole_machines')
-            ->where('ole_machines.productionlineID', '=', $productionlineID)
+            ->join('ole_productionline', 'ole_productionline.productionline_name', '=', 'ole_machines.productionline_name')
+            ->where('ole_productionline.id', '=', $productionlineID)
             ->orderBy('ole_machines.ordre', 'ASC')
             ->get();
 
         $formats = DB::table('ole_formats')
-            ->where('ole_formats.productionlineID', '=', $productionlineID)
+            ->join('ole_productionline', 'ole_productionline.productionline_name', '=', 'ole_formats.productionlineName')
+            ->where('ole_productionline.id', '=', $productionlineID)
             ->get();
 
         //$products = DB::table('ole_products')
         //  ->where('ole_products.productionlineID', '=', $productionlineID)
         //->get();
 
-        $formulations = DB::table('ole_formulations')
-            ->where('ole_formulations.productionlineID', '=', $productionlineID)
-            ->get();
+
 
         $tab = array(
 
             0 => $machines,
             1 => $formats,
             //2 => $products,
-            3 => $formulations,
         );
 
 
@@ -819,8 +788,8 @@ class FormController extends Controller
             ->get();
 
         $productionLines = DB::table('ole_productionline')
-            ->join('worksite', 'worksite.id', '=', 'ole_productionline.worksiteID')
-            ->select('ole_productionline.id', 'ole_productionline.productionline_name', 'ole_productionline.worksiteID', 'worksite.name')
+            ->join('worksite', 'worksite.name', '=', 'ole_productionline.worksite_name')
+            ->select('ole_productionline.id', 'ole_productionline.productionline_name', 'worksite.id', 'worksite.name')
             ->get();
 
         $tab = array(
@@ -837,14 +806,14 @@ class FormController extends Controller
     {
 
         $userInfo = DB::table('user')
-            ->join('worksite', 'user.assignement', '=', 'worksite.id')
-            ->join('ole_productionline', 'worksite.id', '=', 'ole_productionline.worksiteID')
+            ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
+            ->join('ole_productionline', 'worksite.name', '=', 'ole_productionline.worksite_name')
             ->where('user.login', '=', $username)
             ->get();
 
 
         $crewLeaders = DB::table('user')
-            ->join('worksite', 'user.assignement', '=', 'worksite.id')
+            ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
             //->where('worksite.id', '=', $userInfo.worksite)
             ->where('user.status', '=', 1)
             ->select('user.lastname', 'user.firstname', 'worksite.id')
@@ -852,15 +821,15 @@ class FormController extends Controller
 
 
         $shifts = DB::table('teamInfo')
-            ->join('worksite', 'worksite.id', '=', 'teamInfo.worksite')
+            ->join('worksite', 'worksite.name', '=', 'teamInfo.worksite_name')
             ->get();
 
 
         $productionLine = DB::table('user')
-            ->join('worksite', 'user.assignement', '=', 'worksite.id')
-            ->join('ole_productionline', 'ole_productionline.worksiteID', '=', 'worksite.id')
+            ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
+            ->join('ole_productionline', 'ole_productionline.worksite_name', '=', 'worksite.name')
             ->where('user.login', '=', $username)
-            ->select('ole_productionline.productionline_name', 'ole_productionline.worksiteID')
+            ->select('ole_productionline.productionline_name', 'worksite.id')
             ->get();
 
 
@@ -932,7 +901,7 @@ class FormController extends Controller
     public function get_unplannedDowntime_Machine_Issue($machineName)
     {
         $issues = DB::table('machine_component')
-            ->join('ole_machines', 'ole_machines.id', '=', 'machine_component.machineID')
+            ->join('ole_machines', 'ole_machines.name', '=', 'machine_component.machineName')
             ->where('ole_machines.name', '=', $machineName)
             ->select('machine_component.name as component', 'ole_machines.name', 'other_machine')
             ->get();

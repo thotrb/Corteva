@@ -1,59 +1,68 @@
 <template>
 
     <div>
-<!--
-        {{ this.qualityLosses['formats']}}
+        <!--
+                {{ this.qualityLosses['formats']}}
 
-        {{allEvents['SITE']}}-->
-        <div class="row">
+                {{allEvents['SITE']}}-->
+        <div class="row dataInput">
             <div class="col-sm">
-                <div class="">
+                <div class="data">
+                    <div class="">
 
-                    <form>
-                        <label class="" for="site">{{$t("site")}} : </label>
-                        <select name="site" id="site" class="form-select" v-model="site">
-                            <template v-for="site in sites[0]">
-                                <option v-bind:value="site.name">
-                                    {{site.name}}
-                                </option>
-                            </template>
-                        </select>
-                    </form>
-
-                    <form>
-                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                            <template v-for="productionline in sites[1]">
-                                <template v-if="productionline.name === site">
-                                    <option v-bind:value="productionline.productionline_name">
-                                        {{productionline.productionline_name}}
+                        <form>
+                            <label class="" for="site">{{$t("site")}} : </label>
+                            <select name="site" id="site" class="form-select" v-model="site">
+                                <template v-for="site in sites[0]">
+                                    <option v-bind:value="site.name">
+                                        {{site.name}}
                                     </option>
                                 </template>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <form>
+                            <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                            <select name="productionline" id="productionline" class="form-select"
+                                    v-model="productionline">
+                                <template v-for="productionline in sites[1]">
+                                    <template v-if="productionline.name === site">
+                                        <option v-bind:value="productionline.productionline_name">
+                                            {{productionline.productionline_name}}
+                                        </option>
+                                    </template>
 
-                            </template>
+                                </template>
 
-                        </select>
-                    </form>
-                    <br/>
-                    <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
-
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                    </div>
 
                 </div>
             </div>
 
             <div class="col-sm">
-                <h1>
-                    {{$t("qualityLossesDashboard")}}
-                </h1>
+                <div class=data>
+                    <div>
 
-                <label class="" for="startingPO">{{$t("from")}}</label>
-                <input type="date" id="startingPO" class=" " required v-model="beginningDate">
+                        <h1>
+                            {{$t("qualityLossesDashboard")}}
+                        </h1>
+                    </div>
+                    <div>
+                        <label class="" for="startingPO">{{$t("from")}}</label>
+                        <input type="date" id="startingPO" class=" " required v-model="beginningDate">
 
 
-                <label class="" for="endingPO">{{$t("to")}}</label>
-                <input type="date" id="endingPO" class=""
-                       required v-model="endingDate">
-
+                        <label class="" for="endingPO">{{$t("to")}}</label>
+                        <input type="date" id="endingPO" class=""
+                               required v-model="endingDate">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -205,19 +214,19 @@
                             <td>{{qualityLosses['rejectionCounter'][0].sumWeightBoxRejection}}</td>
                         </tr>
 
-                        <tr class="boxWeigher mainLine">
+                        <tr class="qualityControl mainLine">
                             <th scope="row">{{$t("qualityControl")}}</th>
                             <td>{{qualityLosses['rejectionCounter'][0].sumQualityControlCounter*1 +
                                 qualityLosses['rejectionCounter'][0].sumQualityControlRejection*1}}
                             </td>
                         </tr>
 
-                        <tr class="boxWeigher">
+                        <tr class="qualityControl">
                             <th scope="row">{{$t("overProcess")}}</th>
                             <td>{{qualityLosses['rejectionCounter'][0].sumQualityControlCounter}}</td>
                         </tr>
 
-                        <tr class="boxWeigher">
+                        <tr class="qualityControl">
                             <th scope="row">{{$t("rejectedItems")}}</th>
                             <td>{{qualityLosses['rejectionCounter'][0].sumQualityControlRejection}}</td>
                         </tr>
@@ -292,8 +301,6 @@
                         </tr>
 
 
-
-
                         <tr class="labeler mainLine">
                             <th scope="row">{{$t("labeler")}}</th>
                             <td v-for="format in tableauFormats">
@@ -339,23 +346,23 @@
                             </td>
                         </tr>
 
-                        <tr class="filler mainLine">
-                            <th scope="row">{{$t("controlQuality")}}</th>
+                        <tr class="qualityControl mainLine">
+                            <th scope="row">{{$t("qualityControl")}}</th>
                             <td v-for="format in tableauFormats">
-                                {{qtyPerMachine["controlQualityCounter"][format]  +
+                                {{qtyPerMachine["controlQualityCounter"][format] +
                                 qtyPerMachine["controlQualityRejection"][format]}}
                             </td>
 
                         </tr>
 
-                        <tr class="filler">
+                        <tr class="qualityControl">
                             <th scope="row">{{$t("overProcess")}}</th>
                             <td v-for="format in tableauFormats">
                                 {{qtyPerMachine['controlQualityCounter'][format]}}
                             </td>
                         </tr>
 
-                        <tr class="filler">
+                        <tr class="qualityControl">
                             <th scope="row">{{$t("rejectedItems")}}</th>
                             <td v-for="format in tableauFormats">
                                 {{qtyPerMachine["controlQualityRejection"][format]}}
@@ -403,7 +410,7 @@
                 qtyPerMachine: [],
                 totalPerFormat: [],
                 qualityLossesPerMachineArray: [],
-                quality : 0
+                quality: 0
             };
 
             return data;
@@ -427,7 +434,6 @@
 
 
             load: async function () {
-
 
 
                 var index = 0;
@@ -507,7 +513,7 @@
                 }
             },
 
-            loadQualityLosses : function (){
+            loadQualityLosses: function () {
 
 
                 var sommeQtyProduced = 0;
@@ -520,11 +526,7 @@
                 var qualityControlCounter = 0;
 
 
-
-
-
                 for (let i = 0; i < this.allEvents['SITE'].length; i++) {
-
 
 
                     let PO = this.allEvents['SITE'][i];
@@ -537,10 +539,6 @@
                     qualityControlCounter += PO.qualityControlCounter * 1;
 
                 }
-
-
-
-
 
 
                 var summCompteur = 0;
@@ -702,7 +700,7 @@
                     let theta = (startAngle + endAngle) / 2;
                     let deltaY = Math.sin(theta) * 1.5 * radius;
                     let deltaX = Math.cos(theta) * 1.5 * radius;
-                    var txt = item.name + '\n';
+                    var txt = this.$t(item.name) + '\n';
                     var pct = item.nbr / totalPieChart1 * 100;
                     txt = txt + ' ' + pct.toFixed(2) + '%';
 
@@ -841,6 +839,12 @@
     }
 </script>
 <style scoped>
+
+    div {
+        padding: 15px;
+        background-color: #fff;
+
+    }
 
     div.main-container {
         flex-direction: column;
@@ -985,6 +989,10 @@
         background: palevioletred;
     }
 
+    .qualityControl {
+        background: lightpink;
+    }
+
     .totalQty {
         background: papayawhip;
     }
@@ -997,6 +1005,18 @@
 
     h3 {
         align: center;
+    }
+
+    div.data {
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 10px 5px;
+    }
+
+    div.dataInput{
+        border-bottom: solid 1px;
+
     }
 
 

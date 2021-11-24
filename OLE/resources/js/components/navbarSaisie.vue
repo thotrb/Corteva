@@ -6,13 +6,14 @@
 
             <div class="d-flex">
 
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('fr')">
-                    FR
-                </button>
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('en')">
-                    EN
-                </button>
-
+                <select name="languages" id="languages" v-model="language" v-on:change="swapLanguage(language)">
+                    <option value="fr">
+                        Fr
+                    </option>
+                    <option value="en" >
+                        En
+                    </option>
+                </select>
             </div>
 
         </nav>
@@ -27,7 +28,10 @@
         name: "navbarSaisie",
 
         data() {
-            return {}
+            return {
+                url: sessionStorage.getItem("url"),
+                language: "en",
+            }
         },
 
         methods: {

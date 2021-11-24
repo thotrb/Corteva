@@ -181,5 +181,11 @@
     "wastedTime": "Wasted time (min)",
     "comments/reason": "Comments/Reason",
     "select": "Select",
-    "standardDeviation": "Standard deviation"
+    "standardDeviation": "Standard deviation",
+    "overProcess" : "Over process",
+    "rejectedItems" : "Rejected items",
+    "boxWeigher" : "Box weigher",
+    "weightBox" : "Box weigher",
+    "labeler" : "Labeler"
+
 }

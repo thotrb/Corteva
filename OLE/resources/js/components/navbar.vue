@@ -3,17 +3,19 @@
 
         <nav class="navbar">
             <a class="navbar-brand" v-bind:href="url + 'packagingLineID' ">
-                <img src="images/icon.png" alt="" width="200" height="130">
+                <img src="images/icon.png" alt="" width="150" height="100">
             </a>
 
             <div class="d-flex">
 
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('fr')">
-                    FR
-                </button>
-                <button class="btn btn-outline-success" type="button" v-on:click="swapLanguage('en')">
-                    EN
-                </button>
+                <select name="languages" id="languages" v-model="language" v-on:change="swapLanguage(language)">
+                    <option value="fr">
+                        Fr
+                    </option>
+                    <option value="en" >
+                        En
+                    </option>
+                </select>
 
                 <select name="page" id="page" class="" v-model="selection">
                     <option value="packagingLineID">
@@ -72,6 +74,7 @@
             return {
                 selection: 'packagingLineID',
                 url: sessionStorage.getItem("url"),
+                language: "en",
 
             }
         },
@@ -90,15 +93,26 @@
                 }else{
                     sessionStorage.setItem("language",language);
                 }
+            },
+
+            mounted: function()
+            {
+                if(sessionStorage.getItem("language") === null){
+                    this.language = "en";
+                }else{
+                    this.language = sessionStorage.getItem("language");
+                }
             }
         },
+
     }
 </script>
 
 <style scoped>
 
     .nv {
-        background: white;
+        background: lightblue;
         width: 100%;
+
     }
 </style>

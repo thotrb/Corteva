@@ -19,7 +19,6 @@
 
         <!--
         html, body {
-            padding: 45px;
             background-color: lightgray;
             color: #636b6f;
             font-family: 'Nunito', sans-serif;

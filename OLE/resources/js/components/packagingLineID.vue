@@ -1,70 +1,79 @@
 <template>
     <div>
-        <div class="d-flex">
-            <br/>
-            <div class="col">
 
-                <div class="d-flex">
+        <div class="row dataInput">
+            <div class="col-sm">
+                <div class="data">
+                    <div class="">
 
-                    <form>
-                        <label class="" for="site">{{$t("site")}} : </label>
-                        <select name="site" id="site" class="form-select" v-model="site">
-                            <template v-for="site in sites[0]">
-                                <option v-bind:value="site.name">
-                                    {{site.name}}
-                                </option>
-                            </template>
-                        </select>
-                    </form>
-
-                </div>
-
-                <br/>
-
-                <div class="d-flex">
-                    <form>
-                        <label class="" for="productionline">{{$t("productionLine")}} : </label>
-                        <select name="productionline" id="productionline" class="form-select" v-model="productionline">
-                            <template v-for="productionline in sites[1]">
-                                <template v-if="productionline.name === site">
-                                    <option v-bind:value="productionline.productionline_name">
-                                        {{productionline.productionline_name}}
+                        <form>
+                            <label class="" for="site">{{$t("site")}} : </label>
+                            <select name="site" id="site" class="form-select" v-model="site">
+                                <template v-for="site in sites[0]">
+                                    <option v-bind:value="site.name">
+                                        {{site.name}}
                                     </option>
                                 </template>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <form>
+                            <label class="" for="productionline">{{$t("productionLine")}} : </label>
+                            <select name="productionline" id="productionline" class="form-select"
+                                    v-model="productionline">
+                                <template v-for="productionline in sites[1]">
+                                    <template v-if="productionline.name === site">
+                                        <option v-bind:value="productionline.productionline_name">
+                                            {{productionline.productionline_name}}
+                                        </option>
+                                    </template>
 
-                            </template>
+                                </template>
 
-                        </select>
-                    </form>
+                            </select>
+                        </form>
+                    </div>
+                    <div>
+                        <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
+                    </div>
 
                 </div>
-
-                <br/>
-
-                <input v-on:click="load()" type="button" class="btn btn-outline-info" v-bind:value="lo">
-
-                <br/>
-                <br/>
-
-                <template v-if="show === 1">
-                    <h2 style="padding-bottom: -30px;">{{$t("flowDiagram")}}</h2>
-                </template>
             </div>
 
-
-
+            <div class="col-sm">
+                <div class=data>
+                    <div>
+                        <h1>
+                            {{$t("packagingLineID")}}
+                        </h1>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex" style="margin-top: -30px;">
+        <div class="row">
+            <div class="col-sm">
+                <template v-if="show === 1">
+                    <div align="center">
+                        <h2 align="center">
+                            {{$t("flowDiagram")}}
+                        </h2>
+                    </div>
+                </template>
 
-            <div id="flowDiagram">
+                <div id="flowDiagram">
+                </div>
+
             </div>
 
-            <div align="center">
+            <div class="col-sm">
                 <template v-if="show === 1">
-                    <h2>
-                        {{$t("machineList")}}
-                    </h2>
+                    <div>
+                        <h2>
+                            {{$t("machineList")}}
+                        </h2>
+                    </div>
 
                     <div class="table-info-data">
                         <table class="table">
@@ -94,10 +103,11 @@
 
 
                     <br/>
-
-                    <h2>
-                        {{$t("formatList")}}
-                    </h2>
+                    <div>
+                        <h2>
+                            {{$t("formatList")}}
+                        </h2>
+                    </div>
 
 
                     <div class="table-info-data">
@@ -134,7 +144,10 @@
 
                 </template>
             </div>
+
+
         </div>
+
 
     </div>
 
@@ -207,16 +220,16 @@
                 div.setAttribute("align", "center");
 
 
-                if(previousMachine.rejection === 1){
+                if (previousMachine.rejection === 1) {
                     var rejection = document.createElement("div");
                     var R = document.createElement("h5");
                     R.innerHTML = "R";
                     R.setAttribute("style", "padding-top:15px;");
-                    R.setAttribute("id", "rejection_"+previousMachine.name);
+                    R.setAttribute("id", "rejection_" + previousMachine.name);
 
 
                     rejection.append(R);
-                    rejection.setAttribute("id", "rejection_"+previousMachine.name);
+                    rejection.setAttribute("id", "rejection_" + previousMachine.name);
                     rejection.setAttribute("style", "color:red;");
                     rejection.setAttribute("align", "center");
                     rejection.setAttribute("class", "col-sm");
@@ -226,7 +239,7 @@
 
                     var redArrow = document.createElement("connection");
                     redArrow.setAttribute("from", "#" + previousMachine.name);
-                    redArrow.setAttribute("to", "#rejection_"+previousMachine.name);
+                    redArrow.setAttribute("to", "#rejection_" + previousMachine.name);
                     redArrow.setAttribute("color", "red");
                     redArrow.setAttribute("tail", "true");
                     redArrow.setAttribute("style", "padding-top:15px;");
@@ -250,7 +263,6 @@
                     row.setAttribute("style", "margin: 30px;height: 50px; height: 50px;");
 
 
-
                     var div = document.createElement("div");
                     var h5 = document.createElement("h5");
                     h5.innerHTML = machine.denomination_ordre;
@@ -271,19 +283,17 @@
                     arrow.setAttribute("style", "padding-top:15px;");
 
 
-
                     row.appendChild(div);
 
 
-
-                    if(machine.rejection === 1){
+                    if (machine.rejection === 1) {
                         var rejection = document.createElement("div");
                         var R = document.createElement("h5");
                         R.innerHTML = "R";
                         R.setAttribute("style", "padding-top:15px;");
 
                         rejection.append(R);
-                        rejection.setAttribute("id", "rejection_"+machine.name);
+                        rejection.setAttribute("id", "rejection_" + machine.name);
                         rejection.setAttribute("style", "color:red;");
                         rejection.setAttribute("align", "center");
                         rejection.setAttribute("class", "col-sm");
@@ -293,7 +303,7 @@
 
                         var redArrow = document.createElement("connection");
                         redArrow.setAttribute("from", "#" + machine.name);
-                        redArrow.setAttribute("to", "#rejection_"+machine.name);
+                        redArrow.setAttribute("to", "#rejection_" + machine.name);
                         redArrow.setAttribute("color", "red");
                         redArrow.setAttribute("tail", "true");
                         redArrow.setAttribute("style", "padding-top:15px;");
@@ -385,7 +395,26 @@
     }
 
     .arrow {
-        padding-top : 15px;
+        padding-top: 15px;
+    }
+
+    div.data {
+        flex-direction: column;
+        border: solid 1px;
+        border-radius: 5px;
+        padding: 10px 5px;
+    }
+
+    div.dataInput {
+        border-bottom: solid 1px;
+
+    }
+
+
+    div {
+        padding: 15px;
+        background-color: #fff;
+
     }
 
 </style>
