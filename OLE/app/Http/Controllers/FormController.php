@@ -563,73 +563,6 @@ class FormController extends Controller
 
         }
         return response()->json($tab);
-
-
-
-
-
-        /**
-         *
-         *  var sommeQtyProduced2 = 0;
-        this.packsizes = [];
-
-        var qtyPerPacksize = [];
-
-        for (let i = 0; i < this.volumes.length; i++) {
-        sommeQtyProduced2 += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * 1;
-        if (!this.packsizes.includes(this.volumes[i].size)) {
-         *
-        this.packsizes.push(this.volumes[i].size);
-         *
-        qtyPerPacksize[this.volumes[i].size] = this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase  * 1;
-        } else {
-        qtyPerPacksize[this.volumes[i].size] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase  * 1;
-        }
-        }
-
-        var finalValue2 = [];
-        for (let j = 0; j < this.formulations.length; j++) {
-        tableauFormulation = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var tableauPacksizeValue = [];
-        for (let k = 0; k < tableauFormulation.length; k++) {
-        tableauPacksizeValue[tableauFormulation[k]] = 0;
-        }
-
-
-        for (let i = 0; i < this.volumes.length; i++) {
-        if (this.volumes[i].size === this.packsizes[j]) {
-        month = this.volumes[i].created_at.split('-')[1];
-
-        correspondingMonth = tableauFormulation[month - 1];
-        tableauPacksizeValue[correspondingMonth] += this.volumes[i].qtyProduced * this.volumes[i].bottlesPerCase * 1;
-        }
-        }
-
-        finalValue2.push(tableauPacksizeValue);
-        }
-
-        l = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        tab = [];
-        for (let k = 0; k < l.length; k++) {
-        tab[l[k]] = 0;
-        }
-        for(let t=0; t<finalValue2.length; t++)
-        {
-        for (let k = 0; k < l.length; k++) {
-        let month = l[k];
-        tab[month] += finalValue2[t][month];
-        this.total2 += finalValue2[t][month];
-        }
-
-        }
-        this.sumPerMonth2.push(tab);
-        this.packsizePerMonth = finalValue2;
-
-
-
-         */
-
-
     }
 
 
@@ -644,16 +577,11 @@ class FormController extends Controller
             ->where('ole_formats.productionlineID', '=', $productionlineID)
             ->get();
 
-        //$products = DB::table('ole_products')
-          //  ->where('ole_products.productionlineID', '=', $productionlineID)
-            //->get();
-
         $formulations = DB::table('ole_formulations')
             ->where('ole_formulations.productionlineID', '=', $productionlineID)
             ->get();
 
         $tab = array(
-
             0 => $machines,
             1 => $formats,
             //2 => $products,
@@ -1063,8 +991,6 @@ class FormController extends Controller
             [$performance, $availability, $quality, $OLE, $quantityProduced, $totalDuration, $PO]
         );
         return response()->json($update);
-
-
     }
 
 }

@@ -42,7 +42,7 @@ if ($num > 0) {
         $issuer_claim = $serverName;
         $audience_claim = 'OLEClient';
         $issuedat_claim = time(); // issued at
-        $notbefore_claim = $issuedat_claim + 10; //not before in seconds
+        $notbefore_claim = $issuedat_claim; //not before in seconds
         $expire_claim = $issuedat_claim + 12*3600; // 12 hours
         $token = array(
             "iss" => $issuer_claim,
@@ -52,14 +52,14 @@ if ($num > 0) {
             "exp" => $expire_claim,
             "data" => array(
                 "id" => $id,
-                "firstname" => $firstname,
+                "firstname" =>  $firstname,
                 "lastname" => $lastname,
                 "login" => $login
         ));
 
         http_response_code(200);
 
-        $jwt = JWT::encode($token, $secret_key);
+        $jwt = JWT::encode($token, $secret_key, 'HS512');
         echo json_encode(
             array(
                 "message" => "Successful login.",
