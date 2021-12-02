@@ -18,7 +18,6 @@
     <!-- Styles -->
     <style>
         html, body {
-            padding: 45px;
             background-color: #fff;
             color: #636b6f;
             font-family: 'Nunito', sans-serif;
@@ -75,13 +74,11 @@
 
 <div id="app">
 
-    <div class="container">
 
         <navbar-saisie></navbar-saisie>
         <br/>
         <top-second-page></top-second-page>
         <bottom-second-page></bottom-second-page>
-    </div>
 
 
 </div>

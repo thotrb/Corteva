@@ -1,175 +1,109 @@
 <template>
     <div>
+        <template v-if="user[0] !== undefined">
 
-        <form>
-            <div class="form-group row">
-                <label class="col-sm-2 col-form-label rcorners1" for="site">{{$t("site")}}</label>
-                <div class="col-sm-10">
-                    <input type="text" id="site" readonly class="form-control-plaintext rcorners2"
-                           v-bind:value="user[0][0].name">
+            <form>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label rcorners1" for="site">{{$t("site")}}</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="site" readonly class="form-control-plaintext rcorners2"
+                               v-bind:value="user[0][0].name">
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group row">
-                <label for="crewLeader" class="col-sm-2 rcorners1">{{$t("crewLeader")}}</label>
-                <select name="crewLeader" id="crewLeader" class="rcorners2">
-                    <template v-for="leader in user[1]">
-
-
-                        <!--
-                        <template v-if="leader.firstname+' '+leader.lastname === crewL">
-
-                            <option v-if="leader.id === user[0][0].worksiteID"
-                                    v-bind:value="leader.firstname+' '+leader.lastname" selected>
+                <div class="form-group row">
+                    <label for="crewLeader" class="col-sm-2 rcorners1">{{$t("crewLeader")}}</label>
+                    <select name="crewLeader" id="crewLeader" class="rcorners2">
+                        <template v-for="leader in user[1]">
+                            <option v-if="leader.worksite_name === user[0][0].worksite_name"
+                                    v-bind:value="leader.firstname+' '+leader.lastname">
                                 {{leader.firstname}} {{leader.lastname}}
                             </option>
+                        </template>
 
+                    </select>
+                </div>
+
+                <div class="form-group row">
+
+                    <label for="typeTeam" class="col-sm-2 rcorners1">{{$t("typeTeam")}}</label>
+                    <select name="Leader" id="typeTeam" class="rcorners2" v-model="selected">
+                        <template v-for="shift in user[2]">
+                            <option v-if="shift.worksite === user[0][0].worksiteID" v-bind:value="shift.type">
+                                {{shift.type}}
+                            </option>
+                        </template>
+
+                    </select>
+                </div>
+
+
+                <div class="form-group row">
+                    <label for="workingDebut" class="col-sm-2 rcorners1">{{$t("startTime")}}</label>
+                    <div class="col-sm-10">
+                        <template v-for="shift in user[2]">
+                            <input v-if="shift.type===selected" type="text" id="workingDebut" readonly
+                                   class="form-control-plaintext rcorners2"
+                                   v-bind:value="shift.workingDebut">
                         </template>
 
 
-                        <template v-else>-->
-                        <option v-if="leader.id === user[0][0].worksiteID"
-                                v-bind:value="leader.firstname+' '+leader.lastname">
-                            {{leader.firstname}} {{leader.lastname}}
-                        </option>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="workingEnd" class="col-sm-2 rcorners1">{{$t("endTime")}}</label>
+                    <div class="col-sm-10">
+                        <template v-for="shift in user[2]">
+                            <input v-if="shift.type===selected" type="text" id="workingEnd" readonly
+                                   class="form-control-plaintext rcorners2"
+                                   v-bind:value="shift.workingEnd">
+                        </template>
+
+
+                    </div>
+                </div>
+
+                <template v-for="productionLine in user[3]">
+
+                    <template v-if="productionLine.worksiteID === user[0][0].worksiteID">
+
+                        <div class="row production">
+                            <div class="col">
+                                <p align="center" class="form-control-plaintext rcorners1">
+                                    {{$t("line")}} {{productionLine.productionline_name}}
+                                </p>
+                            </div>
+
+                            <div class="col">
+                                <input type="text" class="form-control-plaintext rcorners2 D-Code" name="D-Code/GMID"
+                                       placeholder="D-Code/GMID">
+                            </div>
+
+                            <div class="col">
+                                <input type="text" class="form-control-plaintext rcorners2 PO" name="PO"
+                                       placeholder="PO">
+                            </div>
+                        </div>
+
+                        <br/>
+
                         <!--</template>-->
 
                     </template>
-
-                </select>
-            </div>
-
-            <div class="form-group row">
-
-                <label for="typeTeam" class="col-sm-2 rcorners1">{{$t("typeTeam")}}</label>
-                <select name="Leader" id="typeTeam" class="rcorners2" v-model="selected">
-                    <template v-for="shift in user[2]">
-                        <option v-if="shift.worksite === user[0][0].worksiteID" v-bind:value="shift.type">
-                            {{shift.type}}
-                        </option>
-                    </template>
-
-                </select>
-            </div>
-
-
-            <div class="form-group row">
-                <label for="workingDebut" class="col-sm-2 rcorners1">{{$t("startTime")}}</label>
-                <div class="col-sm-10">
-                    <template v-for="shift in user[2]">
-                        <input v-if="shift.type===selected" type="text" id="workingDebut" readonly
-                               class="form-control-plaintext rcorners2"
-                               v-bind:value="shift.workingDebut">
-                    </template>
-
-
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="workingEnd" class="col-sm-2 rcorners1">{{$t("endTime")}}</label>
-                <div class="col-sm-10">
-                    <template v-for="shift in user[2]">
-                        <input v-if="shift.type===selected" type="text" id="workingEnd" readonly
-                               class="form-control-plaintext rcorners2"
-                               v-bind:value="shift.workingEnd">
-                    </template>
-
-
-                </div>
-            </div>
-            <!--
-                    <template v-if="pos.length === 2">
-
-                        <div class="row production">
-                            <div class="col">
-                                <p align="center" class="form-control-plaintext rcorners1">
-                                    Production {{productionlines[0]}}
-                                </p>
-                            </div>
-
-                            <div class="col">
-                                <input type="text" class="form-control-plaintext rcorners2 D-Code" name="D-Code/GMID"
-                                       placeholder="D-Code/GMID">
-                            </div>
-
-                            <div class="col">
-                                <input type="text" class="form-control-plaintext rcorners2 PO" name="PO" placeholder="PO"
-                                       v-bind:value="pos[0]">
-                            </div>
-                        </div>
-
-                        <br/>
-
-                        <div class="row production">
-                            <div class="col">
-                                <p align="center" class="form-control-plaintext rcorners1">
-                                    Production {{productionlines[1]}}
-                                </p>
-                            </div>
-
-                            <div class="col">
-                                <input type="text" class="form-control-plaintext rcorners2 D-Code" name="D-Code/GMID"
-                                       placeholder="D-Code/GMID">
-                            </div>
-
-                            <div class="col">
-                                <input type="text" class="form-control-plaintext rcorners2 PO" name="PO" placeholder="PO"
-                                       v-bind:value="pos[1]">
-                            </div>
-                        </div>
-
-                        <br/>
-
-                    </template>
-                    <template v-else>
-                    -->
-            <template v-for="productionLine in user[3]">
-
-                <template v-if="productionLine.worksiteID === user[0][0].worksiteID">
-
-                    <div class="row production">
-                        <div class="col">
-                            <p align="center" class="form-control-plaintext rcorners1">
-                                {{$t("line")}}  {{productionLine.productionline_name}}
-                            </p>
-                        </div>
-                        <!--
-                                                <div class="col">
-                                                    <p align="center" class="form-control-plaintext rcorners1">
-                                                        Oui/Non
-                                                    </p>
-                                                </div>
-                        -->
-                        <div class="col">
-                            <input type="text" class="form-control-plaintext rcorners2 D-Code" name="D-Code/GMID"
-                                   placeholder="D-Code/GMID">
-                        </div>
-
-                        <div class="col">
-                            <input type="text" class="form-control-plaintext rcorners2 PO" name="PO"
-                                   placeholder="PO">
-                        </div>
-                    </div>
-
-                    <br/>
-
-                    <!--</template>-->
-
                 </template>
-            </template>
 
 
-            <div align="right">
+                <div align="right">
 
-                <button class="btn btn-primary border-success align-items-center btn-success" type="button"
-                        v-on:click="nextPage()">
-                    OK
-                </button>
+                    <button class="btn btn-primary border-success align-items-center btn-success" type="button"
+                            v-on:click="nextPage()">
+                        OK
+                    </button>
 
-            </div>
-        </form>
-
+                </div>
+            </form>
+        </template>
 
     </div>
 
@@ -206,9 +140,10 @@
             };
         },
 
-        mounted() {
+        async mounted() {
             this.parameters.push(this.username);
-            this.$store.dispatch('fetchUsers', this.parameters);
+            await this.$store.dispatch('fetchUsers', this.parameters);
+            await this.resolveAfter15Second();
 
 
         },
@@ -217,6 +152,14 @@
 
         methods: {
 
+            resolveAfter15Second: function () {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve('resolved');
+                    }, 1500);
+                });
+
+            },
 
             resolveAfter05Second: function () {
                 return new Promise(resolve => {
@@ -260,29 +203,43 @@
                 var POToAdd = [];
 
 
+                var productionlinesTab = [];
+
+                for (let i = 0; i < this.user[3].length; i++) {
+                    if (this.user[3][i].worksiteID === this.user[0][0].worksiteID) {
+                        productionlinesTab.push(this.user[3][i].productionline_name);
+                    }
+                }
+
 
                 for (let i = 0; i < POs.length; i++) {
                     poTab.push(POs[i].value);
-                    let po = {
-                        number: POs[i].value,
-                        GMIDCode: dcodesTab[i],
-                    };
 
-                    POElement.push(po);
+                    var number = POs[i].value;
 
-                    var PO = POs[i].value;
-                    await this.$store.dispatch('checkPO', po);
-                    await this.resolveAfter05Second();
+                    if(number !== "" && dcodesTab[i] !==  ""){
 
-                    if (this.checkPO === 0) {
-                        let element = {
-                            number: po,
-                            GMIDCode: this.GMID[i],
-                            productionline_name: this.productionlines[i],
 
-                        };
+                        await this.$store.dispatch('checkPO', number);
+                        await this.resolveAfter05Second();
 
-                        POToAdd.push(element);
+
+
+                        console.log(this.checkPO);
+
+                        if (this.checkPO === 0) {
+                            let element = {
+                                number: number,
+                                GMIDCode: dcodesTab[i],
+                                productionline_name: productionlinesTab[i],
+                            };
+
+                            console.log(element);
+
+                            POToAdd.push(element);
+                        }
+
+
                     }
                 }
                 this.$store.dispatch('create_PO', POToAdd);
@@ -307,13 +264,7 @@
                 }
 
 
-                var productionlinesTab = [];
 
-                for (let i = 0; i < this.user[3].length; i++) {
-                    if (this.user[3][i].worksiteID === this.user[0][0].worksiteID) {
-                        productionlinesTab.push(this.user[3][i].productionline_name);
-                    }
-                }
 
 
                 if (sessionStorage.getItem("prodlines") === null) {
@@ -362,6 +313,8 @@
                     sessionStorage.setItem("site", document.getElementById('site').value);
                 }
 
+                await this.resolveAfter05Second();
+
                 window.location.href = this.url + 'summary';
 
             }
@@ -370,6 +323,7 @@
         computed: {
             ...mapGetters([
                 'user',
+                'checkPO'
             ])
         }
     }

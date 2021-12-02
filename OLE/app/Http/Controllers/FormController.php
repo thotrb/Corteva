@@ -193,7 +193,6 @@ class FormController extends Controller
 
             $rejectionCounter = DB::table('ole_rejection_counters')
                 ->join('ole_pos', 'ole_pos.number', '=', 'ole_rejection_counters.po')
-
                 ->select(DB::raw('SUM(ole_rejection_counters.fillerCounter) as sumFillerCounter'), DB::raw('SUM(ole_rejection_counters.caperCounter) as sumCaperCounter'), DB::raw('SUM(ole_rejection_counters.labelerCounter) as sumLabelerCounter'),
                     DB::raw('SUM(ole_rejection_counters.weightBoxCounter) as sumWeightBoxCounter'), DB::raw('SUM(ole_rejection_counters.fillerRejection) as sumFillerRejection'), DB::raw('SUM(ole_rejection_counters.caperRejection) as sumCaperRejection'),
                     DB::raw('SUM(ole_rejection_counters.labelerRejection) as sumLabelerRejection'), DB::raw('SUM(ole_rejection_counters.weightBoxRejection) as sumWeightBoxRejection'), DB::raw('SUM(ole_rejection_counters.qualityControlCounter) as sumQualityControlCounter'),
@@ -282,7 +281,6 @@ class FormController extends Controller
             ->where('ole_productionline.productionline_name', '=', $productionLine)
             ->whereDate('ole_pos.created_at', '>=', $beginningDate)
             ->whereDate('ole_pos.created_at', '<=', $endingDate)
-
             ->get();
 
 
@@ -300,7 +298,6 @@ class FormController extends Controller
 
             $startDate = Carbon::createFromFormat('Y-m-d', $beginningYear . '-' . $beginningMonth . '-' . $beginningDay)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $endingYear . '-' . $endingMonth . '-' . $endingDay)->startOfDay();
-
 
 
             $speedLossesEvents = DB::table('ole_speed_losses')
@@ -704,7 +701,6 @@ class FormController extends Controller
         //->get();
 
 
-
         $tab = array(
 
             0 => $machines,
@@ -824,21 +820,20 @@ class FormController extends Controller
 
         $userInfo = DB::table('user')
             ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
-            ->join('ole_productionline', 'worksite.name', '=', 'ole_productionline.worksite_name')
             ->where('user.login', '=', $username)
             ->get();
 
 
         $crewLeaders = DB::table('user')
             ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
-            //->where('worksite.id', '=', $userInfo.worksite)
             ->where('user.status', '=', 1)
-            ->select('user.lastname', 'user.firstname', 'worksite.id')
             ->get();
 
 
-        $shifts = DB::table('teamInfo')
-            ->join('worksite', 'worksite.name', '=', 'teamInfo.worksite_name')
+        $shifts = DB::table('user')
+            ->join('worksite', 'user.worksite_name', '=', 'worksite.name')
+            ->join('teamInfo', 'worksite.name', '=', 'teamInfo.worksite_name')
+            ->where('user.login', '=', $username)
             ->get();
 
 

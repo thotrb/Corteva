@@ -17,7 +17,6 @@
     <!-- Styles -->
     <style>
         html, body {
-            padding: 45px;
             background-color: #fff;
             color: #1b1e21;
             font-family: 'Nunito', sans-serif;
@@ -68,6 +67,10 @@
             margin-bottom: 30px;
         }
 
+        #formul {
+            padding : 45px;
+        }
+
 
     </style>
 </head>
@@ -78,8 +81,9 @@
 
     <div class="">
         <navbar-saisie></navbar-saisie>
-
+    <div id="formul">
         <team-info></team-info>
+    </div>
     </div>
 
 

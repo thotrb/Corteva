@@ -2,9 +2,9 @@
     <div class="nv">
 
         <nav class="navbar">
-            <a class="navbar-brand" v-bind:href="url + 'packagingLineID' ">
+            <!--<a class="navbar-brand" v-bind:href="url + 'packagingLineID' ">-->
                 <img src="images/icon.png" alt="" width="150" height="100">
-            </a>
+            <!--</a>-->
 
             <div class="d-flex">
 
