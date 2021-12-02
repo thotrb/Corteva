@@ -1,6 +1,5 @@
 <template>
     <div class="d-flex main-container">
-
         <!-- Interval, site and production line selection menu -->
         <div class="d-flex selection-menu">
             <!-- Site and production line selection-->
