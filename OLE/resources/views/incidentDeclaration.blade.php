@@ -18,13 +18,16 @@
     <!-- Styles -->
     <style>
         html, body {
-            padding: 45px;
             background-color: #fff;
             color: #1b1e21;
             font-family: 'Nunito', sans-serif;
             font-weight: 200;
             height: 100vh;
             margin: 0;
+        }
+
+        #pannel {
+            padding: 45px;
         }
 
 
@@ -36,7 +39,13 @@
 
 <div id="app">
 
+    <navbar-saisie></navbar-saisie>
+
+    <div id="pannel">
         <choice_planned_unplanned></choice_planned_unplanned>
+
+    </div>
+
 
 
 </div>

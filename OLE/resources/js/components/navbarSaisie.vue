@@ -2,7 +2,7 @@
     <div class="nv">
 
         <nav class="navbar">
-            <img src="images/icon.png" alt="" width="100" height="50">
+            <img src="img/icon.png" alt="" width="150" height="100">
 
             <div class="d-flex">
 

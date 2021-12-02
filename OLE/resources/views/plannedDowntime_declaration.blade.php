@@ -18,7 +18,6 @@
     <!-- Styles -->
     <style>
         html, body {
-            padding: 45px;
             background-color: #fff;
             color: #636b6f;
             font-family: 'Nunito', sans-serif;
@@ -27,14 +26,23 @@
             margin: 0;
         }
 
+        #pannel {
+            padding: 45px;
+        }
+
     </style>
 </head>
 <body>
 
 <div id="app">
 
-    <planned-downtime_-declaration></planned-downtime_-declaration>
 
+    <navbar-saisie></navbar-saisie>
+
+    <div id="pannel">
+        <planned-downtime_-declaration></planned-downtime_-declaration>
+
+    </div>
 
 </div>
 

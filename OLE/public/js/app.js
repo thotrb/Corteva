@@ -8964,72 +8964,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 var selectElem = document.getElementById('typeTeam');
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -9050,11 +8984,39 @@ var selectElem = document.getElementById('typeTeam');
     };
   },
   mounted: function mounted() {
-    this.parameters.push(this.username);
-    this.$store.dispatch('fetchUsers', this.parameters);
+    var _this = this;
+
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _this.parameters.push(_this.username);
+
+              _context.next = 3;
+              return _this.$store.dispatch('fetchUsers', _this.parameters);
+
+            case 3:
+              _context.next = 5;
+              return _this.resolveAfter15Second();
+
+            case 5:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }))();
   },
   beforeMount: function beforeMount() {},
   methods: {
+    resolveAfter15Second: function resolveAfter15Second() {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve('resolved');
+        }, 1500);
+      });
+    },
     resolveAfter05Second: function resolveAfter05Second() {
       return new Promise(function (resolve) {
         setTimeout(function () {
@@ -9066,12 +9028,12 @@ var selectElem = document.getElementById('typeTeam');
       window.location.href = this.url + 'menu';
     },
     nextPage: function () {
-      var _nextPage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var DCODES, dcodesTab, i, POs, poTab, POElement, POToAdd, _i, po, PO, element, nbProd, productionlinesTab, _i2, selectCrewLeader, valueCrewLeader, typeTeam, valueTypeTeam;
+      var _nextPage = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var DCODES, dcodesTab, i, POs, poTab, POElement, POToAdd, productionlinesTab, _i, _i2, number, element, nbProd, selectCrewLeader, valueCrewLeader, typeTeam, valueTypeTeam;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 //this.addSessionValue("productionA", this.productionA);
                 DCODES = document.getElementsByClassName('D-Code');
@@ -9091,49 +9053,61 @@ var selectElem = document.getElementById('typeTeam');
                 poTab = [];
                 POElement = [];
                 POToAdd = [];
-                _i = 0;
+                productionlinesTab = [];
 
-              case 9:
-                if (!(_i < POs.length)) {
-                  _context.next = 22;
+                for (_i = 0; _i < this.user[3].length; _i++) {
+                  if (this.user[3][_i].worksiteID === this.user[0][0].worksiteID) {
+                    productionlinesTab.push(this.user[3][_i].productionline_name);
+                  }
+                }
+
+                _i2 = 0;
+
+              case 11:
+                if (!(_i2 < POs.length)) {
+                  _context2.next = 24;
                   break;
                 }
 
-                poTab.push(POs[_i].value);
-                po = {
-                  number: POs[_i].value,
-                  GMIDCode: dcodesTab[_i]
-                };
-                POElement.push(po);
-                PO = POs[_i].value;
-                _context.next = 16;
-                return this.$store.dispatch('checkPO', po);
+                poTab.push(POs[_i2].value);
+                number = POs[_i2].value;
 
-              case 16:
-                _context.next = 18;
+                if (!(number !== "" && dcodesTab[_i2] !== "")) {
+                  _context2.next = 21;
+                  break;
+                }
+
+                _context2.next = 17;
+                return this.$store.dispatch('checkPO', number);
+
+              case 17:
+                _context2.next = 19;
                 return this.resolveAfter05Second();
 
-              case 18:
+              case 19:
+                console.log(this.checkPO);
+
                 if (this.checkPO === 0) {
                   element = {
-                    number: po,
-                    GMIDCode: this.GMID[_i],
-                    productionline_name: this.productionlines[_i]
+                    number: number,
+                    GMIDCode: dcodesTab[_i2],
+                    productionline_name: productionlinesTab[_i2]
                   };
+                  console.log(element);
                   POToAdd.push(element);
                 }
 
-              case 19:
-                _i++;
-                _context.next = 9;
+              case 21:
+                _i2++;
+                _context2.next = 11;
                 break;
 
-              case 22:
+              case 24:
                 this.$store.dispatch('create_PO', POToAdd);
-                _context.next = 25;
+                _context2.next = 27;
                 return this.resolveAfter05Second();
 
-              case 25:
+              case 27:
                 if (sessionStorage.getItem("pos") === null) {
                   sessionStorage.pos = poTab;
                 } else {
@@ -9146,14 +9120,6 @@ var selectElem = document.getElementById('typeTeam');
                   sessionStorage.nbProductionlines = nbProd;
                 } else {
                   sessionStorage.setItem("nbProductionlines", nbProd);
-                }
-
-                productionlinesTab = [];
-
-                for (_i2 = 0; _i2 < this.user[3].length; _i2++) {
-                  if (this.user[3][_i2].worksiteID === this.user[0][0].worksiteID) {
-                    productionlinesTab.push(this.user[3][_i2].productionline_name);
-                  }
                 }
 
                 if (sessionStorage.getItem("prodlines") === null) {
@@ -9198,14 +9164,18 @@ var selectElem = document.getElementById('typeTeam');
                   sessionStorage.setItem("site", document.getElementById('site').value);
                 }
 
+                _context2.next = 42;
+                return this.resolveAfter05Second();
+
+              case 42:
                 window.location.href = this.url + 'summary';
 
-              case 41:
+              case 43:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function nextPage() {
@@ -9215,7 +9185,7 @@ var selectElem = document.getElementById('typeTeam');
       return nextPage;
     }()
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['user']))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['user', 'checkPO']))
 });
 
 /***/ }),
@@ -59690,23 +59660,9 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "nv" }, [
     _c("nav", { staticClass: "navbar" }, [
-      _c(
-        "a",
-        {
-          staticClass: "navbar-brand",
-          attrs: { href: _vm.url + "packagingLineID" }
-        },
-        [
-          _c("img", {
-            attrs: {
-              src: "images/icon.png",
-              alt: "",
-              width: "150",
-              height: "100"
-            }
-          })
-        ]
-      ),
+      _c("img", {
+        attrs: { src: "images/icon.png", alt: "", width: "150", height: "100" }
+      }),
       _vm._v(" "),
       _c("div", { staticClass: "d-flex" }, [
         _c(
@@ -59887,7 +59843,7 @@ var render = function() {
   return _c("div", { staticClass: "nv" }, [
     _c("nav", { staticClass: "navbar" }, [
       _c("img", {
-        attrs: { src: "images/icon.png", alt: "", width: "100", height: "50" }
+        attrs: { src: "img/icon.png", alt: "", width: "150", height: "100" }
       }),
       _vm._v(" "),
       _c("div", { staticClass: "d-flex" }, [
@@ -62976,242 +62932,271 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
-    _c(
-      "form",
-      [
-        _c("div", { staticClass: "form-group row" }, [
-          _c(
-            "label",
-            {
-              staticClass: "col-sm-2 col-form-label rcorners1",
-              attrs: { for: "site" }
-            },
-            [_vm._v(_vm._s(_vm.$t("site")))]
-          ),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-sm-10" }, [
-            _c("input", {
-              staticClass: "form-control-plaintext rcorners2",
-              attrs: { type: "text", id: "site", readonly: "" },
-              domProps: { value: _vm.user[0][0].name }
-            })
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-group row" }, [
-          _c(
-            "label",
-            { staticClass: "col-sm-2 rcorners1", attrs: { for: "crewLeader" } },
-            [_vm._v(_vm._s(_vm.$t("crewLeader")))]
-          ),
-          _vm._v(" "),
-          _c(
-            "select",
-            {
-              staticClass: "rcorners2",
-              attrs: { name: "crewLeader", id: "crewLeader" }
-            },
-            [
-              _vm._l(_vm.user[1], function(leader) {
-                return [
-                  leader.id === _vm.user[0][0].worksiteID
-                    ? _c(
-                        "option",
-                        {
-                          domProps: {
-                            value: leader.firstname + " " + leader.lastname
-                          }
-                        },
-                        [
-                          _vm._v(
-                            "\n                        " +
-                              _vm._s(leader.firstname) +
-                              " " +
-                              _vm._s(leader.lastname) +
-                              "\n                    "
-                          )
-                        ]
-                      )
-                    : _vm._e()
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-group row" }, [
-          _c(
-            "label",
-            { staticClass: "col-sm-2 rcorners1", attrs: { for: "typeTeam" } },
-            [_vm._v(_vm._s(_vm.$t("typeTeam")))]
-          ),
-          _vm._v(" "),
-          _c(
-            "select",
-            {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.selected,
-                  expression: "selected"
-                }
-              ],
-              staticClass: "rcorners2",
-              attrs: { name: "Leader", id: "typeTeam" },
-              on: {
-                change: function($event) {
-                  var $$selectedVal = Array.prototype.filter
-                    .call($event.target.options, function(o) {
-                      return o.selected
-                    })
-                    .map(function(o) {
-                      var val = "_value" in o ? o._value : o.value
-                      return val
-                    })
-                  _vm.selected = $event.target.multiple
-                    ? $$selectedVal
-                    : $$selectedVal[0]
-                }
-              }
-            },
-            [
-              _vm._l(_vm.user[2], function(shift) {
-                return [
-                  shift.worksite === _vm.user[0][0].worksiteID
-                    ? _c("option", { domProps: { value: shift.type } }, [
-                        _vm._v(
-                          "\n                        " +
-                            _vm._s(shift.type) +
-                            "\n                    "
-                        )
-                      ])
-                    : _vm._e()
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-group row" }, [
-          _c(
-            "label",
-            {
-              staticClass: "col-sm-2 rcorners1",
-              attrs: { for: "workingDebut" }
-            },
-            [_vm._v(_vm._s(_vm.$t("startTime")))]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "col-sm-10" },
-            [
-              _vm._l(_vm.user[2], function(shift) {
-                return [
-                  shift.type === _vm.selected
-                    ? _c("input", {
-                        staticClass: "form-control-plaintext rcorners2",
-                        attrs: {
-                          type: "text",
-                          id: "workingDebut",
-                          readonly: ""
-                        },
-                        domProps: { value: shift.workingDebut }
-                      })
-                    : _vm._e()
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "form-group row" }, [
-          _c(
-            "label",
-            { staticClass: "col-sm-2 rcorners1", attrs: { for: "workingEnd" } },
-            [_vm._v(_vm._s(_vm.$t("endTime")))]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "col-sm-10" },
-            [
-              _vm._l(_vm.user[2], function(shift) {
-                return [
-                  shift.type === _vm.selected
-                    ? _c("input", {
-                        staticClass: "form-control-plaintext rcorners2",
-                        attrs: { type: "text", id: "workingEnd", readonly: "" },
-                        domProps: { value: shift.workingEnd }
-                      })
-                    : _vm._e()
-                ]
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _vm._l(_vm.user[3], function(productionLine) {
-          return [
-            productionLine.worksiteID === _vm.user[0][0].worksiteID
-              ? [
-                  _c("div", { staticClass: "row production" }, [
-                    _c("div", { staticClass: "col" }, [
-                      _c(
-                        "p",
-                        {
-                          staticClass: "form-control-plaintext rcorners1",
-                          attrs: { align: "center" }
-                        },
-                        [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(_vm.$t("line")) +
-                              "  " +
-                              _vm._s(productionLine.productionline_name) +
-                              "\n                        "
-                          )
-                        ]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _vm._m(0, true),
-                    _vm._v(" "),
-                    _vm._m(1, true)
-                  ]),
+  return _c(
+    "div",
+    [
+      _vm.user[0] !== undefined
+        ? [
+            _c(
+              "form",
+              [
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 col-form-label rcorners1",
+                      attrs: { for: "site" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("site")))]
+                  ),
                   _vm._v(" "),
-                  _c("br")
-                ]
-              : _vm._e()
+                  _c("div", { staticClass: "col-sm-10" }, [
+                    _c("input", {
+                      staticClass: "form-control-plaintext rcorners2",
+                      attrs: { type: "text", id: "site", readonly: "" },
+                      domProps: { value: _vm.user[0][0].name }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 rcorners1",
+                      attrs: { for: "crewLeader" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("crewLeader")))]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "select",
+                    {
+                      staticClass: "rcorners2",
+                      attrs: { name: "crewLeader", id: "crewLeader" }
+                    },
+                    [
+                      _vm._l(_vm.user[1], function(leader) {
+                        return [
+                          leader.worksite_name === _vm.user[0][0].worksite_name
+                            ? _c(
+                                "option",
+                                {
+                                  domProps: {
+                                    value:
+                                      leader.firstname + " " + leader.lastname
+                                  }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                            " +
+                                      _vm._s(leader.firstname) +
+                                      " " +
+                                      _vm._s(leader.lastname) +
+                                      "\n                        "
+                                  )
+                                ]
+                              )
+                            : _vm._e()
+                        ]
+                      })
+                    ],
+                    2
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 rcorners1",
+                      attrs: { for: "typeTeam" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("typeTeam")))]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "select",
+                    {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.selected,
+                          expression: "selected"
+                        }
+                      ],
+                      staticClass: "rcorners2",
+                      attrs: { name: "Leader", id: "typeTeam" },
+                      on: {
+                        change: function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.selected = $event.target.multiple
+                            ? $$selectedVal
+                            : $$selectedVal[0]
+                        }
+                      }
+                    },
+                    [
+                      _vm._l(_vm.user[2], function(shift) {
+                        return [
+                          shift.worksite === _vm.user[0][0].worksiteID
+                            ? _c(
+                                "option",
+                                { domProps: { value: shift.type } },
+                                [
+                                  _vm._v(
+                                    "\n                            " +
+                                      _vm._s(shift.type) +
+                                      "\n                        "
+                                  )
+                                ]
+                              )
+                            : _vm._e()
+                        ]
+                      })
+                    ],
+                    2
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 rcorners1",
+                      attrs: { for: "workingDebut" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("startTime")))]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-sm-10" },
+                    [
+                      _vm._l(_vm.user[2], function(shift) {
+                        return [
+                          shift.type === _vm.selected
+                            ? _c("input", {
+                                staticClass: "form-control-plaintext rcorners2",
+                                attrs: {
+                                  type: "text",
+                                  id: "workingDebut",
+                                  readonly: ""
+                                },
+                                domProps: { value: shift.workingDebut }
+                              })
+                            : _vm._e()
+                        ]
+                      })
+                    ],
+                    2
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group row" }, [
+                  _c(
+                    "label",
+                    {
+                      staticClass: "col-sm-2 rcorners1",
+                      attrs: { for: "workingEnd" }
+                    },
+                    [_vm._v(_vm._s(_vm.$t("endTime")))]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-sm-10" },
+                    [
+                      _vm._l(_vm.user[2], function(shift) {
+                        return [
+                          shift.type === _vm.selected
+                            ? _c("input", {
+                                staticClass: "form-control-plaintext rcorners2",
+                                attrs: {
+                                  type: "text",
+                                  id: "workingEnd",
+                                  readonly: ""
+                                },
+                                domProps: { value: shift.workingEnd }
+                              })
+                            : _vm._e()
+                        ]
+                      })
+                    ],
+                    2
+                  )
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.user[3], function(productionLine) {
+                  return [
+                    productionLine.worksiteID === _vm.user[0][0].worksiteID
+                      ? [
+                          _c("div", { staticClass: "row production" }, [
+                            _c("div", { staticClass: "col" }, [
+                              _c(
+                                "p",
+                                {
+                                  staticClass:
+                                    "form-control-plaintext rcorners1",
+                                  attrs: { align: "center" }
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                                " +
+                                      _vm._s(_vm.$t("line")) +
+                                      " " +
+                                      _vm._s(
+                                        productionLine.productionline_name
+                                      ) +
+                                      "\n                            "
+                                  )
+                                ]
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _vm._m(0, true),
+                            _vm._v(" "),
+                            _vm._m(1, true)
+                          ]),
+                          _vm._v(" "),
+                          _c("br")
+                        ]
+                      : _vm._e()
+                  ]
+                }),
+                _vm._v(" "),
+                _c("div", { attrs: { align: "right" } }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass:
+                        "btn btn-primary border-success align-items-center btn-success",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.nextPage()
+                        }
+                      }
+                    },
+                    [_vm._v("\n                    OK\n                ")]
+                  )
+                ])
+              ],
+              2
+            )
           ]
-        }),
-        _vm._v(" "),
-        _c("div", { attrs: { align: "right" } }, [
-          _c(
-            "button",
-            {
-              staticClass:
-                "btn btn-primary border-success align-items-center btn-success",
-              attrs: { type: "button" },
-              on: {
-                click: function($event) {
-                  return _vm.nextPage()
-                }
-              }
-            },
-            [_vm._v("\n                OK\n            ")]
-          )
-        ])
-      ],
-      2
-    )
-  ])
+        : _vm._e()
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {

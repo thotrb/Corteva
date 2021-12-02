@@ -18,7 +18,6 @@
     <!-- Styles -->
     <style>
         html, body {
-            padding: 45px;
             background-color: #fff;
             color: #636b6f;
             font-family: 'Nunito', sans-serif;
@@ -27,13 +26,21 @@
             margin: 0;
         }
 
+        #pannel {
+            padding: 45px;
+        }
+
     </style>
 </head>
 <body>
 
 <div id="app">
 
-    <c-i-p_-declaration></c-i-p_-declaration>
+    <navbar-saisie></navbar-saisie>
+    <div id="pannel">
+        <c-i-p_-declaration></c-i-p_-declaration>
+
+    </div>
 
 
 </div>
