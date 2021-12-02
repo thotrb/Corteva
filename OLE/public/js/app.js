@@ -4834,7 +4834,7 @@ __webpack_require__.r(__webpack_exports__);
       var tab = [];
       tab.push(this.username);
       tab.push(this.password);
-      this.$store.dispatch('retrieveToken', tab); //var homeUrl = window.location.hostname + "8000";
+      this.$store.dispatch('retrieveToken', tab).then(function () {}); //var homeUrl = window.location.hostname + "8000";
 
       var username = document.getElementById("login").value; //console.log(homeUrl);
 
@@ -11597,7 +11597,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -12431,8 +12430,8 @@ var actions = {
 
       if (res.data.length > 0) {
         token = 'OK';
-        localStorage.setItem('access_token', token);
-        context.commit('RETREIVETOKEN', token);
+        localStorage.setItem('access_token', res.data);
+        context.commit('RETREIVETOKEN', res.data);
       }
     })["catch"](function (err) {
       console.log(err);

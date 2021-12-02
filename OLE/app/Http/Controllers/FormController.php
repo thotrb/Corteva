@@ -763,14 +763,31 @@ class FormController extends Controller
 
     public function log($username, $password)
     {
-
         $userInfo = DB::table('user')
             ->where('user.login', '=', $username)
             ->where('user.password', '=', $password)
-            ->get();
-        return response()->json($userInfo);
+            ->first();
+    
 
+        $response = "";
+        //User validated
+        if (response()->count() > 0) {
+            $serverName = "OLEServer";
+            $secretKey = env("SECRET_KEY");
+            $issuedAt = new DateTimeImmutable();
+            $expire = $issuedAt->modify("+12 hours")->getTimestamp();
+            $data = array(
+                "iat" => $issuedat_claim,
+                "iss" => $serverName,
+                "nbf" => $issuedAt->getTimestamp(),
+                "exp" => $expire,
+                "userName" => $userInfo->login
 
+            );
+            $response = JWT::encode($data, $secretKey, 'HS512');
+        }
+
+        return response()->$response;
     }
 
     public function saveUnplannedEvent(Request $request)

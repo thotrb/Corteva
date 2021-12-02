@@ -8,8 +8,8 @@ let actions = {
                 var token;
                 if (res.data.length > 0) {
                     token = 'OK';
-                    localStorage.setItem('access_token', token);
-                    context.commit('RETREIVETOKEN', token);
+                    localStorage.setItem('access_token', res.data);
+                    context.commit('RETREIVETOKEN', res.data);
                 }
 
             }).catch(err => {

@@ -44,7 +44,9 @@
                 tab.push(this.username);
                 tab.push(this.password);
 
-                this.$store.dispatch('retrieveToken', tab);
+                this.$store.dispatch('retrieveToken', tab).then(() => {
+                    
+                });
 
 
                 //var homeUrl = window.location.hostname + "8000";
