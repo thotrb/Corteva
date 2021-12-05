@@ -11,6 +11,11 @@ pool:
 
 variables:
   phpVersion: 7.2
+ 
+  # the name of your web app here is the same one you used above
+  # when you created the web app using the Azure CLI
+  appName: OLE_CalculationTool
+ 
 
 steps:
 - script: |
