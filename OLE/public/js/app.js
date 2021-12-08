@@ -8429,6 +8429,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -11454,7 +11457,6 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-//
 //
 //
 //
@@ -17880,7 +17882,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv[data-v-7a9be1b3] {\n    padding: 15px;\n    background-color: #fff;\n}\ndiv.main-container[data-v-7a9be1b3] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-7a9be1b3] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-7a9be1b3] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-7a9be1b3] {\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-7a9be1b3] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-7a9be1b3] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-7a9be1b3] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\n.content-title[data-v-7a9be1b3] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-7a9be1b3] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-7a9be1b3] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-7a9be1b3],\ndiv.bottom-panel[data-v-7a9be1b3] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-7a9be1b3],\ndiv.ql-format-panel[data-v-7a9be1b3] {\n    width: 50%;\n}\ntable.table[data-v-7a9be1b3] {\n}\nh1[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-7a9be1b3] {\n    font-size: 1em;\n    color: black;\n}\nh2[data-v-7a9be1b3] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-7a9be1b3] {\n    color: red;\n}\n.row[data-v-7a9be1b3] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-7a9be1b3] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\nh5[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-7a9be1b3] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.mainLine[data-v-7a9be1b3] {\n    border: 2px solid black;\n}\n.boxWeigher[data-v-7a9be1b3] {\n    background: palegoldenrod;\n}\n.caper[data-v-7a9be1b3] {\n    background: palegreen;\n}\n.labeler[data-v-7a9be1b3] {\n    background: paleturquoise;\n}\n.filler[data-v-7a9be1b3] {\n    background: palevioletred;\n}\n.qualityControl[data-v-7a9be1b3] {\n    background: lightpink;\n}\n.totalQty[data-v-7a9be1b3] {\n    background: papayawhip;\n}\n.machineDiagram[data-v-7a9be1b3] {\n    background: lightblue;\n    color: white;\n    align: center;\n}\nh3[data-v-7a9be1b3] {\n    align: center;\n}\ndiv.data[data-v-7a9be1b3] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-7a9be1b3]{\n    border-bottom: solid 1px;\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv[data-v-7a9be1b3] {\n    padding: 15px;\n    background-color: #fff;\n}\ndiv.main-container[data-v-7a9be1b3] {\n    flex-direction: column;\n    background-color: white;\n    padding: 20px;\n    min-width: 1000px;\n    border-radius: 5px;\n    margin: 20px 0px;\n}\ndiv.selection-menu[data-v-7a9be1b3] {\n    flex-direction: row;\n    padding: 20px 0px;\n    border-bottom: solid 1px;\n}\ndiv.site-pl-selection[data-v-7a9be1b3] {\n    flex-direction: column;\n    justify-content: space-evenly;\n    min-width: 200px;\n}\ndiv.site-pl-selection > div[data-v-7a9be1b3] {\n    align-items: center;\n}\ndiv.site-pl-selection select[data-v-7a9be1b3] {\n    width: 100%;\n}\ndiv.site-pl-selection label[data-v-7a9be1b3] {\n    margin: 0px 10px 0px 0px;\n}\ndiv.title-container[data-v-7a9be1b3] {\n    margin-top: 10px;\n    display: flex;\n    justify-content: center;\n}\n.content-title[data-v-7a9be1b3] {\n    font-size: 20px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\nspan.content-subtitle[data-v-7a9be1b3] {\n    font-size: 17px;\n    font-weight: bold;\n    color: black;\n    width: 100%;\n}\ndiv.content-panel[data-v-7a9be1b3] {\n    display: flex;\n    flex-direction: column;\n}\ndiv.upper-panel[data-v-7a9be1b3],\ndiv.bottom-panel[data-v-7a9be1b3] {\n    display: flex;\n    width: 100%;\n}\ndiv.ql-machine-panel[data-v-7a9be1b3],\ndiv.ql-format-panel[data-v-7a9be1b3] {\n    width: 50%;\n}\ntable.table[data-v-7a9be1b3] {\n}\nh1[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\nlabel[data-v-7a9be1b3] {\n    font-size: 1.4em;\n    color: #56baed;\n}\np[data-v-7a9be1b3] {\n    font-size: 1em;\n    color: black;\n}\nh2[data-v-7a9be1b3] {\n    font-size: 1.2em;\n    color: #56baed;\n}\nh4[data-v-7a9be1b3] {\n    color: red;\n}\n.row[data-v-7a9be1b3] {\n    background-color: #fff;\n    padding: 15px;\n}\nthead[data-v-7a9be1b3] {\n    color: white;\n    background: #56baed;\n}\n.container[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\nh5[data-v-7a9be1b3] {\n    margin-left: 60px;\n}\n.table-info-data[data-v-7a9be1b3] {\n    overflow: scroll;\n    max-height: 300px;\n}\n.mainLine[data-v-7a9be1b3] {\n    border: 2px solid black;\n}\n.boxWeigher[data-v-7a9be1b3] {\n    background: palegoldenrod;\n}\n.caper[data-v-7a9be1b3] {\n    background: palegreen;\n}\n.labeler[data-v-7a9be1b3] {\n    background: paleturquoise;\n}\n.filler[data-v-7a9be1b3] {\n    background: palevioletred;\n}\n.qualityControl[data-v-7a9be1b3] {\n    background: lightpink;\n}\n.totalQty[data-v-7a9be1b3] {\n    background: papayawhip;\n}\n.machineDiagram[data-v-7a9be1b3] {\n    background: lightblue;\n    color: white;\n    align: center;\n}\nh3[data-v-7a9be1b3] {\n    align: center;\n}\ndiv.data[data-v-7a9be1b3] {\n    flex-direction: column;\n    border: solid 1px;\n    border-radius: 5px;\n    padding: 10px 5px;\n}\ndiv.dataInput[data-v-7a9be1b3] {\n    border-bottom: solid 1px;\n}\n\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -62121,13 +62123,16 @@ var render = function() {
       _vm._m(0),
       _vm._v(" "),
       _c("div", { staticClass: "col-sm  border border-primary" }, [
-        _c("h3", { staticStyle: { "padding-top": "55px" } }, [
-          _vm._v(
-            "\n                QL = " +
-              _vm._s((_vm.quality * 100).toFixed(2)) +
-              " %\n            "
-          )
-        ])
+        _c(
+          "h3",
+          { staticStyle: { "padding-top": "55px" } },
+          [
+            _vm.show === 1
+              ? [_vm._v("\n                    QL = 100 %\n                ")]
+              : _vm._e()
+          ],
+          2
+        )
       ])
     ]),
     _vm._v(" "),
