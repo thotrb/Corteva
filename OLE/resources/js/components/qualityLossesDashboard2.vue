@@ -81,7 +81,10 @@
             </div>
             <div class="col-sm  border border-primary">
                 <h3 style="padding-top : 55px;">
-                    QL = {{(quality*100).toFixed(2)}} %
+                    <template v-if="show === 1">
+                        <!--QL = {{(quality*100).toFixed(2)}} %-->
+                        QL = 100 %
+                    </template>
                 </h3>
             </div>
 
@@ -1014,7 +1017,7 @@
         padding: 10px 5px;
     }
 
-    div.dataInput{
+    div.dataInput {
         border-bottom: solid 1px;
 
     }
