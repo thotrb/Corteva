@@ -67,7 +67,7 @@
                 </div>
                 <div class="chart-panel no-bottom-border rounded-top-right">
                     <div class="chart-container">
-                        <canvas class="chart" id="own-stop-sl-chart"></canvas>
+                        <canvas class="chart" id="filler-stop-sl-chart"></canvas>
                     </div>
                     
                 </div>
@@ -104,7 +104,7 @@
                 </div>
                 <div class="chart-panel rounded-bottom-right">
                     <div class="chart-container">
-                        <canvas class="chart" id="other-machine-sl-chart"></canvas>
+                        <canvas class="chart" id="reduced-rate-sl-chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -126,10 +126,10 @@
                 site: '',
                 productionLine: '',
                 chartObjects: {
-                    'own-stop': {
+                    'filler-stop': {
                         chart: undefined
                     },
-                    'other-machine': {
+                    'reduced-rate': {
                         chart: undefined
                     },
                     created: false
@@ -179,9 +179,8 @@
 
                 if (site && selectedPL && begDate && endDate) {
                     const params = [site, selectedPL, begDate, endDate];
-                    console.log(params);
                 
-                    this.$store.dispatch('fetchAllEvents', params).then(() => {
+                    this.$store.dispatch('getSpeedLosses', params).then(() => {
 
                         this.resolveAfter(1000).then(() => {
 
@@ -199,8 +198,8 @@
 
                             //Add fetched events to the slEvents variable
                             //Creates charts' data
-                            if (this.allEvents.SLEVENTS) {
-                                this.slEvents = this.allEvents.SLEVENTS.reduce((acc, slEvent) => {
+                            if (this.getSpeedLosses.SLEVENTS) {
+                                this.slEvents = this.getSpeedLosses.SLEVENTS.reduce((acc, slEvent) => {
                                     if (acc[slEvent.reason]) {
                                         //If event is concerned by a chart, create its data
                                         if (chartData[slEvent.reason]) {
@@ -220,7 +219,7 @@
                                 //Join table events
                                 this.slEventsByTable.reducedRate = [];
                                 this.slEventsByTable.fillerStop = [];
-                                for (let event of this.allEvents.SLEVENTS) {
+                                for (let event of this.getSpeedLosses.SLEVENTS) {
                                     if (this.dbNames.reducedRate.includes(event.reason)) {
                                         this.slEventsByTable.reducedRate.push(event);
                                     } else if (this.dbNames.fillerStop.includes(event.reason)) {
@@ -241,19 +240,19 @@
                             });
 
                             const map = {
-                                'Filler Own Stoppage': 'own-stop',
-                                'Filler Stop By Other Machine': 'other-machine',
-                                'Reduced Rate At Filler': 'own-stop',
-                                'Reduced Rate At An Other Machine': 'other-machine'
+                                'Filler Own Stoppage': 'filler-stop',
+                                'Filler Stop By Other Machine': 'filler-stop',
+                                'Reduced Rate At Filler': 'reduced-rate',
+                                'Reduced Rate At An Other Machine': 'reduced-rate'
                             }
 
                             //Update charts' data
                             let labels = {
-                                'own-stop': [
+                                'filler-stop': [
                                     this.$t("fillerOwnStop"),
                                     this.$t("fillerStopByOtherMachine")
                                 ],
-                                'other-machine': [
+                                'reduced-rate': [
                                     this.$t("reduceRateAtFiller"),
                                     this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")
                                 ]
@@ -277,7 +276,7 @@
 
             createCharts: function() {
                 this.chartObjects.created = true;
-                for (let slCat of ['own-stop', 'other-machine']) {
+                for (let slCat of ['filler-stop', 'reduced-rate']) {
                     this.chartObjects[slCat].chart = new Chart(slCat + '-sl-chart', {
                     type: 'bar',
                     data: {
@@ -343,7 +342,7 @@
         },
 
         computed: {
-            ...mapGetters(['sites', 'speedLoss', 'allEvents'])
+            ...mapGetters(['sites', 'speedLoss', 'getSpeedLosses'])
         },
 
         components: {

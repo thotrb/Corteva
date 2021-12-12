@@ -44,6 +44,7 @@ module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
     var requestData = config.data;
     var requestHeaders = config.headers;
+    var responseType = config.responseType;
 
     if (utils.isFormData(requestData)) {
       delete requestHeaders['Content-Type']; // Let the browser set it
@@ -64,23 +65,14 @@ module.exports = function xhrAdapter(config) {
     // Set the request timeout in MS
     request.timeout = config.timeout;
 
-    // Listen for ready state
-    request.onreadystatechange = function handleLoad() {
-      if (!request || request.readyState !== 4) {
+    function onloadend() {
+      if (!request) {
         return;
       }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
       // Prepare the response
       var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
+        request.responseText : request.response;
       var response = {
         data: responseData,
         status: request.status,
@@ -94,7 +86,30 @@ module.exports = function xhrAdapter(config) {
 
       // Clean up request
       request = null;
-    };
+    }
+
+    if ('onloadend' in request) {
+      // Use onloadend if available
+      request.onloadend = onloadend;
+    } else {
+      // Listen for ready state to emulate onloadend
+      request.onreadystatechange = function handleLoad() {
+        if (!request || request.readyState !== 4) {
+          return;
+        }
+
+        // The request errored out and we didn't get a response, this will be
+        // handled by onerror instead
+        // With one exception: request that using file: protocol, most browsers
+        // will return status as 0 even though it's a successful request
+        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+          return;
+        }
+        // readystate handler is calling before onerror or ontimeout handlers,
+        // so we should call onloadend on the next 'tick'
+        setTimeout(onloadend);
+      };
+    }
 
     // Handle browser request cancellation (as opposed to a manual cancellation)
     request.onabort = function handleAbort() {
@@ -124,7 +139,10 @@ module.exports = function xhrAdapter(config) {
       if (config.timeoutErrorMessage) {
         timeoutErrorMessage = config.timeoutErrorMessage;
       }
-      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
+      reject(createError(
+        timeoutErrorMessage,
+        config,
+        config.transitional && config.transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
         request));
 
       // Clean up request
@@ -164,16 +182,8 @@ module.exports = function xhrAdapter(config) {
     }
 
     // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
+    if (responseType && responseType !== 'json') {
+      request.responseType = config.responseType;
     }
 
     // Handle progress if needed
@@ -407,7 +417,9 @@ var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/ax
 var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios/lib/core/InterceptorManager.js");
 var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios/lib/core/dispatchRequest.js");
 var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
+var validator = __webpack_require__(/*! ../helpers/validator */ "./node_modules/axios/lib/helpers/validator.js");
 
+var validators = validator.validators;
 /**
  * Create a new instance of Axios
  *
@@ -447,20 +459,71 @@ Axios.prototype.request = function request(config) {
     config.method = 'get';
   }
 
-  // Hook up interceptors middleware
-  var chain = [dispatchRequest, undefined];
-  var promise = Promise.resolve(config);
+  var transitional = config.transitional;
 
+  if (transitional !== undefined) {
+    validator.assertOptions(transitional, {
+      silentJSONParsing: validators.transitional(validators.boolean, '1.0.0'),
+      forcedJSONParsing: validators.transitional(validators.boolean, '1.0.0'),
+      clarifyTimeoutError: validators.transitional(validators.boolean, '1.0.0')
+    }, false);
+  }
+
+  // filter out skipped interceptors
+  var requestInterceptorChain = [];
+  var synchronousRequestInterceptors = true;
   this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+      return;
+    }
+
+    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+
+    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
   });
 
+  var responseInterceptorChain = [];
   this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    chain.push(interceptor.fulfilled, interceptor.rejected);
+    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
   });
 
-  while (chain.length) {
-    promise = promise.then(chain.shift(), chain.shift());
+  var promise;
+
+  if (!synchronousRequestInterceptors) {
+    var chain = [dispatchRequest, undefined];
+
+    Array.prototype.unshift.apply(chain, requestInterceptorChain);
+    chain = chain.concat(responseInterceptorChain);
+
+    promise = Promise.resolve(config);
+    while (chain.length) {
+      promise = promise.then(chain.shift(), chain.shift());
+    }
+
+    return promise;
+  }
+
+
+  var newConfig = config;
+  while (requestInterceptorChain.length) {
+    var onFulfilled = requestInterceptorChain.shift();
+    var onRejected = requestInterceptorChain.shift();
+    try {
+      newConfig = onFulfilled(newConfig);
+    } catch (error) {
+      onRejected(error);
+      break;
+    }
+  }
+
+  try {
+    promise = dispatchRequest(newConfig);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  while (responseInterceptorChain.length) {
+    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
   }
 
   return promise;
@@ -522,10 +585,12 @@ function InterceptorManager() {
  *
  * @return {Number} An ID used to remove interceptor later
  */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
   this.handlers.push({
     fulfilled: fulfilled,
-    rejected: rejected
+    rejected: rejected,
+    synchronous: options ? options.synchronous : false,
+    runWhen: options ? options.runWhen : null
   });
   return this.handlers.length - 1;
 };
@@ -658,7 +723,8 @@ module.exports = function dispatchRequest(config) {
   config.headers = config.headers || {};
 
   // Transform request data
-  config.data = transformData(
+  config.data = transformData.call(
+    config,
     config.data,
     config.headers,
     config.transformRequest
@@ -684,7 +750,8 @@ module.exports = function dispatchRequest(config) {
     throwIfCancellationRequested(config);
 
     // Transform response data
-    response.data = transformData(
+    response.data = transformData.call(
+      config,
       response.data,
       response.headers,
       config.transformResponse
@@ -697,7 +764,8 @@ module.exports = function dispatchRequest(config) {
 
       // Transform response data
       if (reason && reason.response) {
-        reason.response.data = transformData(
+        reason.response.data = transformData.call(
+          config,
           reason.response.data,
           reason.response.headers,
           config.transformResponse
@@ -909,6 +977,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
+var defaults = __webpack_require__(/*! ./../defaults */ "./node_modules/axios/lib/defaults.js");
 
 /**
  * Transform the data for a request or a response
@@ -919,9 +988,10 @@ var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/util
  * @returns {*} The resulting transformed data
  */
 module.exports = function transformData(data, headers, fns) {
+  var context = this || defaults;
   /*eslint no-param-reassign:0*/
   utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
+    data = fn.call(context, data, headers);
   });
 
   return data;
@@ -942,6 +1012,7 @@ module.exports = function transformData(data, headers, fns) {
 
 var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
 var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ "./node_modules/axios/lib/helpers/normalizeHeaderName.js");
+var enhanceError = __webpack_require__(/*! ./core/enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -965,12 +1036,35 @@ function getDefaultAdapter() {
   return adapter;
 }
 
+function stringifySafely(rawValue, parser, encoder) {
+  if (utils.isString(rawValue)) {
+    try {
+      (parser || JSON.parse)(rawValue);
+      return utils.trim(rawValue);
+    } catch (e) {
+      if (e.name !== 'SyntaxError') {
+        throw e;
+      }
+    }
+  }
+
+  return (encoder || JSON.stringify)(rawValue);
+}
+
 var defaults = {
+
+  transitional: {
+    silentJSONParsing: true,
+    forcedJSONParsing: true,
+    clarifyTimeoutError: false
+  },
+
   adapter: getDefaultAdapter(),
 
   transformRequest: [function transformRequest(data, headers) {
     normalizeHeaderName(headers, 'Accept');
     normalizeHeaderName(headers, 'Content-Type');
+
     if (utils.isFormData(data) ||
       utils.isArrayBuffer(data) ||
       utils.isBuffer(data) ||
@@ -987,20 +1081,32 @@ var defaults = {
       setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
       return data.toString();
     }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
+    if (utils.isObject(data) || (headers && headers['Content-Type'] === 'application/json')) {
+      setContentTypeIfUnset(headers, 'application/json');
+      return stringifySafely(data);
     }
     return data;
   }],
 
   transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
+    var transitional = this.transitional;
+    var silentJSONParsing = transitional && transitional.silentJSONParsing;
+    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
+    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
+
+    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
       try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
+        return JSON.parse(data);
+      } catch (e) {
+        if (strictJSONParsing) {
+          if (e.name === 'SyntaxError') {
+            throw enhanceError(e, this, 'E_JSON_PARSE');
+          }
+          throw e;
+        }
+      }
     }
+
     return data;
   }],
 
@@ -1483,6 +1589,122 @@ module.exports = function spread(callback) {
 
 /***/ }),
 
+/***/ "./node_modules/axios/lib/helpers/validator.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/axios/lib/helpers/validator.js ***!
+  \*****************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var pkg = __webpack_require__(/*! ./../../package.json */ "./node_modules/axios/package.json");
+
+var validators = {};
+
+// eslint-disable-next-line func-names
+['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
+  validators[type] = function validator(thing) {
+    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
+  };
+});
+
+var deprecatedWarnings = {};
+var currentVerArr = pkg.version.split('.');
+
+/**
+ * Compare package versions
+ * @param {string} version
+ * @param {string?} thanVersion
+ * @returns {boolean}
+ */
+function isOlderVersion(version, thanVersion) {
+  var pkgVersionArr = thanVersion ? thanVersion.split('.') : currentVerArr;
+  var destVer = version.split('.');
+  for (var i = 0; i < 3; i++) {
+    if (pkgVersionArr[i] > destVer[i]) {
+      return true;
+    } else if (pkgVersionArr[i] < destVer[i]) {
+      return false;
+    }
+  }
+  return false;
+}
+
+/**
+ * Transitional option validator
+ * @param {function|boolean?} validator
+ * @param {string?} version
+ * @param {string} message
+ * @returns {function}
+ */
+validators.transitional = function transitional(validator, version, message) {
+  var isDeprecated = version && isOlderVersion(version);
+
+  function formatMessage(opt, desc) {
+    return '[Axios v' + pkg.version + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
+  }
+
+  // eslint-disable-next-line func-names
+  return function(value, opt, opts) {
+    if (validator === false) {
+      throw new Error(formatMessage(opt, ' has been removed in ' + version));
+    }
+
+    if (isDeprecated && !deprecatedWarnings[opt]) {
+      deprecatedWarnings[opt] = true;
+      // eslint-disable-next-line no-console
+      console.warn(
+        formatMessage(
+          opt,
+          ' has been deprecated since v' + version + ' and will be removed in the near future'
+        )
+      );
+    }
+
+    return validator ? validator(value, opt, opts) : true;
+  };
+};
+
+/**
+ * Assert object's properties type
+ * @param {object} options
+ * @param {object} schema
+ * @param {boolean?} allowUnknown
+ */
+
+function assertOptions(options, schema, allowUnknown) {
+  if (typeof options !== 'object') {
+    throw new TypeError('options must be an object');
+  }
+  var keys = Object.keys(options);
+  var i = keys.length;
+  while (i-- > 0) {
+    var opt = keys[i];
+    var validator = schema[opt];
+    if (validator) {
+      var value = options[opt];
+      var result = value === undefined || validator(value, opt, options);
+      if (result !== true) {
+        throw new TypeError('option ' + opt + ' must be ' + result);
+      }
+      continue;
+    }
+    if (allowUnknown !== true) {
+      throw Error('Unknown option ' + opt);
+    }
+  }
+}
+
+module.exports = {
+  isOlderVersion: isOlderVersion,
+  assertOptions: assertOptions,
+  validators: validators
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/axios/lib/utils.js":
 /*!*****************************************!*\
   !*** ./node_modules/axios/lib/utils.js ***!
@@ -1493,8 +1715,6 @@ module.exports = function spread(callback) {
 
 
 var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-
-/*global toString:true*/
 
 // utils is a library of generic helper functions non-specific to axios
 
@@ -1679,7 +1899,7 @@ function isURLSearchParams(val) {
  * @returns {String} The String freed of excess whitespace
  */
 function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 }
 
 /**
@@ -1842,6 +2062,17 @@ module.exports = {
   stripBOM: stripBOM
 };
 
+
+/***/ }),
+
+/***/ "./node_modules/axios/package.json":
+/*!*****************************************!*\
+  !*** ./node_modules/axios/package.json ***!
+  \*****************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ }),
 
@@ -10893,7 +11124,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
               _this3.sequencesCIP[pair].totalDuration += _event.total_duration;
               _this3.sequencesCIP[pair].number++;
-              _this3.sequencesCIP[pair].avgDuration = _this3.sequencesCIP[pair].totalDuration / _this3.sequencesCIP[pair].number; //Calculate standard deviation
+              _this3.sequencesCIP[pair].avgDuration = (_this3.sequencesCIP[pair].totalDuration / _this3.sequencesCIP[pair].number).toFixed(2); //Calculate standard deviation
 
               var std = 0;
               var mean = _this3.sequencesCIP[pair].avgDuration;
@@ -10946,7 +11177,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
               _this3.sequencesCOV[type].totalDuration += _event2.total_duration;
               _this3.sequencesCOV[type].number++;
-              _this3.sequencesCOV[type].avgDuration = _this3.sequencesCOV[type].totalDuration / _this3.sequencesCOV[type].number; //Calculate standard deviation
+              _this3.sequencesCOV[type].avgDuration = (_this3.sequencesCOV[type].totalDuration / _this3.sequencesCOV[type].number).toFixed(2); //Calculate standard deviation
 
               var _std = 0;
               var _mean = _this3.sequencesCOV[type].avgDuration;
@@ -11577,10 +11808,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       site: '',
       productionLine: '',
       chartObjects: {
-        'own-stop': {
+        'filler-stop': {
           chart: undefined
         },
-        'other-machine': {
+        'reduced-rate': {
           chart: undefined
         },
         created: false
@@ -11640,8 +11871,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
       if (site && selectedPL && begDate && endDate) {
         var params = [site, selectedPL, begDate, endDate];
-        console.log(params);
-        this.$store.dispatch('fetchAllEvents', params).then(function () {
+        this.$store.dispatch('getSpeedLosses', params).then(function () {
           _this.resolveAfter(1000).then(function () {
             if (!_this.chartObjects.created) _this.createCharts(); //Reinitialize slEvents as empty arrays
 
@@ -11668,8 +11898,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             }; //Add fetched events to the slEvents variable
             //Creates charts' data
 
-            if (_this.allEvents.SLEVENTS) {
-              _this.slEvents = _this.allEvents.SLEVENTS.reduce(function (acc, slEvent) {
+            if (_this.getSpeedLosses.SLEVENTS) {
+              _this.slEvents = _this.getSpeedLosses.SLEVENTS.reduce(function (acc, slEvent) {
                 if (acc[slEvent.reason]) {
                   //If event is concerned by a chart, create its data
                   if (chartData[slEvent.reason]) {
@@ -11689,7 +11919,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               _this.slEventsByTable.reducedRate = [];
               _this.slEventsByTable.fillerStop = [];
 
-              var _iterator = _createForOfIteratorHelper(_this.allEvents.SLEVENTS),
+              var _iterator = _createForOfIteratorHelper(_this.getSpeedLosses.SLEVENTS),
                   _step;
 
               try {
@@ -11718,15 +11948,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               slCat.percentage = (slCat.totalDuration / totalSpeedLossDuration * 100).toFixed(2);
             });
             var map = {
-              'Filler Own Stoppage': 'own-stop',
-              'Filler Stop By Other Machine': 'other-machine',
-              'Reduced Rate At Filler': 'own-stop',
-              'Reduced Rate At An Other Machine': 'other-machine'
+              'Filler Own Stoppage': 'filler-stop',
+              'Filler Stop By Other Machine': 'filler-stop',
+              'Reduced Rate At Filler': 'reduced-rate',
+              'Reduced Rate At An Other Machine': 'reduced-rate'
             }; //Update charts' data
 
             var labels = {
-              'own-stop': [_this.$t("fillerOwnStop"), _this.$t("fillerStopByOtherMachine")],
-              'other-machine': [_this.$t("reduceRateAtFiller"), _this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")]
+              'filler-stop': [_this.$t("fillerOwnStop"), _this.$t("fillerStopByOtherMachine")],
+              'reduced-rate': [_this.$t("reduceRateAtFiller"), _this.$t("reduceRateAtFillerDueToAnotherMachineCapacity")]
             };
             Object.keys(map).forEach(function (key) {
               _this.chartObjects[map[key]].chart.data.datasets[0].data = [];
@@ -11748,7 +11978,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     createCharts: function createCharts() {
       this.chartObjects.created = true;
 
-      for (var _i = 0, _arr = ['own-stop', 'other-machine']; _i < _arr.length; _i++) {
+      for (var _i = 0, _arr = ['filler-stop', 'reduced-rate']; _i < _arr.length; _i++) {
         var slCat = _arr[_i];
         this.chartObjects[slCat].chart = new Chart(slCat + '-sl-chart', {
           type: 'bar',
@@ -11807,7 +12037,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     chartJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/chart.js');
     document.head.appendChild(chartJs);
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss', 'allEvents'])),
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(['sites', 'speedLoss', 'getSpeedLosses'])),
   components: {
     ProductionWindow: _productionWindow_vue__WEBPACK_IMPORTED_MODULE_0__.default
   },
@@ -12521,8 +12751,16 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason: function fetchDowntimeReason(_ref12, parameters) {
+  getSpeedLosses: function getSpeedLosses(_ref12, parameters) {
     var commit = _ref12.commit;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/getSpeedLosses/".concat(parameters[0], "/").concat(parameters[1], "/").concat(parameters[2], "/").concat(parameters[3])).then(function (res) {
+      commit('GET_SPEED_LOSSES', res.data);
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  },
+  fetchDowntimeReason: function fetchDowntimeReason(_ref13, parameters) {
+    var commit = _ref13.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/summary/".concat(parameters[0], "/").concat(parameters[1])).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS', res.data);
@@ -12530,8 +12768,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref13, parameters) {
-    var commit = _ref13.commit;
+  fetchDowntimeReason_2: function fetchDowntimeReason_2(_ref14, parameters) {
+    var commit = _ref14.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/".concat(parameters[0], "/").concat(parameters[1], "/unplannedDowntime")).then(function (res) {
       console.log('Je passe ici');
       console.log(res.data);
@@ -12540,8 +12778,8 @@ var actions = {
       console.log(err);
     });
   },
-  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref14, machineName) {
-    var commit = _ref14.commit;
+  fetchDowntimeReason_Machine_Issue: function fetchDowntimeReason_Machine_Issue(_ref15, machineName) {
+    var commit = _ref15.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/unplannedDowntime/unplannedDowntime/".concat(machineName)).then(function (res) {
       console.log(res.data);
       commit('FETCH_DOWNTIME_REASONS_MACHINE_ISSUE', res.data);
@@ -12549,56 +12787,56 @@ var actions = {
       console.log(err);
     });
   },
-  getWorksiteID: function getWorksiteID(_ref15, worksite) {
-    var commit = _ref15.commit;
+  getWorksiteID: function getWorksiteID(_ref16, worksite) {
+    var commit = _ref16.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/worksiteID/".concat(worksite)).then(function (res) {
       commit('FETCH_WORKSITEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getPerformanceForASite: function getPerformanceForASite(_ref16, PO) {
-    var commit = _ref16.commit;
+  getPerformanceForASite: function getPerformanceForASite(_ref17, PO) {
+    var commit = _ref17.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/performance/".concat(PO)).then(function (res) {
       commit('FETCH_PERFORMANCE_INDEXES', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getProductionlineID: function getProductionlineID(_ref17, productionline) {
-    var commit = _ref17.commit;
+  getProductionlineID: function getProductionlineID(_ref18, productionline) {
+    var commit = _ref18.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/productionlineID/".concat(productionline)).then(function (res) {
       commit('FETCH_PRODUCTIONLINEID', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkAssignation: function checkAssignation(_ref18, assignation) {
-    var commit = _ref18.commit;
+  checkAssignation: function checkAssignation(_ref19, assignation) {
+    var commit = _ref19.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/assignation/".concat(assignation.username, "/").concat(assignation.po, "/").concat(assignation.productionline)).then(function (res) {
       commit('FECTH_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  checkPO: function checkPO(_ref19, po) {
-    var commit = _ref19.commit;
+  checkPO: function checkPO(_ref20, po) {
+    var commit = _ref20.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/po/".concat(po)).then(function (res) {
       commit('FECTH_CHECKPO', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  getNetOPTime: function getNetOPTime(_ref20, GMID) {
-    var commit = _ref20.commit;
+  getNetOPTime: function getNetOPTime(_ref21, GMID) {
+    var commit = _ref21.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/netOP/".concat(GMID)).then(function (res) {
       commit('FETCH_NETOP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_PO: function create_PO(_ref21, potab) {
-    var commit = _ref21.commit;
+  create_PO: function create_PO(_ref22, potab) {
+    var commit = _ref22.commit;
 
     for (var i = 0; i < potab.length; i++) {
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/PO", potab[i]).then(function (res) {
@@ -12608,56 +12846,56 @@ var actions = {
       });
     }
   },
-  storeAssignation: function storeAssignation(_ref22, assignation) {
-    var commit = _ref22.commit;
+  storeAssignation: function storeAssignation(_ref23, assignation) {
+    var commit = _ref23.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/assignation", assignation).then(function (res) {
       commit('CREATE_ASSIGNATION', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref23, event) {
-    var commit = _ref23.commit;
+  create_UnplannedEvent_Changingformat: function create_UnplannedEvent_Changingformat(_ref24, event) {
+    var commit = _ref24.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/changingFormat", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CHANGINGFORMAT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref24, event) {
-    var commit = _ref24.commit;
+  create_UnplannedEvent_Clientchanging: function create_UnplannedEvent_Clientchanging(_ref25, event) {
+    var commit = _ref25.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/clientChanging", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CLIENTCHANGING', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref25, event) {
-    var commit = _ref25.commit;
+  create_UnplannedEvent_CIP: function create_UnplannedEvent_CIP(_ref26, event) {
+    var commit = _ref26.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/CIP", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_CIP', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref26, event) {
-    var commit = _ref26.commit;
+  create_UnplannedEvent_UnplannedDowntime: function create_UnplannedEvent_UnplannedDowntime(_ref27, event) {
+    var commit = _ref27.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/unplannedEvent/unplannedDowntime", event).then(function (res) {
       commit('CREATE_UNPLANNEDEVENT_UNPLANNEDDOWNTIME', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  create_plannedEvent: function create_plannedEvent(_ref27, event) {
-    var commit = _ref27.commit;
+  create_plannedEvent: function create_plannedEvent(_ref28, event) {
+    var commit = _ref28.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/plannedEvent", event).then(function (res) {
       commit('CREATE_PLANNEDEVENT', res.data);
     })["catch"](function (err) {
       console.log(err);
     });
   },
-  stop_PO: function stop_PO(_ref28, array) {
-    var commit = _ref28.commit;
+  stop_PO: function stop_PO(_ref29, array) {
+    var commit = _ref29.commit;
     var PO = array[0];
     var availability = array[1];
     var performance = array[2];
@@ -12671,8 +12909,8 @@ var actions = {
       console.log(err);
     });
   },
-  store_Rejection: function store_Rejection(_ref29, rejection) {
-    var commit = _ref29.commit;
+  store_Rejection: function store_Rejection(_ref30, rejection) {
+    var commit = _ref30.commit;
 
     /**  var po = array[0];
       var labelerCounter =  array[1];
@@ -12692,8 +12930,8 @@ var actions = {
       console.log(err);
     });
   },
-  create_SpeedLoss: function create_SpeedLoss(_ref30, event) {
-    var commit = _ref30.commit;
+  create_SpeedLoss: function create_SpeedLoss(_ref31, event) {
+    var commit = _ref31.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/speedLoss", event).then(function (res) {
       commit('CREATE_SPEEDLOSS', res.data);
     })["catch"](function (err) {
@@ -12755,6 +12993,9 @@ var getters = {
   },
   speedLoss: function speedLoss(state) {
     return state.speedLoss;
+  },
+  getSpeedLosses: function getSpeedLosses(state) {
+    return state.getSpeedLosses;
   },
   volumes: function volumes(state) {
     return state.volumes;
@@ -12937,6 +13178,9 @@ var mutations = {
   },
   RETREIVETOKEN: function RETREIVETOKEN(state, token) {
     state.token = token;
+  },
+  GET_SPEED_LOSSES: function GET_SPEED_LOSSES(state, sl) {
+    state.getSpeedLosses = sl;
   }
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (mutations);
@@ -12983,7 +13227,8 @@ var state = {
   REJECTION: [],
   unplannedDowntimeMachineShutdownTypes: [],
   qualityLosses: [],
-  performanceIndexes: []
+  performanceIndexes: [],
+  getSpeedLosses: []
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (state);
 
@@ -65505,7 +65750,7 @@ var staticRenderFns = [
         _c("div", { staticClass: "chart-container" }, [
           _c("canvas", {
             staticClass: "chart",
-            attrs: { id: "own-stop-sl-chart" }
+            attrs: { id: "filler-stop-sl-chart" }
           })
         ])
       ]
@@ -65519,7 +65764,7 @@ var staticRenderFns = [
       _c("div", { staticClass: "chart-container" }, [
         _c("canvas", {
           staticClass: "chart",
-          attrs: { id: "other-machine-sl-chart" }
+          attrs: { id: "reduced-rate-sl-chart" }
         })
       ])
     ])
