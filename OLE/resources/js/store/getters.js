@@ -61,6 +61,10 @@ let getters = {
         return state.speedLoss
     },
 
+    getSpeedLosses: state => {
+        return state.getSpeedLosses
+    },
+
     volumes: state => {
 
         return state.volumes;

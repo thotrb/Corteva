@@ -158,6 +158,15 @@ let actions = {
         })
     },
 
+    getSpeedLosses({commit}, parameters) {
+        axios.get(`/api/getSpeedLosses/${parameters[0]}/${parameters[1]}/${parameters[2]}/${parameters[3]}`)
+            .then(res => {
+                commit('GET_SPEED_LOSSES', res.data);
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
 
     fetchDowntimeReason({commit}, parameters) {
         axios.get(`/api/summary/${parameters[0]}/${parameters[1]}`)

@@ -89,6 +89,8 @@ Route::post('plannedEvent', FormController::class.'@savePlannedEvent');
 
 Route::post('speedLoss', FormController::class.'@saveSpeedLoss');
 
+Route::get('getSpeedLosses/{site}/{productionLine}/{beginningDate}/{endingDate}', FormController::class.'@getSpeedLosses');
+
 
 
 

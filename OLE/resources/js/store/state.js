@@ -28,7 +28,8 @@ let state = {
     REJECTION: [],
     unplannedDowntimeMachineShutdownTypes: [],
     qualityLosses: [],
-    performanceIndexes: []
+    performanceIndexes: [],
+    getSpeedLosses: []
 };
 
 export default state
