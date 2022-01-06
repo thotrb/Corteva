@@ -570,8 +570,8 @@ export default {
             this.sequencesCIP[pair].totalDuration += event.total_duration;
             this.sequencesCIP[pair].number++;
             this.sequencesCIP[pair].avgDuration =
-              this.sequencesCIP[pair].totalDuration /
-              this.sequencesCIP[pair].number;
+              (this.sequencesCIP[pair].totalDuration /
+              this.sequencesCIP[pair].number).toFixed(2);
 
             //Calculate standard deviation
             let std = 0;
@@ -601,8 +601,8 @@ export default {
             this.sequencesCOV[type].totalDuration += event.total_duration;
             this.sequencesCOV[type].number++;
             this.sequencesCOV[type].avgDuration =
-              this.sequencesCOV[type].totalDuration /
-              this.sequencesCOV[type].number;
+              (this.sequencesCOV[type].totalDuration /
+              this.sequencesCOV[type].number).toFixed(2);
 
             //Calculate standard deviation
             let std = 0;

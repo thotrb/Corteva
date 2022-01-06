@@ -8,8 +8,8 @@ let actions = {
                 var token;
                 if (res.data.length > 0) {
                     token = 'OK';
-                    localStorage.setItem('access_token', token);
-                    context.commit('RETREIVETOKEN', token);
+                    localStorage.setItem('access_token', res.data);
+                    context.commit('RETREIVETOKEN', res.data);
                 }
 
             }).catch(err => {
@@ -153,6 +153,15 @@ let actions = {
         axios.get(`/api/speedLosses/${parameters[1]}/${parameters[0]}`)
             .then(res => {
                 commit('FETCH_SPEEDLOSSES', res.data);
+            }).catch(err => {
+            console.log(err)
+        })
+    },
+
+    getSpeedLosses({commit}, parameters) {
+        axios.get(`/api/getSpeedLosses/${parameters[0]}/${parameters[1]}/${parameters[2]}/${parameters[3]}`)
+            .then(res => {
+                commit('GET_SPEED_LOSSES', res.data);
             }).catch(err => {
             console.log(err)
         })

@@ -140,6 +140,10 @@ let mutations = {
         state.token = token;
     },
 
+    GET_SPEED_LOSSES(state, sl) {
+        state.getSpeedLosses = sl;
+    }
+
 
 
 
